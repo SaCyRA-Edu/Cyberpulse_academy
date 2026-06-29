@@ -206,7 +206,7 @@ class _LessonScreenState extends State<LessonScreen> {
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: passed ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+        color: passed ? Colors.green.withValues(alpha: 0.1) : Colors.orange.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: passed ? Colors.green : Colors.orange,
@@ -270,9 +270,9 @@ class _LessonScreenState extends State<LessonScreen> {
     Color? tileColor;
     if (_submitted) {
       if (optIndex == q.correctIndex) {
-        tileColor = Colors.green.withOpacity(0.15);
+        tileColor = Colors.green.withValues(alpha: 0.15);
       } else if (optIndex == selected) {
-        tileColor = Colors.red.withOpacity(0.15);
+        tileColor = Colors.red.withValues(alpha: 0.15);
       }
     }
 

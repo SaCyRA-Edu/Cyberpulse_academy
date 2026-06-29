@@ -222,9 +222,9 @@ class _LevelExamScreenState extends State<LevelExamScreen> {
     Color? tileColor;
     if (_currentAnswered) {
       if (optIndex == q.correctIndex) {
-        tileColor = Colors.green.withOpacity(0.15);
+        tileColor = Colors.green.withValues(alpha: 0.15);
       } else if (optIndex == _currentSelection) {
-        tileColor = Colors.red.withOpacity(0.15);
+        tileColor = Colors.red.withValues(alpha: 0.15);
       }
     }
 
@@ -257,7 +257,7 @@ class _LevelExamScreenState extends State<LevelExamScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: passed ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+              color: passed ? Colors.green.withValues(alpha: 0.1) : Colors.orange.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: passed ? Colors.green : Colors.orange),
             ),
@@ -377,7 +377,7 @@ class _DifficultyChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: _color.withOpacity(0.15),
+        color: _color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(

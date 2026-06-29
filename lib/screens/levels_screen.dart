@@ -83,7 +83,8 @@ class _LevelsScreenState extends State<LevelsScreen> {
           FilledButton(
             onPressed: () async {
               await ProgressService.markLevelPurchased(levelIndex);
-              if (context.mounted) Navigator.pop(context);
+              if (!context.mounted) return;
+              Navigator.pop(context);
               _refresh();
             },
             child: const Text('Simulate Purchase (Dev Only)'),
@@ -273,7 +274,7 @@ class _PriceBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: isFree ? Colors.green.withOpacity(0.15) : Colors.amber.withOpacity(0.2),
+        color: isFree ? Colors.green.withValues(alpha: 0.15) : Colors.amber.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(

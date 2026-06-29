@@ -59,7 +59,7 @@ class LevelDetailScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Card(
-            color: Colors.blue.withOpacity(0.06),
+            color: Colors.blue.withValues(alpha: 0.06),
             child: ListTile(
               leading: const Icon(Icons.quiz, color: Colors.blue),
               title: Text('${level.title} Exam (Adaptive)'),

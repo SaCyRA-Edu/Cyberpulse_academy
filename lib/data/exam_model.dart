@@ -1,10 +1,10 @@
-/// Model for the adaptive Level Exams (distinct from the lighter per-module
-/// practice quizzes in lesson_model.dart).
-///
-/// Each [ExamQuestion] is tagged with a [Difficulty]. The exam engine
-/// (see LevelExamScreen) starts at medium difficulty and adjusts the next
-/// question up or down based on whether the previous answer was correct —
-/// a simple, transparent, rule-based form of adaptive testing.
+// Model for the adaptive Level Exams (distinct from the lighter per-module
+// practice quizzes in lesson_model.dart).
+//
+// Each [ExamQuestion] is tagged with a [Difficulty]. The exam engine
+// (see LevelExamScreen) starts at medium difficulty and adjusts the next
+// question up or down based on whether the previous answer was correct —
+// a simple, transparent, rule-based form of adaptive testing.
 
 enum Difficulty { easy, medium, hard }
 

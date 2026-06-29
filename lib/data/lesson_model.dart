@@ -1,8 +1,8 @@
-/// Shared content models used across all modules.
-///
-/// A [Lesson] is made up of [LessonSection]s (heading + paragraph + optional
-/// bullet list). A lesson may also carry a [quiz] — when it does,
-/// LessonScreen renders an interactive quiz instead of plain reading content.
+// Shared content models used across all modules.
+//
+// A [Lesson] is made up of [LessonSection]s (heading + paragraph + optional
+// bullet list). A lesson may also carry a [quiz] — when it does,
+// LessonScreen renders an interactive quiz instead of plain reading content.
 
 class LessonSection {
   final String? heading;
