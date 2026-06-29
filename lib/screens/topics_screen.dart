@@ -11,7 +11,6 @@ class TopicsScreen extends StatefulWidget {
 }
 
 class _TopicsScreenState extends State<TopicsScreen> {
-  List<String?> _lockReasons = [];
   Map<int, double?> _bestScoresByLevel = {};
   bool _loading = true;
 
@@ -22,18 +21,11 @@ class _TopicsScreenState extends State<TopicsScreen> {
   }
 
   Future<void> _refresh() async {
-    final reasons = <String?>[];
     final scores = <int, double?>{};
     for (final entry in allTopics) {
-      final reason = await ProgressService.getLockReason(
-        levelIndex: entry.levelIndex,
-        levelIsFree: entry.level.isFree,
-      );
-      reasons.add(reason);
       scores[entry.levelIndex] = await ProgressService.getBestScore(entry.levelIndex);
     }
     setState(() {
-      _lockReasons = reasons;
       _bestScoresByLevel = scores;
       _loading = false;
     });
@@ -50,64 +42,12 @@ class _TopicsScreenState extends State<TopicsScreen> {
           'privilege, defense in depth, Zero Trust, and more — apply '
           'across platforms and aren\'t tied to any single certification '
           'body or vendor product.\n\n'
-          'Each topic below is tagged with the level it belongs to. '
-          'Beginner is free; Intermediate, Advanced, and Expert unlock '
-          'once you pass the previous level\'s exam at 80%+.',
+          'Beginner topics are free and open. Intermediate, Advanced, and '
+          'Expert topics unlock once you pass the previous level\'s exam '
+          'at 80%+ — open one of those topics to see what\'s needed.',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Got it'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showUpgradeDialog(TopicEntry entry) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text('Unlock ${entry.level.title}'),
-        content: const Text(
-          'This topic belongs to a premium level. Real payment processing '
-          'isn\'t wired up yet in this build — that needs a payment '
-          'provider (Stripe, Google Play Billing, or Apple In-App '
-          'Purchase) connected to a merchant account.\n\n'
-          'For now, you can simulate unlocking it for testing.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              await ProgressService.markLevelPurchased(entry.levelIndex);
-              if (!dialogContext.mounted) return;
-              Navigator.pop(dialogContext);
-              _refresh();
-            },
-            child: const Text('Simulate Purchase (Dev Only)'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showPrerequisiteDialog(TopicEntry entry) {
-    final previousTitle = allLevels[entry.levelIndex - 1].title;
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Topic Locked'),
-        content: Text(
-          'This topic belongs to the ${entry.level.title} level. Pass the '
-          '$previousTitle level exam with a score of 80% or higher to '
-          'unlock it.',
-        ),
-        actions: [
-          FilledButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Got it'),
           ),
@@ -138,23 +78,12 @@ class _TopicsScreenState extends State<TopicsScreen> {
                 itemCount: allTopics.length,
                 itemBuilder: (context, index) {
                   final entry = allTopics[index];
-                  final lockReason = _lockReasons[index];
-                  final isLocked = lockReason != null;
                   final bestScore = _bestScoresByLevel[entry.levelIndex];
 
                   return _TopicCard(
                     entry: entry,
-                    isLocked: isLocked,
                     bestScore: bestScore,
                     onTap: () async {
-                      if (isLocked) {
-                        if (lockReason == 'previous_not_passed') {
-                          _showPrerequisiteDialog(entry);
-                        } else if (lockReason == 'not_purchased') {
-                          _showUpgradeDialog(entry);
-                        }
-                        return;
-                      }
                       await Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -173,13 +102,11 @@ class _TopicsScreenState extends State<TopicsScreen> {
 
 class _TopicCard extends StatelessWidget {
   final TopicEntry entry;
-  final bool isLocked;
   final double? bestScore;
   final VoidCallback onTap;
 
   const _TopicCard({
     required this.entry,
-    required this.isLocked,
     required this.bestScore,
     required this.onTap,
   });
@@ -199,11 +126,7 @@ class _TopicCard extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           child: Row(
             children: [
-              Icon(
-                isLocked ? Icons.lock : module.icon,
-                size: 32,
-                color: isLocked ? Colors.grey : Colors.blue,
-              ),
+              Icon(module.icon, size: 32, color: Colors.blue),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
@@ -211,11 +134,7 @@ class _TopicCard extends StatelessWidget {
                   children: [
                     Text(
                       module.title,
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: isLocked ? Colors.grey : null,
-                      ),
+                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -242,10 +161,7 @@ class _TopicCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (isLocked)
-                const Icon(Icons.lock_outline, color: Colors.grey)
-              else
-                const Icon(Icons.arrow_forward_ios, size: 16),
+              const Icon(Icons.arrow_forward_ios, size: 16),
             ],
           ),
         ),
@@ -253,4 +169,3 @@ class _TopicCard extends StatelessWidget {
     );
   }
 }
-
