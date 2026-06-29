@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'levels_screen.dart';
+import 'topics_screen.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -38,7 +38,7 @@ class SplashScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const LevelsScreen(),
+                        builder: (context) => const TopicsScreen(),
                       ),
                     );
                   },

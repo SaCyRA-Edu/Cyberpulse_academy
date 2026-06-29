@@ -133,3 +133,25 @@ final List<Level> allLevels = [
     examBank: expertExamBank,
   ),
 ];
+
+/// A single navigable topic (= one Module) paired with the Level it
+/// belongs to. This flattens the Level -> Modules tree into one flat list
+/// so the Topics screen can list every topic up front, while each topic
+/// still carries its level for badging, lock checks, and exam routing.
+class TopicEntry {
+  final Module module;
+  final Level level;
+  final int levelIndex;
+
+  const TopicEntry({
+    required this.module,
+    required this.level,
+    required this.levelIndex,
+  });
+}
+
+final List<TopicEntry> allTopics = [
+  for (var i = 0; i < allLevels.length; i++)
+    for (final module in allLevels[i].modules)
+      TopicEntry(module: module, level: allLevels[i], levelIndex: i),
+];
