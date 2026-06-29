@@ -327,7 +327,7 @@ const List<Lesson> fundamentalsLessons = [
 
   // 8 ------------------------------------------------------------------ Quiz
   Lesson(
-    title: 'Final Quiz',
+    title: 'Practice Quiz',
     quiz: [
       QuizQuestion(
         question: 'Which of the following best defines cybersecurity?',

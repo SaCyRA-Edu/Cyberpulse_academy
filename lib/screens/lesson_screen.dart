@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import '../data/lesson_model.dart';
 
 class LessonScreen extends StatefulWidget {
@@ -15,11 +16,59 @@ class _LessonScreenState extends State<LessonScreen> {
   late List<int> _selectedAnswers;
   bool _submitted = false;
 
+  // Audio narration state.
+  final FlutterTts _tts = FlutterTts();
+  bool _isSpeaking = false;
+
   @override
   void initState() {
     super.initState();
     final quiz = widget.lesson.quiz;
     _selectedAnswers = quiz != null ? List.filled(quiz.length, -1) : [];
+
+    _tts.setCompletionHandler(() {
+      if (mounted) setState(() => _isSpeaking = false);
+    });
+    _tts.setCancelHandler(() {
+      if (mounted) setState(() => _isSpeaking = false);
+    });
+    _tts.setErrorHandler((msg) {
+      if (mounted) setState(() => _isSpeaking = false);
+    });
+  }
+
+  @override
+  void dispose() {
+    _tts.stop();
+    super.dispose();
+  }
+
+  String _lessonNarrationText(Lesson lesson) {
+    final buffer = StringBuffer();
+    for (final section in lesson.sections) {
+      if (section.heading != null) {
+        buffer.writeln(section.heading);
+      }
+      if (section.body != null) {
+        buffer.writeln(section.body);
+      }
+      if (section.bullets != null) {
+        for (final bullet in section.bullets!) {
+          buffer.writeln(bullet);
+        }
+      }
+    }
+    return buffer.toString();
+  }
+
+  Future<void> _toggleNarration() async {
+    if (_isSpeaking) {
+      await _tts.stop();
+      setState(() => _isSpeaking = false);
+    } else {
+      setState(() => _isSpeaking = true);
+      await _tts.speak(_lessonNarrationText(widget.lesson));
+    }
   }
 
   int get _score {
@@ -41,6 +90,14 @@ class _LessonScreenState extends State<LessonScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(lesson.title),
+        actions: [
+          if (!lesson.isQuiz)
+            IconButton(
+              icon: Icon(_isSpeaking ? Icons.stop_circle : Icons.volume_up),
+              tooltip: _isSpeaking ? 'Stop narration' : 'Listen to this lesson',
+              onPressed: _toggleNarration,
+            ),
+        ],
       ),
       body: lesson.isQuiz ? _buildQuiz(lesson.quiz!) : _buildReadingContent(lesson),
     );
@@ -104,7 +161,7 @@ class _LessonScreenState extends State<LessonScreen> {
     );
   }
 
-  // -- Quiz -----------------------------------------------------------------
+  // -- Practice Quiz ---------------------------------------------------------
 
   Widget _buildQuiz(List<QuizQuestion> quiz) {
     return SingleChildScrollView(
@@ -113,7 +170,7 @@ class _LessonScreenState extends State<LessonScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Test what you\'ve learned across this module.',
+            'Test what you\'ve learned across this module. (80% needed to pass)',
             style: TextStyle(fontSize: 16, color: Colors.grey),
           ),
           const SizedBox(height: 16),
@@ -126,8 +183,7 @@ class _LessonScreenState extends State<LessonScreen> {
               onPressed: _submitted
                   ? () => setState(() {
                         _submitted = false;
-                        _selectedAnswers =
-                            List.filled(quiz.length, -1);
+                        _selectedAnswers = List.filled(quiz.length, -1);
                       })
                   : (_allAnswered ? () => setState(() => _submitted = true) : null),
               child: Text(_submitted ? 'Retake Quiz' : 'Submit Quiz'),
@@ -141,7 +197,10 @@ class _LessonScreenState extends State<LessonScreen> {
 
   Widget _buildScoreBanner(int total) {
     final score = _score;
-    final passed = score >= (total * 0.7).ceil();
+    final passed = score >= (total * 0.8).ceil();
+    final suffix = passed
+        ? ' — nice work, that\'s 80%+!'
+        : ' — review the explanations and try again.';
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 20),
@@ -162,8 +221,7 @@ class _LessonScreenState extends State<LessonScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'You scored $score / $total'
-              '${passed ? ' — nice work!' : ' — review the explanations and try again.'}',
+              'You scored $score / $total$suffix',
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),

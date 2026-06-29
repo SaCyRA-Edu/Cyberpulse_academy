@@ -222,7 +222,7 @@ const List<Lesson> windowsSecurityLessons = [
 
   // 8 ------------------------------------------------------------------ Quiz
   Lesson(
-    title: 'Final Quiz',
+    title: 'Practice Quiz',
     quiz: [
       QuizQuestion(
         question: 'What is the "principle of least privilege"?',

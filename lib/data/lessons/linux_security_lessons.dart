@@ -225,7 +225,7 @@ const List<Lesson> linuxSecurityLessons = [
 
   // 8 ------------------------------------------------------------------ Quiz
   Lesson(
-    title: 'Final Quiz',
+    title: 'Practice Quiz',
     quiz: [
       QuizQuestion(
         question: 'Why is it recommended to avoid doing day-to-day work '

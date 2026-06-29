@@ -214,7 +214,7 @@ const List<Lesson> emailSecurityLessons = [
 
   // 8 ------------------------------------------------------------------ Quiz
   Lesson(
-    title: 'Final Quiz',
+    title: 'Practice Quiz',
     quiz: [
       QuizQuestion(
         question: 'Why is basic email vulnerable to spoofing?',

@@ -240,7 +240,7 @@ const List<Lesson> networkingLessons = [
 
   // 8 ------------------------------------------------------------------ Quiz
   Lesson(
-    title: 'Final Quiz',
+    title: 'Practice Quiz',
     quiz: [
       QuizQuestion(
         question: 'Which OSI layer is responsible for IP addressing and '
