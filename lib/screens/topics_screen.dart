@@ -217,14 +217,6 @@ class _TopicCard extends StatelessWidget {
                         color: isLocked ? Colors.grey : null,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        _LevelBadge(levelTitle: level.title, dimmed: isLocked),
-                        const SizedBox(width: 6),
-                        _PriceBadge(isFree: level.isFree, dimmed: isLocked),
-                      ],
-                    ),
                     const SizedBox(height: 4),
                     Text(
                       '${module.lessonCount} lessons',
@@ -262,48 +254,3 @@ class _TopicCard extends StatelessWidget {
   }
 }
 
-class _LevelBadge extends StatelessWidget {
-  final String levelTitle;
-  final bool dimmed;
-
-  const _LevelBadge({required this.levelTitle, required this.dimmed});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = dimmed ? Colors.grey : Colors.blue;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        levelTitle.toUpperCase(),
-        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
-      ),
-    );
-  }
-}
-
-class _PriceBadge extends StatelessWidget {
-  final bool isFree;
-  final bool dimmed;
-
-  const _PriceBadge({required this.isFree, required this.dimmed});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = dimmed ? Colors.grey : (isFree ? Colors.green : Colors.amber[800]!);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        isFree ? 'FREE' : 'PREMIUM',
-        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
-      ),
-    );
-  }
-}
