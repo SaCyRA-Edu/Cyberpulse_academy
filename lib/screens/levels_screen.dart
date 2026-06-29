@@ -66,7 +66,7 @@ class _LevelsScreenState extends State<LevelsScreen> {
     final level = allLevels[levelIndex];
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text('Unlock ${level.title}'),
         content: const Text(
           'This is a premium level. Real payment processing isn\'t wired '
@@ -77,14 +77,14 @@ class _LevelsScreenState extends State<LevelsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           FilledButton(
             onPressed: () async {
               await ProgressService.markLevelPurchased(levelIndex);
-              if (!context.mounted) return;
-              Navigator.pop(context);
+              if (!dialogContext.mounted) return;
+              Navigator.pop(dialogContext);
               _refresh();
             },
             child: const Text('Simulate Purchase (Dev Only)'),
