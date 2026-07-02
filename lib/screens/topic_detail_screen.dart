@@ -220,7 +220,6 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
                         style: TextStyle(
                             fontSize: 12, color: Colors.blue))
                     : null,
-                title: Text(lesson.title),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               );
             },
