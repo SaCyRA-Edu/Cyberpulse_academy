@@ -1,6 +1,65 @@
 import '../lesson_model.dart';
 
 const List<Lesson> linuxSecurityLessons = [
+  // 1 -- AUDIO -------------------------------------------------------------
+  Lesson(
+    title: 'Linux: The Invisible OS Running the World',
+    isAudio: true,
+    sections: [
+      LessonSection(
+        heading: 'Linux Security — Audio Introduction',
+        body:
+            'This is an audio lesson. Sit back and listen. A transcript '
+            'is shown below.',
+      ),
+      LessonSection(
+        heading: 'You\'re Already Using It',
+        body:
+            'If you\'ve sent an email, loaded a website, used a streaming '
+            'service, or made a payment online in the last 24 hours — '
+            'you\'ve interacted with a Linux system. Linux runs roughly '
+            '96 percent of the world\'s web servers, nearly all cloud '
+            'infrastructure, the majority of supercomputers, and most '
+            'Android devices. It\'s the engine behind the modern internet, '
+            'and almost nobody outside the tech industry knows it exists.',
+      ),
+      LessonSection(
+        heading: 'Why It\'s Worth Learning to Secure',
+        body:
+            'Because Linux runs so much critical infrastructure, '
+            'attackers spend enormous effort targeting it. A compromised '
+            'Linux server can mean a data breach, ransomware encrypting '
+            'databases, a botnet node sending millions of spam emails, '
+            'or a cryptominer silently consuming cloud resources at '
+            'your expense. The consequences of a poorly secured Linux '
+            'server are often larger than a single endpoint compromise.',
+      ),
+      LessonSection(
+        heading: 'The Unix Philosophy',
+        body:
+            'Linux inherits the Unix security model: everything is a '
+            'file, every process runs as a user, and the kernel '
+            'mediates all access. This simplicity is a strength — '
+            'the model is predictable and auditable. But it also means '
+            'that small misconfigurations can have large consequences. '
+            'A file with the wrong permissions, a service running as '
+            'root unnecessarily, a forgotten user account — any of '
+            'these can be the foothold that turns into a full compromise.',
+      ),
+      LessonSection(
+        heading: 'What This Module Covers',
+        body:
+            'You\'ll learn how Linux manages users and permissions, '
+            'how to configure SSH securely, how to set up firewalls, '
+            'what mandatory access control adds on top of standard '
+            'permissions, how to read logs effectively, and how to '
+            'harden a system from a fresh install to something you can '
+            'put on the internet with confidence.',
+      ),
+    ],
+  ),
+
+  // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'Linux Security Architecture',
     sections: [

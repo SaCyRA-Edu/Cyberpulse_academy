@@ -33,9 +33,10 @@ class Module {
 /// Advanced / Expert). Each level bundles one or more [Module]s plus an
 /// adaptive [examBank] used for the gating Level Exam.
 ///
-/// [isFree] only ever applies to the first level — everything else is
-/// gated behind [isFree] == false AND requires the previous level's exam
-/// to be passed at 80%+, regardless of payment status.
+/// [isFree] marks a level as freely accessible without purchase. When true,
+/// users only need to pass the previous level's exam at 80%+ to unlock it.
+/// When false (Expert/Capstone), passing the previous exam is still required
+/// AND the level must be purchased.
 class Level {
   final String title;
   final String description;
@@ -58,7 +59,7 @@ class Level {
 final List<Level> allLevels = [
   Level(
     title: 'Beginner',
-    description: 'Core security concepts and email safety. Free to start.',
+    description: 'Core security concepts and email safety — start here.',
     isFree: true,
     modules: [
       Module(
@@ -79,7 +80,7 @@ final List<Level> allLevels = [
   Level(
     title: 'Intermediate',
     description: 'Networking fundamentals and Windows hardening.',
-    isFree: false,
+    isFree: true,
     modules: [
       Module(
         title: 'Networking',
@@ -99,7 +100,7 @@ final List<Level> allLevels = [
   Level(
     title: 'Advanced',
     description: 'Linux hardening and Security Operations Center skills.',
-    isFree: false,
+    isFree: true,
     modules: [
       Module(
         title: 'Linux Security',
@@ -120,8 +121,9 @@ final List<Level> allLevels = [
     title: 'Expert',
     description:
         'Capstone: threat modeling, ethical hacking, forensics, Zero '
-        'Trust, and GRC — tying every prior level together.',
-    isFree: false,
+        'Trust, and GRC — tying every prior level together. '
+        'Pass the Advanced exam to unlock.',
+    isFree: true,
     modules: [
       Module(
         title: 'Capstone: Applied Defense',

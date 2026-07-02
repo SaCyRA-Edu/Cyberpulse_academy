@@ -1,7 +1,66 @@
 import '../lesson_model.dart';
 
 const List<Lesson> windowsSecurityLessons = [
-  // 1 ----------------------------------------------------------------------
+  // 1 -- AUDIO -------------------------------------------------------------
+  Lesson(
+    title: 'Why Windows Is the World\'s Most Targeted OS',
+    isAudio: true,
+    sections: [
+      LessonSection(
+        heading: 'Windows Security — Audio Introduction',
+        body:
+            'This is an audio lesson. Sit back and listen. A transcript '
+            'is shown below.',
+      ),
+      LessonSection(
+        heading: 'The Numbers Tell the Story',
+        body:
+            'Somewhere between 70 and 75 percent of the world\'s desktop '
+            'computers run Windows. In enterprise environments, that '
+            'number is even higher. Banks, hospitals, government agencies, '
+            'schools, factories — almost all of them run Windows on the '
+            'machines their employees use every day. This is exactly '
+            'why attackers spend so much effort targeting it.',
+      ),
+      LessonSection(
+        heading: 'It\'s Not That Windows Is Bad',
+        body:
+            'There\'s a common misconception that Windows is inherently '
+            'less secure than other operating systems. That\'s not really '
+            'true. Windows is targeted more because there are more '
+            'Windows machines to attack — the economics favor it. A piece '
+            'of malware that works on Windows potentially works on '
+            'hundreds of millions of machines. The same malware targeting '
+            'a niche OS reaches a tiny fraction of that. Attackers go '
+            'where the targets are.',
+      ),
+      LessonSection(
+        heading: 'The Defender\'s Advantage',
+        body:
+            'Here\'s the flip side of that equation: because Windows is '
+            'so widely targeted, it\'s also one of the most thoroughly '
+            'studied platforms from a defensive standpoint. The tooling '
+            'is mature, the documentation is extensive, and the security '
+            'community has decades of experience hardening it. The '
+            'controls you\'ll learn in this module — user account '
+            'management, Group Policy, Windows Defender, BitLocker, '
+            'event log monitoring — are battle-tested and genuinely '
+            'effective when properly configured.',
+      ),
+      LessonSection(
+        heading: 'What You\'ll Learn',
+        body:
+            'Over the lessons ahead you\'ll understand how Windows '
+            'decides who can do what, how attackers try to escalate '
+            'their privileges, how to configure and monitor defenses, '
+            'and how Active Directory — the identity backbone of most '
+            'enterprise Windows environments — works and why protecting '
+            'it is so critical. Let\'s get into it.',
+      ),
+    ],
+  ),
+
+  // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'Windows Security Architecture',
     sections: [

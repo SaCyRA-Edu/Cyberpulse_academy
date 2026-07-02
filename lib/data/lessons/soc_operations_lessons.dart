@@ -1,6 +1,67 @@
 import '../lesson_model.dart';
 
 const List<Lesson> socOperationsLessons = [
+  // 1 -- AUDIO -------------------------------------------------------------
+  Lesson(
+    title: 'A Day in the Life of a Security Analyst',
+    isAudio: true,
+    sections: [
+      LessonSection(
+        heading: 'SOC Operations — Audio Introduction',
+        body:
+            'This is an audio lesson. Sit back and listen. A transcript '
+            'is shown below.',
+      ),
+      LessonSection(
+        heading: '6:58 AM',
+        body:
+            'Maya arrives two minutes before her shift starts. The '
+            'overnight analyst is already at the door. "Quiet night," '
+            'he says — but then mentions one thing: an unusual outbound '
+            'connection from a server in the finance segment, around '
+            '3 AM. It was flagged low-priority, auto-resolved, and '
+            'nothing followed. Maya nods and writes it down. In her '
+            'experience, "quiet night" with one exception is worth '
+            'a second look.',
+      ),
+      LessonSection(
+        heading: '8:15 AM',
+        body:
+            'The alert queue has 47 items. She triages from the top. '
+            'Most are familiar noise — failed logins from a known '
+            'scanner, a cloud API threshold that fires every Tuesday '
+            'morning. She clears 40 in the first hour. Seven need '
+            'investigation. Two of those she escalates. One she\'s '
+            'not sure about: an endpoint that ran a PowerShell command '
+            'at 2:47 AM while no one was logged in. She opens the '
+            'timeline.',
+      ),
+      LessonSection(
+        heading: '10:30 AM',
+        body:
+            'The PowerShell command downloaded a small file from an '
+            'external IP. The IP doesn\'t appear in any threat feed. '
+            'The file hash isn\'t known malicious. But it executed '
+            '11 minutes after the unusual finance server connection '
+            'from last night. Two anomalies at 3 AM, 11 minutes apart, '
+            'on different systems. She escalates to Tier 2 and adds a '
+            'note: possible lateral movement, investigate together.',
+      ),
+      LessonSection(
+        heading: 'What This Illustrates',
+        body:
+            'SOC work isn\'t about dramatic, obvious attacks. It\'s about '
+            'pattern recognition — connecting signals that individually '
+            'look like noise but together look like something real. It '
+            'requires technical knowledge, methodical process, clear '
+            'documentation, and the judgment to know when two "low '
+            'priority" events are actually one serious incident. '
+            'That\'s what this module builds.',
+      ),
+    ],
+  ),
+
+  // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'SOC Models: In-House, MSSP & MDR',
     sections: [

@@ -1,7 +1,67 @@
 import '../lesson_model.dart';
 
 const List<Lesson> networkingLessons = [
-  // 1 ----------------------------------------------------------------------
+  // 1 -- AUDIO -------------------------------------------------------------
+  Lesson(
+    title: 'How the Internet Actually Works',
+    isAudio: true,
+    sections: [
+      LessonSection(
+        heading: 'Welcome to Networking',
+        body:
+            'This is an audio lesson. Sit back and listen. A full '
+            'transcript is below if you\'d like to follow along.',
+      ),
+      LessonSection(
+        heading: 'You\'re Doing It Right Now',
+        body:
+            'Right now, as you read or listen to this, data is moving '
+            'between your device and a server somewhere in the world. '
+            'It might be crossing undersea cables, bouncing through a '
+            'dozen routers, passing through corporate firewalls — and it '
+            'all happened in the time it took you to load this screen. '
+            'Most people use the internet every day without knowing any '
+            'of this. But if you want to defend networks, you need to '
+            'understand what\'s actually happening.',
+      ),
+      LessonSection(
+        heading: 'The Journey of a Single Request',
+        body:
+            'Let\'s trace what happens when you type a web address and '
+            'hit enter. Your device first needs to find the IP address '
+            'behind that name — it asks a DNS server, which is like '
+            'calling directory enquiries for the internet. Once it has '
+            'the IP address, your device sends a connection request '
+            'across the network. That request doesn\'t travel as one '
+            'piece — it\'s broken into small packets, each one finding '
+            'its own path through the network, potentially through '
+            'different countries, before being reassembled at the '
+            'destination. The whole thing takes milliseconds.',
+      ),
+      LessonSection(
+        heading: 'Why This Matters for Security',
+        body:
+            'Every step in that journey is an opportunity for something '
+            'to go wrong. The DNS lookup can be poisoned. The packets '
+            'can be intercepted. The routers can be compromised. The '
+            'connection itself can be spoofed. Understanding the '
+            'journey is what lets you understand the attacks — and '
+            'more importantly, where to place your defenses.',
+      ),
+      LessonSection(
+        heading: 'What\'s Ahead',
+        body:
+            'In the lessons that follow you\'ll learn how IP addresses '
+            'work, what ports and protocols are, how firewalls make '
+            'decisions, how DNS can be abused, and what the most common '
+            'network attacks look like and how to defend against them. '
+            'By the end, the network won\'t be a black box — it\'ll be '
+            'something you can reason about, configure, and protect.',
+      ),
+    ],
+  ),
+
+  // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'TCP/IP & the OSI Model',
     sections: [

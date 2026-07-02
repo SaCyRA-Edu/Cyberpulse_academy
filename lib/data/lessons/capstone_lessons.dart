@@ -1,6 +1,69 @@
 import '../lesson_model.dart';
 
 const List<Lesson> capstoneLessons = [
+  // 1 -- AUDIO -------------------------------------------------------------
+  Lesson(
+    title: 'From Beginner to Security Professional: Your Roadmap',
+    isAudio: true,
+    sections: [
+      LessonSection(
+        heading: 'Capstone — Audio Introduction',
+        body:
+            'This is an audio lesson. Sit back and listen. A transcript '
+            'is shown below.',
+      ),
+      LessonSection(
+        heading: 'You\'ve Come a Long Way',
+        body:
+            'Think about where you started. The CIA Triad might have '
+            'been a new concept. You probably hadn\'t thought carefully '
+            'about how email actually works, or what a SOC analyst does '
+            'at 3 AM, or why the root account on a Linux server is '
+            'something to treat with such care. Now you understand all '
+            'of that — and more. You have a foundation that most people '
+            'in non-security IT roles don\'t have.',
+      ),
+      LessonSection(
+        heading: 'What This Module Is About',
+        body:
+            'The Capstone isn\'t just more content to absorb. It\'s about '
+            'synthesis — taking everything you\'ve learned and connecting '
+            'it into a coherent picture of how real security programs '
+            'are designed, maintained, and improved. Threat modeling. '
+            'Ethical hacking methodology. Digital forensics. Zero Trust '
+            'architecture. Governance, Risk, and Compliance. These '
+            'aren\'t separate topics — they\'re all expressions of the '
+            'same underlying question: how do you build and run a system '
+            'that people can trust?',
+      ),
+      LessonSection(
+        heading: 'Where Security Careers Go From Here',
+        body:
+            'Security is one of the few fields where deep specialization '
+            'and broad generalism are both valuable career paths. Some '
+            'professionals go deep into one area — penetration testing, '
+            'forensics, detection engineering, cloud security. Others '
+            'stay broad, working across governance, risk, and multiple '
+            'technical domains. Neither path is wrong. What this course '
+            'has built is the foundation that makes either direction '
+            'possible.',
+      ),
+      LessonSection(
+        heading: 'A Note on Continuous Learning',
+        body:
+            'Cybersecurity changes faster than almost any other field. '
+            'New attack techniques emerge constantly. New platforms '
+            'create new attack surfaces. The specific tools and vendor '
+            'products will evolve. What won\'t change are the principles '
+            'you\'ve internalized — the CIA Triad, least privilege, '
+            'defense in depth, Zero Trust, risk-based thinking. These '
+            'are the constants that make sense of everything new you\'ll '
+            'encounter. Take them with you.',
+      ),
+    ],
+  ),
+
+  // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'Security Architecture: Defense in Depth',
     sections: [

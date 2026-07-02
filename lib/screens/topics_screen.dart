@@ -42,9 +42,10 @@ class _TopicsScreenState extends State<TopicsScreen> {
           'privilege, defense in depth, Zero Trust, and more — apply '
           'across platforms and aren\'t tied to any single certification '
           'body or vendor product.\n\n'
-          'Beginner topics are free and open. Intermediate, Advanced, and '
-          'Expert topics unlock once you pass the previous level\'s exam '
-          'at 80%+ — open one of those topics to see what\'s needed.',
+          'All topics are free — just pass each level\'s exam at 80%+ '
+          'to unlock the next level. Each topic includes an audio '
+          'introduction you can listen to before diving into the '
+          'reading lessons.',
         ),
         actions: [
           TextButton(
