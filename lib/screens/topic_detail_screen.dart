@@ -26,12 +26,8 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
   }
 
   Future<void> _refresh() async {
-    final reason = await ProgressService.getLockReason(
-      levelIndex: widget.entry.levelIndex,
-      levelIsFree: widget.entry.level.isFree,
-    );
     setState(() {
-      _lockReason = reason;
+      _lockReason = null; // All topics freely accessible
       _loading = false;
     });
   }
