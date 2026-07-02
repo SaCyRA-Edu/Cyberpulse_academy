@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import '../data/levels_data.dart';
-import '../services/progress_service.dart';
 import 'lesson_screen.dart';
 import 'level_exam_screen.dart';
 
-const List<String> _levelOrder = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
+const List<String> _tabs = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
 
 class TopicDetailScreen extends StatefulWidget {
   final TopicEntry entry;
@@ -15,52 +14,20 @@ class TopicDetailScreen extends StatefulWidget {
   State<TopicDetailScreen> createState() => _TopicDetailScreenState();
 }
 
-class _TopicDetailScreenState extends State<TopicDetailScreen> {
-  bool _loading = true;
-  String? _lockReason; // null = unlocked
+class _TopicDetailScreenState extends State<TopicDetailScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _refresh();
+    _tabController = TabController(length: _tabs.length, vsync: this);
   }
 
-  Future<void> _refresh() async {
-    setState(() {
-      _lockReason = null; // All topics freely accessible
-      _loading = false;
-    });
-  }
-
-  void _showUpgradeDialog() {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text('Unlock ${widget.entry.level.title}'),
-        content: const Text(
-          'This topic belongs to a premium level. Real payment processing '
-          'isn\'t wired up yet in this build — that needs a payment '
-          'provider (Stripe, Google Play Billing, or Apple In-App '
-          'Purchase) connected to a merchant account.\n\n'
-          'For now, you can simulate unlocking it for testing.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              await ProgressService.markLevelPurchased(widget.entry.levelIndex);
-              if (!dialogContext.mounted) return;
-              Navigator.pop(dialogContext);
-              _refresh();
-            },
-            child: const Text('Simulate Purchase (Dev Only)'),
-          ),
-        ],
-      ),
-    );
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -68,68 +35,31 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.entry.module.title),
-      ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : (_lockReason != null ? _buildLockedView() : _buildUnlockedView()),
-    );
-  }
-
-  // -- Locked state -----------------------------------------------------------
-
-  Widget _buildLockedView() {
-    final level = widget.entry.level;
-    final isPrereqIssue = _lockReason == 'previous_not_passed';
-    final previousTitle = widget.entry.levelIndex > 0
-        ? allLevels[widget.entry.levelIndex - 1].title
-        : '';
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.lock, size: 64, color: Colors.grey),
-            const SizedBox(height: 20),
-            Text(
-              '${widget.entry.module.title} is locked',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              isPrereqIssue
-                  ? 'This topic belongs to the ${level.title} level. Pass '
-                      'the $previousTitle level exam with a score of 80% or '
-                      'higher to unlock it.'
-                  : 'This topic belongs to the ${level.title} level, which '
-                      'is a premium level.',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 15, color: Colors.black87),
-            ),
-            const SizedBox(height: 24),
-            if (!isPrereqIssue)
-              FilledButton(
-                onPressed: _showUpgradeDialog,
-                child: const Text('Unlock This Level'),
-              )
-            else
-              OutlinedButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Back to Topics'),
-              ),
-          ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: _tabs.map((t) => Tab(text: t)).toList(),
+          labelColor: Colors.blue,
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: Colors.blue,
         ),
       ),
+      body: TabBarView(
+        controller: _tabController,
+        physics: const NeverScrollableScrollPhysics(),
+        children: [
+          _buildBeginnerTab(),
+          _buildUpgradeTab('Intermediate'),
+          _buildUpgradeTab('Advanced'),
+          _buildUpgradeTab('Expert'),
+        ],
+      ),
     );
   }
 
-  // -- Unlocked state ---------------------------------------------------------
+  // -- Beginner Tab (free content) -----------------------------------------
 
-  Widget _buildUnlockedView() {
-    final entry = widget.entry;
-    final module = entry.module;
+  Widget _buildBeginnerTab() {
+    final module = widget.entry.module;
     final lessons = module.lessons;
 
     return Column(
@@ -140,9 +70,9 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
             color: Colors.blue.withValues(alpha: 0.06),
             child: ListTile(
               leading: const Icon(Icons.quiz, color: Colors.blue),
-              title: Text('${entry.level.title} Level Exam'),
+              title: Text('${widget.entry.level.title} Level Exam'),
               subtitle: const Text(
-                'Adaptive · 80% required to pass and unlock the next level',
+                'Adaptive · Test what you\'ve learned',
               ),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
@@ -150,8 +80,8 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (_) => LevelExamScreen(
-                      level: entry.level,
-                      levelIndex: entry.levelIndex,
+                      level: widget.entry.level,
+                      levelIndex: widget.entry.levelIndex,
                     ),
                   ),
                 );
@@ -160,7 +90,7 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
           ),
         ),
         const Padding(
-          padding: EdgeInsets.fromLTRB(16, 4, 16, 4),
+          padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
@@ -189,12 +119,14 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
                       : lesson.isQuiz
                           ? Icons.quiz_outlined
                           : Icons.menu_book,
+                  color: lesson.isAudio ? Colors.blue : null,
                 ),
                 title: Text(lesson.title),
                 subtitle: lesson.isAudio
-                    ? const Text('Audio Course',
-                        style: TextStyle(
-                            fontSize: 12, color: Colors.blue))
+                    ? const Text(
+                        'Audio Course',
+                        style: TextStyle(fontSize: 12, color: Colors.blue),
+                      )
                     : null,
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               );
@@ -204,5 +136,138 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
       ],
     );
   }
-}
 
+  // -- Upgrade Tab (paid levels) -------------------------------------------
+
+  Widget _buildUpgradeTab(String levelName) {
+    final features = {
+      'Intermediate': [
+        'In-depth technical lessons',
+        'Hands-on practice scenarios',
+        'Intermediate-level adaptive exam',
+        'Certificate of completion',
+      ],
+      'Advanced': [
+        'Advanced attack & defense techniques',
+        'Real-world case studies',
+        'Advanced adaptive exam',
+        'Certificate of completion',
+      ],
+      'Expert': [
+        'Expert-level capstone content',
+        'Threat modeling & ethical hacking',
+        'Expert adaptive exam',
+        'Professional certificate',
+      ],
+    };
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blue.shade700, Colors.blue.shade400],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  const Icon(Icons.workspace_premium,
+                      size: 56, color: Colors.white),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Unlock $levelName',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${widget.entry.module.title} — $levelName Level',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 14, color: Colors.white70),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 28),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "What you'll get:",
+                style:
+                    TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 12),
+            for (final feature in features[levelName]!)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  children: [
+                    const Icon(Icons.check_circle,
+                        color: Colors.green, size: 20),
+                    const SizedBox(width: 12),
+                    Text(feature,
+                        style: const TextStyle(fontSize: 15)),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: Text('Unlock $levelName'),
+                      content: const Text(
+                        'Payment processing is coming soon. '
+                        'We\'ll notify you as soon as this level '
+                        'is available for purchase.',
+                      ),
+                      actions: [
+                        FilledButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: const Text('Got it'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: Text(
+                  'Get $levelName Access',
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Payment integration coming soon',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+}
