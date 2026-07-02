@@ -91,7 +91,7 @@ class _LessonScreenState extends State<LessonScreen> {
       appBar: AppBar(
         title: Text(lesson.title),
         actions: [
-          if (!lesson.isQuiz)
+          if (!lesson.isQuiz && !lesson.isAudio)
             IconButton(
               icon: Icon(_isSpeaking ? Icons.stop_circle : Icons.volume_up),
               tooltip: _isSpeaking ? 'Stop narration' : 'Listen to this lesson',
@@ -99,7 +99,111 @@ class _LessonScreenState extends State<LessonScreen> {
             ),
         ],
       ),
-      body: lesson.isQuiz ? _buildQuiz(lesson.quiz!) : _buildReadingContent(lesson),
+      body: lesson.isQuiz
+          ? _buildQuiz(lesson.quiz!)
+          : lesson.isAudio
+              ? _buildAudioLesson(lesson)
+              : _buildReadingContent(lesson),
+    );
+  }
+
+  // -- Audio Lesson ---------------------------------------------------------
+
+  Widget _buildAudioLesson(Lesson lesson) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Audio player panel
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue.shade800, Colors.blue.shade500],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Column(
+              children: [
+                const Icon(Icons.headphones, size: 64, color: Colors.white),
+                const SizedBox(height: 16),
+                Text(
+                  lesson.title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Audio Course',
+                  style: TextStyle(fontSize: 13, color: Colors.white70),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.blue.shade800,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 28, vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      icon: Icon(
+                        _isSpeaking ? Icons.stop_rounded : Icons.play_arrow_rounded,
+                        size: 28,
+                      ),
+                      label: Text(
+                        _isSpeaking ? 'Stop' : 'Play',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onPressed: _toggleNarration,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  _isSpeaking
+                      ? 'Now playing — follow along below'
+                      : 'Tap Play to listen to this lesson',
+                  style: const TextStyle(fontSize: 13, color: Colors.white70),
+                ),
+              ],
+            ),
+          ),
+
+          // Transcript
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Transcript',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
+                  ),
+                ),
+                const Divider(height: 20),
+                for (final section in lesson.sections)
+                  _buildSection(section),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -1,88 +1,129 @@
 import '../lesson_model.dart';
 
 const List<Lesson> emailSecurityLessons = [
-  // 1 ----------------------------------------------------------------------
+  // 1 -- AUDIO -------------------------------------------------------------
   Lesson(
-    title: 'How Email Works',
+    title: 'The Anatomy of a Real Phishing Attack',
+    isAudio: true,
     sections: [
       LessonSection(
-        heading: 'The Basic Flow',
+        heading: 'A True Story',
         body:
-            'When you send an email, your mail client hands it to a '
-            'sending mail server, which uses SMTP (Simple Mail Transfer '
-            'Protocol) to relay it — often through several servers — until '
-            'it reaches the recipient\'s mail server.',
+            'This is an audio lesson. Sit back and listen. A transcript '
+            'is shown below.',
       ),
       LessonSection(
-        heading: 'Why This Matters for Security',
+        heading: 'It Started With One Email',
         body:
-            'SMTP, by design, doesn\'t verify who actually sent a message — '
-            'similar to how anyone can write any return address on a '
-            'paper envelope. This is the root cause behind email spoofing, '
-            'which the next few lessons address.',
+            'In early 2016, an accountant at a mid-sized company received '
+            'an email from what appeared to be her CEO. The message was '
+            'short, direct, and carried the kind of casual authority that '
+            'made her not want to question it. It asked her to wire '
+            '47,000 dollars to a vendor account for an urgent acquisition '
+            'that had to close before end of day. She did it. The money '
+            'was gone within hours, routed through multiple accounts '
+            'across three countries. The CEO had never sent the email.',
+      ),
+      LessonSection(
+        heading: 'How It Was Built',
+        body:
+            'The attacker had spent several days on reconnaissance before '
+            'sending a single message. They found the CEO\'s name and email '
+            'format from the company website. They found the accountant\'s '
+            'name and role from LinkedIn. They looked at the company\'s '
+            'press releases to understand its acquisition history. The '
+            'email they crafted referenced a real upcoming deal — using '
+            'information that was already public — and was sent from a '
+            'domain that looked almost identical to the real one, with one '
+            'letter transposed.',
+      ),
+      LessonSection(
+        heading: 'What Made It Work',
+        body:
+            'Three things made this attack succeed. First, urgency — the '
+            'end-of-day deadline left no time to verify. Second, '
+            'authority — the email came from the CEO, or appeared to. '
+            'Third, process failure — there was no policy requiring a '
+            'second confirmation channel for wire transfers above a '
+            'certain amount. Any one of those three things being different '
+            'would likely have stopped it.',
+      ),
+      LessonSection(
+        heading: 'The Lesson',
+        body:
+            'Phishing attacks aren\'t crude. The best ones are tailored, '
+            'researched, and timed. The defense isn\'t just a spam filter '
+            '— it\'s knowing the patterns, slowing down when something '
+            'feels urgent, and having processes that make it hard to act '
+            'on a single email alone. That\'s what this module is about.',
       ),
     ],
   ),
 
   // 2 ----------------------------------------------------------------------
   Lesson(
-    title: 'Phishing',
+    title: 'How Email Works: SMTP, IMAP & POP3',
     sections: [
       LessonSection(
-        heading: 'What is Phishing?',
+        heading: 'The Journey of an Email',
         body:
-            'Phishing is a deceptive message designed to trick the '
-            'recipient into revealing sensitive information, clicking a '
-            'malicious link, or opening a harmful attachment.',
+            'When you hit send, your email client hands the message to '
+            'your outgoing mail server using SMTP (Simple Mail Transfer '
+            'Protocol). That server looks up the recipient\'s mail server '
+            'via DNS and forwards the message — often through several '
+            'relay servers — until it arrives at the destination.',
       ),
       LessonSection(
-        heading: 'Common Variations',
+        heading: 'The Protocols',
         bullets: [
-          'Spear phishing — highly targeted at a specific person, often using personal details',
-          'Business Email Compromise (BEC) — impersonating an executive or vendor to request a wire transfer or sensitive data',
-          'Whaling — phishing aimed specifically at senior executives',
-          'Smishing/Vishing — the same tactic over SMS text or phone calls instead of email',
+          'SMTP (port 25/587) — sends outgoing mail between servers',
+          'IMAP (port 143/993) — retrieves mail from a server, keeping it synced across devices',
+          'POP3 (port 110/995) — downloads mail from a server to a single device (older approach)',
         ],
       ),
       LessonSection(
-        heading: 'Common Red Flags',
-        bullets: [
-          'Urgency or pressure to act immediately',
-          'Requests that bypass normal process (e.g. "don\'t tell anyone, just wire this now")',
-          'Mismatched or slightly altered sender addresses',
-          'Unexpected attachments or links, especially from unfamiliar senders',
-          'Generic greetings on a message claiming to be personal or urgent',
-        ],
+        heading: 'Why SMTP Is the Security Problem',
+        body:
+            'SMTP was designed decades ago with no built-in way to verify '
+            'who actually sent a message. Anyone can write any return '
+            'address on an email — just like on a paper envelope. This '
+            'fundamental design gap is what makes email spoofing, '
+            'phishing, and impersonation possible at scale.',
       ),
     ],
   ),
 
   // 3 ----------------------------------------------------------------------
   Lesson(
-    title: 'Spotting Suspicious Emails',
+    title: 'Phishing, Spear Phishing & Whaling',
     sections: [
       LessonSection(
-        heading: 'Check the Sender, Not Just the Display Name',
-        body:
-            'Display names can say anything. Always check the actual '
-            'email address behind it — attackers often use addresses that '
-            'are close to a real domain but not quite right (for example, '
-            'swapping a letter or adding an extra word).',
-      ),
-      LessonSection(
-        heading: 'Before Clicking a Link',
+        heading: 'The Spectrum of Deceptive Email',
         bullets: [
-          'Hover over the link to preview the actual destination URL',
-          'Look closely at the domain — is it really the company\'s site?',
-          'When in doubt, navigate to the site directly rather than clicking',
+          'Phishing — bulk, generic deception aimed at many recipients simultaneously',
+          'Spear phishing — highly targeted, personalized attack on a specific individual',
+          'Whaling — spear phishing aimed specifically at executives or high-value targets',
+          'Smishing — same tactics over SMS text messages',
+          'Vishing — voice phishing, conducted over phone calls',
         ],
       ),
       LessonSection(
-        heading: 'Before Opening an Attachment',
+        heading: 'The Attacker\'s Toolkit',
         bullets: [
-          'Were you expecting this file from this sender?',
-          'Does the file type make sense for the context (an invoice as a .exe is a red flag)?',
-          'If unsure, verify with the sender through a separate channel before opening',
+          'OSINT (Open Source Intelligence) — mining LinkedIn, company websites, social media for targeting info',
+          'Lookalike domains — registering domains visually similar to the real one',
+          'Display name spoofing — showing a trusted name while hiding a malicious address',
+          'Urgency and authority — using time pressure and impersonation to bypass critical thinking',
+        ],
+      ),
+      LessonSection(
+        heading: 'Red Flags That Appear in Most Phishing Emails',
+        bullets: [
+          'Pressure to act urgently before thinking it through',
+          'Requests that bypass normal process ("don\'t tell anyone, just do this now")',
+          'Mismatched or slightly altered sender domains',
+          'Generic greetings on messages claiming to be personal',
+          'Unexpected links or attachments',
         ],
       ),
     ],
@@ -90,237 +131,297 @@ const List<Lesson> emailSecurityLessons = [
 
   // 4 ----------------------------------------------------------------------
   Lesson(
-    title: 'Email Authentication: SPF, DKIM & DMARC',
+    title: 'Business Email Compromise (BEC)',
     sections: [
       LessonSection(
-        heading: 'The Problem They Solve',
+        heading: 'The Most Costly Email Attack',
         body:
-            'Because basic email doesn\'t verify the sender, these three '
-            'standards work together to let receiving mail servers check '
-            'whether a message claiming to be from a domain is actually '
-            'legitimate.',
+            'Business Email Compromise consistently ranks as the highest-'
+            'dollar category of cybercrime globally. Unlike ransomware, '
+            'it doesn\'t need malware. It just needs a convincing email, '
+            'the right target, and a moment of trust.',
       ),
       LessonSection(
-        heading: 'SPF (Sender Policy Framework)',
-        body:
-            'Publishes a list of mail servers authorized to send email on '
-            'behalf of a domain. If a message arrives from a server not on '
-            'that list, it looks suspicious.',
+        heading: 'Common BEC Scenarios',
+        bullets: [
+          'CEO fraud — impersonating an executive to request wire transfers or gift cards',
+          'Invoice fraud — impersonating a vendor and redirecting legitimate payment to an attacker-controlled account',
+          'Payroll diversion — impersonating an employee to redirect their salary to a new account',
+          'Attorney/legal impersonation — claiming urgent legal matters require immediate payment',
+        ],
       ),
       LessonSection(
-        heading: 'DKIM (DomainKeys Identified Mail)',
+        heading: 'Why It Works So Well',
         body:
-            'Adds a digital signature to outgoing mail, letting the '
-            'receiving server verify the message wasn\'t altered in '
-            'transit and genuinely came from the claimed domain.',
-      ),
-      LessonSection(
-        heading: 'DMARC (Domain-based Message Authentication)',
-        body:
-            'Tells receiving servers what to do if a message fails SPF or '
-            'DKIM checks — quarantine it, reject it outright, or just '
-            'report on it — and gives domain owners visibility into who '
-            'is sending mail using their domain.',
+            'BEC exploits hierarchy, trust, and process gaps. A junior '
+            'employee receiving an urgent request from "the CEO" or "legal" '
+            'is often reluctant to question or delay. The solution isn\'t '
+            'just awareness — it\'s process: dual approval for wire '
+            'transfers, verbal confirmation via a known number for any '
+            'change to payment details.',
       ),
     ],
   ),
 
   // 5 ----------------------------------------------------------------------
   Lesson(
-    title: 'Malicious Attachments & Links',
+    title: 'Reading Email Headers',
     sections: [
       LessonSection(
-        heading: 'How Attachments Are Weaponized',
+        heading: 'What Email Headers Reveal',
         body:
-            'Attackers often hide malicious code inside seemingly normal '
-            'files — documents with malicious macros, disguised '
-            'executables, or files designed to exploit a flaw in the '
-            'program that opens them.',
+            'The visible "From:" line in any email is just a label — '
+            'it can say anything. The email headers (hidden metadata '
+            'in every message) contain the actual routing path, '
+            'originating server, and authentication results that reveal '
+            'whether a message is really what it claims to be.',
       ),
       LessonSection(
-        heading: 'How Malicious Links Work',
+        heading: 'Key Header Fields',
         bullets: [
-          'Credential harvesting — a fake login page that captures whatever you type in',
-          'Drive-by downloads — malware that installs automatically when a page loads',
-          'Redirect chains — a "safe-looking" link that bounces through several redirects to hide its real destination',
+          'Received: — the chain of servers the email passed through; read bottom-up',
+          'Return-Path: — where bounces go; often different from the "From:" address in spoofed mail',
+          'X-Originating-IP: — the IP address that originally submitted the message',
+          'Authentication-Results: — the server\'s report on SPF, DKIM, and DMARC checks',
         ],
       ),
       LessonSection(
-        heading: 'Organizational Defenses',
-        bullets: [
-          'Email filtering/sandboxing — scanning or running attachments in an isolated environment before delivery',
-          'Link rewriting — routing clicked links through a security check first',
-          'Disabling risky file types or macros by default',
-        ],
+        heading: 'How to View Headers',
+        body:
+            'In Gmail: open the email → three-dot menu → "Show original." '
+            'In Outlook: open the email → File → Properties → "Internet '
+            'headers." The Authentication-Results field is the quickest '
+            'signal: a DMARC "fail" or DKIM "none" on a message claiming '
+            'to be from a trusted domain is a strong red flag.',
       ),
     ],
   ),
 
   // 6 ----------------------------------------------------------------------
   Lesson(
-    title: 'Reporting & Response',
+    title: 'Email Authentication: SPF, DKIM & DMARC',
     sections: [
       LessonSection(
-        heading: 'Why Reporting Matters',
+        heading: 'Why These Three Exist',
         body:
-            'When someone reports a phishing email, it doesn\'t just '
-            'protect them — it helps the security team identify and block '
-            'the same campaign before it reaches others in the '
-            'organization.',
+            'Because SMTP can\'t verify senders, these three DNS-based '
+            'standards were layered on top to let receiving mail servers '
+            'check whether a message claiming to be from a domain was '
+            'actually authorized by that domain.',
       ),
       LessonSection(
-        heading: 'What to Do With a Suspicious Email',
-        bullets: [
-          'Don\'t click links or open attachments',
-          'Use the organization\'s "Report Phishing" button if available',
-          'If unsure whether a request is legitimate, verify directly with the sender through a known, separate channel',
-        ],
+        heading: 'SPF — Sender Policy Framework',
+        body:
+            'The domain owner publishes a list of IP addresses authorized '
+            'to send email on its behalf. If a message arrives from a '
+            'server not on that list, the receiving server knows something '
+            'is off.',
       ),
       LessonSection(
-        heading: 'If You Already Clicked',
+        heading: 'DKIM — DomainKeys Identified Mail',
         body:
-            'Report it immediately anyway. Acting fast — disconnecting '
-            'from the network, changing passwords, alerting the security '
-            'team — limits the damage far more than staying quiet out of '
-            'embarrassment.',
+            'The sending server adds a cryptographic signature to outgoing '
+            'mail. The receiving server verifies that signature against '
+            'a public key published in DNS, confirming the message '
+            'wasn\'t altered in transit.',
+      ),
+      LessonSection(
+        heading: 'DMARC — Domain-based Message Authentication',
+        body:
+            'DMARC ties SPF and DKIM together. It tells receiving servers '
+            'what to do when a message fails both checks — reject it, '
+            'quarantine it, or just report it — and gives domain owners '
+            'visibility into who is sending mail using their domain.',
       ),
     ],
   ),
 
   // 7 ----------------------------------------------------------------------
   Lesson(
-    title: 'Building Good Email Habits',
+    title: 'Safe Link & Attachment Practices',
     sections: [
       LessonSection(
-        heading: 'Everyday Habits',
+        heading: 'How Malicious Links Work',
         bullets: [
-          'Pause before acting on urgent or unusual requests, especially involving money or credentials',
-          'Verify unexpected requests through a second channel (call, in person, chat)',
-          'Keep personal and work email separate',
-          'Use MFA on your email account — it\'s one of the most valuable accounts to protect, since it\'s often used to reset other passwords',
+          'Credential harvesting — a fake login page captures your username and password',
+          'Drive-by download — simply visiting a page installs malware',
+          'Redirect chains — a seemingly safe link bounces through multiple URLs to hide its true destination',
+          'URL shorteners — used to mask the real destination from a quick visual check',
         ],
       ),
       LessonSection(
-        heading: 'Why Email Is Such a High-Value Target',
-        body:
-            'Email is frequently the front door for a wider attack — '
-            'compromising one inbox can expose conversations, contacts, '
-            'and a path to reset passwords on other accounts. Treating it '
-            'casually undermines security elsewhere, even if email itself '
-            'feels low-stakes.',
+        heading: 'Before Clicking Any Link',
+        bullets: [
+          'Hover over it first — most email clients show the real destination in a status bar',
+          'Check the domain carefully — look for typos and extra subdomains',
+          'When in doubt, navigate directly to the site rather than clicking',
+          'If it\'s asking for credentials, question why',
+        ],
+      ),
+      LessonSection(
+        heading: 'Attachment Red Flags',
+        bullets: [
+          'Executables disguised as documents (.exe, .scr, .bat, or double extensions like ".pdf.exe")',
+          'Office documents asking you to "Enable Macros" or "Enable Editing"',
+          'Unexpected ZIP or archive files, even from known contacts',
+          'Any attachment you weren\'t expecting — verify with the sender through a separate channel first',
+        ],
       ),
     ],
   ),
 
-  // 8 ------------------------------------------------------------------ Quiz
+  // 8 ----------------------------------------------------------------------
+  Lesson(
+    title: 'Reporting & Responding to Suspicious Email',
+    sections: [
+      LessonSection(
+        heading: 'Why Reporting Matters Beyond Self-Protection',
+        body:
+            'When you report a phishing email, you don\'t just protect '
+            'yourself — you alert the security team to a campaign that '
+            'may be targeting dozens of colleagues simultaneously. One '
+            'report can stop an attack that would otherwise succeed '
+            'against someone else.',
+      ),
+      LessonSection(
+        heading: 'What to Do With a Suspicious Email',
+        bullets: [
+          'Don\'t click any links or open any attachments',
+          'Use your organization\'s "Report Phishing" button if available',
+          'If unsure whether a request is legitimate, verify directly through a known phone number or in person — not by replying to the email',
+          'Forward it to your security team with a note on why it seemed suspicious',
+        ],
+      ),
+      LessonSection(
+        heading: 'If You Already Clicked',
+        body:
+            'Report it immediately. Disconnect from the network if you '
+            'believe malware may have installed. Change any credentials '
+            'you may have entered. Acting within minutes vs. hours makes '
+            'a significant difference in containing the damage. No one '
+            'will judge you for reporting — staying quiet is far more '
+            'harmful.',
+      ),
+    ],
+  ),
+
+  // 9 ----------------------------------------------------------------------
+  Lesson(
+    title: 'Building an Email-Secure Culture',
+    sections: [
+      LessonSection(
+        heading: 'Technology Alone Isn\'t Enough',
+        body:
+            'Spam filters, link-scanning, and sandboxing catch a lot — '
+            'but not everything. The most sophisticated phishing emails '
+            'are specifically designed to pass technical filters. A '
+            'security-aware team is the layer that catches what the tools '
+            'miss.',
+      ),
+      LessonSection(
+        heading: 'Organizational Habits That Help',
+        bullets: [
+          'Phishing simulation exercises — controlled fake phishing campaigns to measure and build awareness',
+          'Clear escalation paths — employees know exactly who to contact and how',
+          'No-blame reporting culture — people report mistakes faster if they won\'t be punished',
+          'Process controls — dual approval for sensitive actions (wire transfers, credential changes) so no single email can trigger them alone',
+        ],
+      ),
+      LessonSection(
+        heading: 'Your Personal Email Hygiene',
+        bullets: [
+          'Enable MFA on your email account — it\'s the password reset key to everything else',
+          'Use a unique password for your email account; don\'t reuse it anywhere',
+          'Keep personal and work email separate',
+          'Be skeptical of urgency — slow down when something demands immediate action',
+        ],
+      ),
+    ],
+  ),
+
+  // 10 ----------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
     quiz: [
       QuizQuestion(
-        question: 'Why is basic email vulnerable to spoofing?',
+        question: 'Why is SMTP considered the root cause of email spoofing?',
         options: [
-          'Email servers run very old software',
-          'SMTP doesn\'t inherently verify who actually sent a message',
-          'All emails are sent unencrypted',
-          'Spoofing is only possible on mobile devices',
+          'SMTP transmits email too slowly',
+          'SMTP has no built-in mechanism to verify who actually sent a message',
+          'SMTP encrypts all email content',
+          'SMTP requires a password for every message',
         ],
         correctIndex: 1,
-        explanation:
-            'SMTP was not originally designed to verify sender identity, '
-            'which is what enables spoofing.',
+        explanation: 'SMTP was designed without sender verification, allowing anyone to write any return address.',
       ),
       QuizQuestion(
-        question: 'An email impersonates a company executive and asks an '
-            'employee to urgently wire funds. This is an example of:',
+        question: 'A highly targeted phishing email crafted using personal '
+            'information about a specific victim is called:',
+        options: ['Whaling', 'Spear phishing', 'Smishing', 'Vishing'],
+        correctIndex: 1,
+        explanation: 'Spear phishing is targeted at a specific individual using researched personal details.',
+      ),
+      QuizQuestion(
+        question: 'An attacker impersonates a supplier and asks your accounts '
+            'team to update payment bank details. This is:',
         options: [
-          'DKIM failure',
+          'DNS poisoning',
           'Business Email Compromise (BEC)',
-          'DNS spoofing',
-          'A firewall misconfiguration',
+          'A DDoS attack',
+          'SQL injection',
         ],
         correctIndex: 1,
-        explanation:
-            'BEC involves impersonating a trusted figure, often an '
-            'executive, to request money or sensitive data.',
+        explanation: 'Invoice/payment fraud is one of the most common BEC scenarios.',
       ),
       QuizQuestion(
-        question: 'What should you check before trusting a sender, '
-            'beyond the display name?',
+        question: 'Which email authentication standard specifies what action '
+            'to take when a message fails SPF and DKIM checks?',
+        options: ['SPF', 'DKIM', 'DMARC', 'TLS'],
+        correctIndex: 2,
+        explanation: 'DMARC defines the enforcement policy (reject, quarantine, or report) for failed checks.',
+      ),
+      QuizQuestion(
+        question: 'You receive an unexpected email from your CEO asking for '
+            'an urgent wire transfer before end of day. What should you do first?',
         options: [
-          'The email\'s font',
-          'The actual email address/domain behind the display name',
-          'The time the email was sent',
-          'The email\'s subject line length',
-        ],
-        correctIndex: 1,
-        explanation:
-            'Display names can be faked freely; the actual address and '
-            'domain reveal more about legitimacy.',
-      ),
-      QuizQuestion(
-        question: 'Which email authentication standard adds a digital '
-            'signature to verify a message wasn\'t altered in transit?',
-        options: ['SPF', 'DKIM', 'DMARC', 'VPN'],
-        correctIndex: 1,
-        explanation:
-            'DKIM signs outgoing messages so receivers can verify '
-            'authenticity and integrity.',
-      ),
-      QuizQuestion(
-        question: 'What does DMARC primarily control?',
-        options: [
-          'Which servers are allowed to send mail for a domain',
-          'How attachments are scanned',
-          'What action to take when a message fails SPF/DKIM checks',
-          'The encryption strength of email traffic',
+          'Process the transfer immediately to avoid delays',
+          'Reply to the email to confirm',
+          'Verify by calling the CEO on a known number before taking any action',
+          'Forward it to the CFO and let them decide',
         ],
         correctIndex: 2,
-        explanation:
-            'DMARC tells receiving servers what to do — quarantine, '
-            'reject, or just report — when SPF/DKIM checks fail.',
+        explanation: 'Verify urgent financial requests through a separate, verified channel — never by replying to the same email.',
       ),
       QuizQuestion(
-        question: 'What is "credential harvesting" in the context of '
-            'malicious links?',
+        question: 'In email headers, which field shows the chain of servers '
+            'the message passed through?',
+        options: ['From:', 'Received:', 'Subject:', 'DKIM-Signature:'],
+        correctIndex: 1,
+        explanation: 'The Received: headers form the routing chain — read from bottom (origin) to top (destination).',
+      ),
+      QuizQuestion(
+        question: 'Why is enabling MFA specifically important for your '
+            'primary email account?',
         options: [
-          'Automatically generating strong passwords',
-          'A fake login page designed to capture whatever you type in',
-          'A tool that stores passwords securely',
-          'A method for resetting forgotten passwords',
+          'It makes email load faster',
+          'Email is used to reset passwords on most other accounts, making it the master key',
+          'It stops all spam automatically',
+          'It is required by most email providers',
         ],
         correctIndex: 1,
-        explanation:
-            'Credential harvesting uses a convincing fake login page to '
-            'steal usernames and passwords.',
+        explanation: 'Compromising your email often means compromising everything else that uses it for password resets.',
       ),
       QuizQuestion(
-        question: 'If you accidentally click a suspicious link, what '
-            'should you do?',
+        question: 'An Office document asks you to "Enable Macros" to view '
+            'its content. What should you do?',
         options: [
-          'Say nothing and hope it was harmless',
-          'Wait a few days to see if anything happens',
-          'Report it immediately, even though it\'s uncomfortable',
-          'Only mention it if asked directly',
-        ],
-        correctIndex: 2,
-        explanation:
-            'Reporting immediately allows the security team to respond '
-            'quickly and limit any damage.',
-      ),
-      QuizQuestion(
-        question: 'Why is enabling MFA on an email account especially '
-            'valuable?',
-        options: [
-          'It makes emails load faster',
-          'Email is often used to reset passwords on other accounts, making it a high-value target',
-          'It removes the need for spam filters',
-          'It automatically blocks all phishing emails',
+          'Enable macros — it\'s just a display setting',
+          'Be suspicious; this is a common malware delivery mechanism — verify with the sender first',
+          'Save the file and resend it',
+          'Enable macros only if the document looks professional',
         ],
         correctIndex: 1,
-        explanation:
-            'Because email often controls password resets elsewhere, '
-            'compromising it can cascade into other accounts — making MFA '
-            'especially important there.',
+        explanation: 'Macro-enabled documents are one of the most common malware delivery methods via email.',
       ),
     ],
   ),

@@ -30,11 +30,13 @@ class Lesson {
   final String title;
   final List<LessonSection> sections;
   final List<QuizQuestion>? quiz;
+  final bool isAudio;
 
   const Lesson({
     required this.title,
     this.sections = const [],
     this.quiz,
+    this.isAudio = false,
   });
 
   bool get isQuiz => quiz != null;

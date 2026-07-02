@@ -1,334 +1,413 @@
 import '../lesson_model.dart';
 
 const List<Lesson> socOperationsLessons = [
-  // 1 ----------------------------------------------------------------------
   Lesson(
-    title: 'What is a SOC?',
+    title: 'SOC Models: In-House, MSSP & MDR',
     sections: [
       LessonSection(
-        heading: 'Security Operations Center',
-        body:
-            'A SOC is the team (and the physical or virtual space) '
-            'responsible for continuously monitoring an organization\'s '
-            'systems, detecting potential security incidents, and '
-            'coordinating the response — often around the clock.',
-      ),
-      LessonSection(
-        heading: 'Core SOC Functions',
+        heading: 'The Three Main SOC Delivery Models',
         bullets: [
-          'Continuous monitoring of networks, endpoints, and applications',
-          'Detecting and triaging security alerts',
-          'Investigating suspicious activity',
-          'Coordinating incident response',
-          'Threat hunting — proactively looking for threats that automated tools missed',
+          'In-house SOC — the organization builds, staffs, and runs its own team; full control, highest cost',
+          'MSSP (Managed Security Service Provider) — outsource monitoring to a third-party provider; cost-effective but less organizational context',
+          'MDR (Managed Detection and Response) — goes further than MSSP by also providing active investigation and containment; the fastest-growing model',
         ],
       ),
       LessonSection(
-        heading: 'In-House vs. Outsourced',
+        heading: 'Hybrid SOC',
         body:
-            'Some organizations run their own SOC; many others use a '
-            'Managed Security Service Provider (MSSP) or a Managed '
-            'Detection and Response (MDR) vendor to provide this function '
-            'instead, especially smaller organizations without the budget '
-            'for a 24/7 in-house team.',
+            'Many organizations blend models — for example, an in-house '
+            'team handles Tier 2+ investigations while an MDR provider '
+            'handles 24/7 Tier 1 alert triage. The right model depends '
+            'on budget, risk appetite, and the availability of security '
+            'talent in the local market.',
+      ),
+      LessonSection(
+        heading: 'Virtual SOC',
+        body:
+            'A Virtual SOC (vSOC) operates with no dedicated physical '
+            'space — analysts work remotely, tool access is cloud-based. '
+            'Accelerated significantly by remote work normalization and '
+            'cloud-native SIEM adoption.',
       ),
     ],
   ),
 
-  // 2 ----------------------------------------------------------------------
   Lesson(
-    title: 'SOC Roles & Tiers',
+    title: 'SOC Roles, Tiers & Career Paths',
     sections: [
       LessonSection(
-        heading: 'Tier 1 — Triage Analyst',
-        body:
-            'Monitors incoming alerts, performs initial investigation, '
-            'and decides whether an alert is a false positive or needs to '
-            'be escalated.',
-      ),
-      LessonSection(
-        heading: 'Tier 2 — Incident Responder',
-        body:
-            'Takes escalated alerts, performs deeper investigation, '
-            'determines scope and impact, and leads containment and '
-            'remediation efforts.',
-      ),
-      LessonSection(
-        heading: 'Tier 3 — Threat Hunter / Senior Analyst',
-        body:
-            'Proactively searches for hidden threats, analyzes complex or '
-            'novel attacks, and often helps tune detection rules so '
-            'similar threats are caught automatically in the future.',
-      ),
-      LessonSection(
-        heading: 'Other Common Roles',
+        heading: 'Tier Structure',
         bullets: [
-          'SOC Manager — oversees operations, staffing, and reporting',
-          'Threat Intelligence Analyst — tracks emerging threats relevant to the organization',
-          'Detection Engineer — builds and tunes the rules that generate alerts',
+          'Tier 1 (Triage Analyst) — first to see alerts; determines whether to close, monitor, or escalate',
+          'Tier 2 (Incident Responder) — investigates escalated alerts, determines scope and impact, leads containment',
+          'Tier 3 (Threat Hunter / Senior Analyst) — proactively searches for undetected threats, handles advanced cases, tunes detection rules',
+        ],
+      ),
+      LessonSection(
+        heading: 'Supporting Roles',
+        bullets: [
+          'SOC Manager — staffing, SLAs, reporting to leadership, tool procurement',
+          'Detection Engineer — writes and maintains the SIEM rules and logic that generate alerts',
+          'Threat Intelligence Analyst — tracks adversary groups, TTPs, and intelligence relevant to the organization',
+          'Forensics Analyst — supports deep-dive investigations requiring evidence preservation',
+        ],
+      ),
+      LessonSection(
+        heading: 'Career Progression',
+        body:
+            'The typical path is T1 → T2 → T3 or into a specialism '
+            '(detection engineering, threat hunting, forensics, IR lead). '
+            'Technical skills (SIEM query languages, scripting, log '
+            'analysis) combine with soft skills (communication, '
+            'documentation, calm decision-making) at every tier.',
+      ),
+    ],
+  ),
+
+  Lesson(
+    title: 'SIEM Platforms & Log Correlation',
+    sections: [
+      LessonSection(
+        heading: 'What a SIEM Does',
+        body:
+            'A SIEM (Security Information and Event Management) platform '
+            'collects, normalizes, and correlates log data from across '
+            'the environment — firewalls, endpoints, cloud services, '
+            'servers, identity providers — then applies detection rules '
+            'and ML to surface potential security events.',
+      ),
+      LessonSection(
+        heading: 'Leading SIEM Platforms',
+        bullets: [
+          'Microsoft Sentinel — cloud-native; tight Azure/M365 integration; KQL query language',
+          'Splunk — widely deployed; powerful SPL query language; extensive ecosystem',
+          'IBM QRadar — enterprise; strong compliance reporting',
+          'Elastic SIEM (OpenSearch) — open-source option; increasingly mature',
+          'Chronicle (Google) — cloud-scale; petabyte retention',
+        ],
+      ),
+      LessonSection(
+        heading: 'The Power of Correlation',
+        body:
+            'One failed login is noise. 500 failed logins from one IP '
+            'followed by a successful login and a lateral movement event '
+            'is a detection. Correlation rules link events across time, '
+            'source, and type to surface patterns that no individual '
+            'alert would reveal.',
+      ),
+    ],
+  ),
+
+  Lesson(
+    title: 'Threat Intelligence & IOC Analysis',
+    sections: [
+      LessonSection(
+        heading: 'What Threat Intelligence Is',
+        body:
+            'Threat intelligence is analyzed information about adversaries '
+            '— their tools, techniques, infrastructure, and objectives — '
+            'that helps defenders prioritize and contextualize alerts.',
+      ),
+      LessonSection(
+        heading: 'Types of Indicators',
+        bullets: [
+          'IOC (Indicator of Compromise) — observable evidence of a breach: malicious IP, file hash, domain, registry key',
+          'TTP (Tactic, Technique, Procedure) — how the attacker operates, mapped to frameworks like MITRE ATT&CK',
+          'Strategic intelligence — broader picture of adversary groups, their targets, and motivations',
+        ],
+      ),
+      LessonSection(
+        heading: 'Intelligence Sources',
+        bullets: [
+          'Open-source (OSINT) — VirusTotal, Shodan, MISP, AlienVault OTX, government CERT feeds',
+          'Commercial feeds — CrowdStrike Intel, Recorded Future, Mandiant Advantage',
+          'ISACs — sector-specific sharing communities (FS-ISAC for financial, H-ISAC for healthcare)',
+          'Internal — your own historical incidents are among the most valuable and context-relevant sources',
         ],
       ),
     ],
   ),
 
-  // 3 ----------------------------------------------------------------------
   Lesson(
-    title: 'SIEM & Monitoring Tools',
-    sections: [
-      LessonSection(
-        heading: 'What is a SIEM?',
-        body:
-            'A Security Information and Event Management (SIEM) platform '
-            'collects logs from across an organization — firewalls, '
-            'servers, endpoints, cloud services — and correlates them to '
-            'surface potential security events.',
-      ),
-      LessonSection(
-        heading: 'Why Correlation Matters',
-        body:
-            'A single failed login means little on its own. But a SIEM '
-            'can connect that failed login with an unusual file download '
-            'and a new outbound connection minutes later — surfacing a '
-            'pattern no single log entry would reveal alone.',
-      ),
-      LessonSection(
-        heading: 'Related Tools',
-        bullets: [
-          'SOAR (Security Orchestration, Automation and Response) — automates routine response steps',
-          'EDR/XDR — endpoint (and extended) detection and response tools feeding data into the SOC',
-          'Threat intelligence feeds — external data on known malicious indicators',
-        ],
-      ),
-    ],
-  ),
-
-  // 4 ----------------------------------------------------------------------
-  Lesson(
-    title: 'Alert Triage',
+    title: 'Alert Triage & False Positive Management',
     sections: [
       LessonSection(
         heading: 'The Alert Fatigue Problem',
         body:
-            'A busy SOC may receive thousands of alerts a day, and most '
-            'turn out to be false positives. Effective triage is what '
-            'separates a functional SOC from one that\'s drowning in noise.',
+            'A busy SOC may process thousands of alerts per day, the '
+            'vast majority of which are false positives. Analysts who '
+            'become numb to high volumes of low-quality alerts start '
+            'missing real events. Alert quality matters as much as '
+            'alert quantity.',
       ),
       LessonSection(
-        heading: 'A Typical Triage Process',
+        heading: 'A Practical Triage Process',
         bullets: [
-          'Gather context — what triggered the alert, and what else was happening at that time?',
-          'Assess severity — what\'s the potential impact if this is real?',
-          'Check for known indicators — does this match known malicious activity?',
-          'Decide — close as a false positive, monitor, or escalate',
+          '1. Contextualize — what triggered this, from where, on which asset, at what time?',
+          '2. Enrich — pull in threat intel, asset info, and recent activity for the involved entities',
+          '3. Assess — what\'s the worst-case if this is real? What\'s the likelihood?',
+          '4. Decide — close (false positive), monitor (watch for more signals), or escalate (open incident)',
+          '5. Document — record the reasoning for every decision',
         ],
       ),
       LessonSection(
-        heading: 'Indicators of Compromise (IOCs)',
-        body:
-            'IOCs are observable signs that a system may be compromised — '
-            'things like a known-malicious IP address, an unusual file '
-            'hash, or a suspicious registry change. Analysts compare '
-            'activity against IOC lists to speed up triage.',
+        heading: 'Reducing False Positives',
+        bullets: [
+          'Tune detection rules after each wave of false positives',
+          'Build allowlists for known-good behaviour (specific admin accounts, maintenance windows)',
+          'Use risk scoring to surface only high-confidence, high-severity alerts for immediate attention',
+          'Track false positive rates per rule — rules above a threshold need to be rewritten or retired',
+        ],
       ),
     ],
   ),
 
-  // 5 ----------------------------------------------------------------------
   Lesson(
     title: 'The Incident Response Lifecycle',
     sections: [
       LessonSection(
-        heading: 'A Common Framework',
-        body:
-            'Most incident response processes follow a similar lifecycle, '
-            'often summarized in six phases:',
+        heading: 'Six Phases',
         bullets: [
-          'Preparation — having tools, playbooks, and trained people ready before anything happens',
-          'Identification — detecting that an incident may be occurring',
-          'Containment — limiting the spread or impact',
-          'Eradication — removing the threat from the environment',
-          'Recovery — restoring systems to normal operation safely',
-          'Lessons Learned — reviewing what happened to improve next time',
+          'Preparation — playbooks, tools, team training, communication plans; before anything happens',
+          'Identification — detecting and confirming that an incident is actually occurring',
+          'Containment — stopping the spread without yet removing the threat (preserve forensic evidence)',
+          'Eradication — removing the threat (malware, backdoor accounts, compromised credentials)',
+          'Recovery — restoring systems to known-good state; validating before returning to production',
+          'Lessons Learned — post-incident review to improve detection, process, and controls',
         ],
       ),
       LessonSection(
-        heading: 'Why "Lessons Learned" Matters',
+        heading: 'Containment Strategies',
+        bullets: [
+          'Short-term: isolate the affected host from the network (network quarantine)',
+          'Long-term: identify and contain all affected systems before eradication begins',
+          'Don\'t reimage immediately — preserve evidence (memory, disk image) for forensic analysis',
+        ],
+      ),
+      LessonSection(
+        heading: 'Communication During an Incident',
         body:
-            'Skipping this final step is a common mistake. The whole point '
-            'of reviewing an incident afterward is to feed what was '
-            'learned back into detection rules, policies, and training so '
-            'the same gap isn\'t exploited twice.',
+            'Who to notify and when is a critical planning decision. '
+            'Leadership, legal, PR, customers, and regulators may all '
+            'have notification requirements on different timelines. '
+            'Having a communication plan prepared in advance prevents '
+            'chaotic, inconsistent messaging during a high-stress event.',
       ),
     ],
   ),
 
-  // 6 ----------------------------------------------------------------------
   Lesson(
-    title: 'Frameworks: Kill Chain & MITRE ATT&CK',
+    title: 'MITRE ATT&CK Framework',
     sections: [
       LessonSection(
-        heading: 'The Cyber Kill Chain',
+        heading: 'What ATT&CK Is',
         body:
-            'A model describing the typical stages of an attack, from '
-            'early reconnaissance through to the attacker\'s final '
-            'objective. The idea is that breaking the chain at any stage '
-            'can stop the attack before it succeeds.',
+            'MITRE ATT&CK (Adversarial Tactics, Techniques, and Common '
+            'Knowledge) is a publicly maintained knowledge base of '
+            'attacker behavior organized by tactic (the goal) and '
+            'technique (how it\'s achieved), built from real-world '
+            'observation of threat actors.',
+      ),
+      LessonSection(
+        heading: 'The Tactics (Enterprise Matrix)',
         bullets: [
-          'Reconnaissance', 'Weaponization', 'Delivery', 'Exploitation',
-          'Installation', 'Command & Control', 'Actions on Objectives',
+          'Reconnaissance, Resource Development, Initial Access',
+          'Execution, Persistence, Privilege Escalation',
+          'Defense Evasion, Credential Access, Discovery',
+          'Lateral Movement, Collection, Command and Control',
+          'Exfiltration, Impact',
         ],
       ),
       LessonSection(
-        heading: 'MITRE ATT&CK',
-        body:
-            'A widely used knowledge base that catalogs known attacker '
-            'tactics and techniques, organized by the goal they achieve '
-            '(like "Persistence" or "Lateral Movement"). SOC teams use it '
-            'as a common language for describing and detecting attacker '
-            'behavior, rather than just a list of specific tools.',
-      ),
-      LessonSection(
-        heading: 'Why These Frameworks Are Useful',
-        body:
-            'They give analysts a shared vocabulary and a structured way '
-            'to map what they\'re observing back to known attacker '
-            'behavior — which speeds up investigation and helps identify '
-            'detection gaps.',
+        heading: 'Practical Uses in a SOC',
+        bullets: [
+          'Alert mapping — tag every detection rule with its ATT&CK technique(s)',
+          'Coverage gap analysis — identify which techniques have no detection coverage',
+          'Investigation pivot — use ATT&CK to anticipate what an attacker will try next',
+          'Reporting — communicate findings to leadership in a consistent, recognized language',
+        ],
       ),
     ],
   ),
 
-  // 7 ----------------------------------------------------------------------
   Lesson(
-    title: 'Life in the SOC',
+    title: 'The Cyber Kill Chain',
     sections: [
       LessonSection(
-        heading: 'Shift Work',
+        heading: 'The Model',
         body:
-            'Because threats don\'t keep business hours, many SOCs operate '
-            'in shifts to provide 24/7 coverage — a notable difference '
-            'from a typical 9-to-5 IT role.',
+            'Developed by Lockheed Martin, the Cyber Kill Chain describes '
+            'seven stages of a targeted intrusion. The insight: an '
+            'attacker must complete every stage to achieve their objective, '
+            'so defenders who disrupt any stage can stop the attack.',
       ),
       LessonSection(
-        heading: 'Documentation Matters',
-        body:
-            'Clear, consistent documentation — of investigations, '
-            'decisions, and handoffs between shifts — keeps the team '
-            'aligned and makes sure context isn\'t lost between analysts.',
-      ),
-      LessonSection(
-        heading: 'Soft Skills That Matter',
+        heading: 'The Seven Stages',
         bullets: [
-          'Clear written communication for incident reports',
-          'Calm decision-making under time pressure',
-          'Curiosity — willingness to dig past the obvious explanation',
-          'Collaboration across IT, legal, and leadership during real incidents',
+          'Reconnaissance — gathering information about the target',
+          'Weaponization — creating the exploit/payload',
+          'Delivery — sending the payload (phishing, USB, web exploit)',
+          'Exploitation — triggering the exploit on the victim',
+          'Installation — establishing persistence (malware, backdoor)',
+          'Command & Control (C2) — establishing a remote communication channel',
+          'Actions on Objectives — achieving the goal (data theft, destruction, lateral movement)',
         ],
+      ),
+      LessonSection(
+        heading: 'Limitations',
+        body:
+            'The Kill Chain was designed around external network-based '
+            'intrusions and doesn\'t model insider threats or some cloud '
+            'attack patterns well. ATT&CK provides more granular and '
+            'updated technique coverage. In practice, both are used '
+            'together.',
       ),
     ],
   ),
 
-  // 8 ------------------------------------------------------------------ Quiz
+  Lesson(
+    title: 'SOAR: Security Orchestration, Automation & Response',
+    sections: [
+      LessonSection(
+        heading: 'What SOAR Does',
+        body:
+            'SOAR platforms automate repetitive, well-defined response '
+            'actions that analysts would otherwise do manually for every '
+            'alert: querying threat intel databases, disabling accounts, '
+            'isolating hosts, sending notifications, opening tickets. '
+            'This compresses mean time to respond (MTTR) significantly.',
+      ),
+      LessonSection(
+        heading: 'Playbooks',
+        body:
+            'A SOAR playbook is a structured workflow that defines exactly '
+            'what steps to take when a specific type of alert fires — '
+            'automated steps, human decision gates, and escalation '
+            'conditions. Well-written playbooks make T1 triage faster '
+            'and more consistent.',
+      ),
+      LessonSection(
+        heading: 'SOAR vs. SIEM',
+        body:
+            'SIEM detects and generates alerts. SOAR responds to those '
+            'alerts. They\'re complementary — most modern deployments '
+            'have both, often integrated so a SIEM alert directly '
+            'triggers a SOAR playbook. Some platforms (like Microsoft '
+            'Sentinel) combine both.',
+      ),
+    ],
+  ),
+
+  Lesson(
+    title: 'SOC Metrics, Documentation & Shift Handoffs',
+    sections: [
+      LessonSection(
+        heading: 'Key SOC Metrics',
+        bullets: [
+          'MTTD (Mean Time to Detect) — how long from initial compromise to detection',
+          'MTTR (Mean Time to Respond) — how long from detection to containment',
+          'MTTC (Mean Time to Contain) — how long from detection to isolation complete',
+          'False positive rate per rule — signal quality indicator',
+          'Dwell time — how long an attacker was present before detection',
+        ],
+      ),
+      LessonSection(
+        heading: 'Shift Handoffs',
+        body:
+            'Because SOCs run 24/7, shift handoffs are high-risk moments '
+            'where context can be lost. A good handoff includes: open '
+            'incidents with current status, decisions made and reasoning, '
+            'actions pending, and anything unusual observed during the '
+            'shift — written, not just verbal.',
+      ),
+      LessonSection(
+        heading: 'Documentation Standards',
+        body:
+            'Every alert disposition should be documented: what it was, '
+            'what evidence was reviewed, what was decided, and why. '
+            'This creates an institutional memory, supports compliance '
+            'audits, and ensures the next analyst can pick up exactly '
+            'where the last one left off.',
+      ),
+    ],
+  ),
+
   Lesson(
     title: 'Practice Quiz',
     quiz: [
       QuizQuestion(
-        question: 'What is the primary purpose of a Security Operations '
-            'Center (SOC)?',
+        question: 'What distinguishes MDR from a traditional MSSP?',
         options: [
-          'Writing company marketing material',
-          'Continuously monitoring systems and coordinating response to security incidents',
-          'Managing employee payroll',
-          'Designing new software features',
+          'MDR is cheaper than MSSP',
+          'MDR provides active investigation and containment, not just monitoring and alerting',
+          'MDR only works for cloud environments',
+          'MSSP uses more advanced tools',
         ],
         correctIndex: 1,
-        explanation:
-            'A SOC\'s core role is ongoing monitoring, detection, and '
-            'coordinated response to security incidents.',
+        explanation: 'MDR goes beyond monitoring to actively investigate and contain threats on behalf of the customer.',
       ),
       QuizQuestion(
-        question: 'Which SOC tier typically performs the first review of '
-            'an incoming alert?',
-        options: ['Tier 1', 'Tier 2', 'Tier 3', 'SOC Manager'],
-        correctIndex: 0,
-        explanation:
-            'Tier 1 analysts perform initial triage on incoming alerts.',
-      ),
-      QuizQuestion(
-        question: 'What does a SIEM mainly help a SOC do?',
+        question: 'What is the role of a Detection Engineer in a SOC?',
         options: [
-          'Write security policies',
-          'Collect and correlate logs from across the organization to surface potential incidents',
-          'Encrypt company laptops',
-          'Manage employee onboarding',
+          'Physical security of the SOC facility',
+          'Writing and maintaining the SIEM rules and logic that generate alerts',
+          'Patching endpoint systems',
+          'Managing the SOC\'s budget',
         ],
         correctIndex: 1,
-        explanation:
-            'A SIEM aggregates and correlates log data to help reveal '
-            'patterns that single events wouldn\'t show.',
+        explanation: 'Detection Engineers build and tune the rules that determine what the SIEM surfaces as alerts.',
       ),
       QuizQuestion(
-        question: 'What is an "Indicator of Compromise" (IOC)?',
+        question: 'In the ATT&CK framework, what does a "Technique" represent?',
         options: [
-          'A formal security policy document',
-          'An observable sign that a system may be compromised, such as a known-malicious IP',
-          'A type of firewall rule',
-          'A performance metric for SOC analysts',
+          'The overall goal the attacker is trying to achieve',
+          'A specific method used to accomplish a tactic',
+          'A type of malware family',
+          'A vulnerability in a specific product',
         ],
         correctIndex: 1,
-        explanation:
-            'IOCs are observable artifacts — like malicious IPs or file '
-            'hashes — that suggest a system may be compromised.',
+        explanation: 'In ATT&CK, Tactics are goals (e.g. Persistence) and Techniques are the specific methods used to achieve them.',
       ),
       QuizQuestion(
-        question: 'In the incident response lifecycle, what comes '
-            'immediately after "Containment"?',
-        options: ['Identification', 'Eradication', 'Preparation', 'Recovery'],
-        correctIndex: 1,
-        explanation:
-            'After containing an incident, the next phase is eradication '
-            '— removing the threat from the environment.',
+        question: 'Which Kill Chain stage does a spear-phishing email delivering '
+            'a malware attachment represent?',
+        options: ['Reconnaissance', 'Weaponization', 'Delivery', 'Exploitation'],
+        correctIndex: 2,
+        explanation: 'Sending the payload to the victim (via email, USB, web) is the Delivery stage.',
       ),
       QuizQuestion(
-        question: 'Why do many incident response processes include a '
-            '"Lessons Learned" phase?',
+        question: 'What does MTTD measure in SOC metrics?',
         options: [
-          'It is legally required everywhere',
-          'To feed what was learned back into detection, policy, and training so gaps aren\'t exploited again',
-          'To assign blame to specific employees',
-          'It is optional and rarely useful',
+          'How long it takes to resolve an alert completely',
+          'How long from initial compromise to detection',
+          'How many alerts were resolved in a shift',
+          'The time to patch a vulnerability',
         ],
         correctIndex: 1,
-        explanation:
-            'Reviewing incidents afterward helps improve defenses and '
-            'close the gaps that were exploited.',
+        explanation: 'MTTD (Mean Time to Detect) measures the gap between compromise and the moment it was discovered.',
       ),
       QuizQuestion(
-        question: 'What is MITRE ATT&CK best described as?',
+        question: 'During the Containment phase of incident response, why '
+            'should you NOT immediately reimage the affected machine?',
         options: [
-          'An antivirus product',
-          'A knowledge base cataloging known attacker tactics and techniques',
-          'A type of firewall',
-          'A password policy standard',
+          'Reimaging is too slow',
+          'You need to preserve forensic evidence (memory and disk) before cleaning up',
+          'Reimaging requires vendor approval',
+          'Containment and eradication are the same phase',
         ],
         correctIndex: 1,
-        explanation:
-            'MITRE ATT&CK is a widely used framework cataloging attacker '
-            'tactics and techniques.',
+        explanation: 'Forensic evidence in memory and on disk is destroyed by reimaging — investigate first, then eradicate.',
       ),
       QuizQuestion(
-        question: 'Why do many SOCs operate in shifts rather than '
-            'standard business hours?',
+        question: 'What is a SOAR playbook?',
         options: [
-          'It is cheaper to staff that way',
-          'Threats can occur at any time, so coverage needs to be continuous',
-          'It is required by most software licenses',
-          'Analysts prefer working at night',
+          'A training manual for new SOC analysts',
+          'A structured automated workflow defining response steps for a specific alert type',
+          'A threat intelligence database',
+          'A compliance reporting template',
         ],
         correctIndex: 1,
-        explanation:
-            'Because attacks aren\'t limited to business hours, many SOCs '
-            'need round-the-clock coverage.',
+        explanation: 'A SOAR playbook automates and standardizes the response to a specific alert type.',
       ),
     ],
   ),

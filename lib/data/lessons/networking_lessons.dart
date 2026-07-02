@@ -3,342 +3,411 @@ import '../lesson_model.dart';
 const List<Lesson> networkingLessons = [
   // 1 ----------------------------------------------------------------------
   Lesson(
-    title: 'How Networks Work',
+    title: 'TCP/IP & the OSI Model',
     sections: [
       LessonSection(
-        heading: 'What is a Network?',
+        heading: 'Two Frameworks, One Reality',
         body:
-            'A network is simply two or more devices connected so they can '
-            'share data. Understanding how data moves between devices is '
-            'essential before you can understand how to secure it.',
+            'The OSI model (7 layers) is a conceptual framework for '
+            'understanding networking. TCP/IP (4 layers) is what actually '
+            'runs the internet. Learning both helps you understand where '
+            'attacks and defenses operate.',
       ),
       LessonSection(
-        heading: 'The OSI Model (Simplified)',
-        body:
-            'The OSI model describes networking in seven layers. You don\'t '
-            'need to memorize all seven to get started — focus on these '
-            'three:',
+        heading: 'OSI Layers That Matter Most for Security',
         bullets: [
-          'Physical/Data Link — the actual cables, Wi-Fi signals, and hardware addressing (MAC addresses)',
-          'Network — how data is routed between networks (IP addresses)',
-          'Transport — how data is delivered reliably between applications (TCP/UDP)',
+          'Layer 2 (Data Link) — MAC addressing, switches, ARP spoofing happens here',
+          'Layer 3 (Network) — IP addressing, routing, IP spoofing happens here',
+          'Layer 4 (Transport) — TCP/UDP ports, connection tracking, SYN floods happen here',
+          'Layer 7 (Application) — HTTP, DNS, SMTP — most application-layer attacks happen here',
         ],
       ),
       LessonSection(
-        heading: 'TCP/IP in Practice',
+        heading: 'TCP: Reliable, Connection-Oriented',
         body:
-            'Most real-world traffic runs on TCP/IP. TCP establishes a '
-            'reliable connection and confirms delivery; UDP sends data '
-            'quickly without that overhead — useful for things like video '
-            'streaming where speed matters more than perfect delivery.',
+            'TCP establishes a connection via a three-way handshake '
+            '(SYN → SYN-ACK → ACK), confirms delivery of every packet, '
+            'and retransmits on failure. Used for HTTP, HTTPS, SSH, email.',
+      ),
+      LessonSection(
+        heading: 'UDP: Fast, Connectionless',
+        body:
+            'UDP sends packets without establishing a connection or '
+            'confirming delivery. Lower overhead, higher speed. Used for '
+            'DNS, VoIP, video streaming, gaming.',
       ),
     ],
   ),
 
   // 2 ----------------------------------------------------------------------
   Lesson(
-    title: 'IP Addressing & Subnetting',
+    title: 'IPv4 & IPv6 Addressing',
     sections: [
       LessonSection(
-        heading: 'What is an IP Address?',
+        heading: 'IPv4 Addressing',
         body:
-            'An IP address identifies a device on a network, similar to a '
-            'street address for mail. IPv4 addresses look like '
-            '192.168.1.10; IPv6 addresses are longer and designed to solve '
-            'IPv4\'s limited address space.',
+            'IPv4 uses 32-bit addresses written as four numbers separated '
+            'by dots (e.g. 192.168.1.10). With roughly 4 billion total '
+            'addresses, IPv4 exhausted its public address space years ago.',
       ),
       LessonSection(
         heading: 'Public vs. Private Addresses',
         bullets: [
-          'Public IPs — reachable directly from the internet',
-          'Private IPs — used inside local networks (e.g. 192.168.x.x, 10.x.x.x) and not routable on the public internet',
+          'Private ranges (not routable on the public internet): 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16',
+          'Public IPs are globally unique and internet-reachable',
+          'NAT (Network Address Translation) allows many private devices to share one public IP',
         ],
       ),
       LessonSection(
-        heading: 'Why Subnetting Matters for Security',
+        heading: 'IPv6',
         body:
-            'Subnetting divides a network into smaller segments. From a '
-            'security standpoint, this lets you isolate sensitive systems '
-            '(like servers handling payment data) from general user '
-            'traffic, limiting how far an attacker can move if they '
-            'compromise one segment.',
+            'IPv6 uses 128-bit addresses (e.g. 2001:0db8::1), providing '
+            'a virtually unlimited number of addresses. Also built-in '
+            'support for IPsec. Security teams must monitor both — '
+            'networks with dual-stack configurations can be exploited '
+            'through whichever protocol has weaker controls.',
       ),
     ],
   ),
 
   // 3 ----------------------------------------------------------------------
   Lesson(
-    title: 'Ports & Protocols',
+    title: 'Subnetting & Network Segmentation',
     sections: [
       LessonSection(
-        heading: 'What is a Port?',
+        heading: 'What Subnetting Is',
         body:
-            'A port is a numbered "door" on a device that a specific '
-            'service listens on. A single IP address can run many '
-            'services at once, each on its own port.',
+            'Subnetting divides an IP network into smaller, isolated '
+            'segments. A subnet mask or CIDR notation (e.g. /24) defines '
+            'how many bits identify the network vs. the individual host.',
       ),
       LessonSection(
-        heading: 'Common Ports to Recognize',
-        bullets: [
-          'Port 80 — HTTP (unencrypted web traffic)',
-          'Port 443 — HTTPS (encrypted web traffic)',
-          'Port 22 — SSH (secure remote administration)',
-          'Port 53 — DNS (domain name resolution)',
-          'Port 25 — SMTP (sending email)',
-        ],
+        heading: 'Why Segmentation Is a Security Control',
+        body:
+            'An attacker who compromises one machine in a flat, unsegmented '
+            'network can reach every other machine. Segmentation limits '
+            'lateral movement — putting finance servers, HR systems, '
+            'IoT devices, and workstations on separate segments means a '
+            'breach in one area doesn\'t automatically expose the rest.',
       ),
       LessonSection(
-        heading: 'Why This Matters for Defense',
+        heading: 'DMZ: A Classic Segmentation Pattern',
         body:
-            'Every open port is a potential entry point. Part of hardening '
-            'any system is closing or restricting ports that aren\'t '
-            'actually needed — this is often called reducing the "attack '
-            'surface."',
+            'A DMZ (Demilitarized Zone) places public-facing servers '
+            '(web, email, DNS) in a segment isolated from both the internet '
+            'and the internal network. Traffic rules ensure the internet '
+            'can reach the DMZ, but the DMZ cannot freely reach internal '
+            'systems — so a compromised web server can\'t directly pivot '
+            'to internal databases.',
       ),
     ],
   ),
 
   // 4 ----------------------------------------------------------------------
   Lesson(
-    title: 'Network Devices',
+    title: 'Common Ports, Protocols & Services',
     sections: [
       LessonSection(
-        heading: 'Routers',
+        heading: 'Why Ports Matter for Security',
         body:
-            'Routers move traffic between different networks, deciding the '
-            'best path for data to reach its destination — for example, '
-            'connecting your home network to the internet.',
+            'Every open port on a system is a potential entry point. '
+            'Hardening means closing every port that isn\'t actively needed '
+            'and understanding exactly what\'s listening on the ones that are.',
       ),
       LessonSection(
-        heading: 'Switches',
-        body:
-            'Switches connect devices within the same local network, '
-            'forwarding traffic only to the device it\'s actually intended '
-            'for rather than broadcasting it to everyone.',
-      ),
-      LessonSection(
-        heading: 'Firewalls',
-        body:
-            'Firewalls inspect traffic and allow or block it based on '
-            'rules — like "block all inbound traffic except on port 443." '
-            'They\'re one of the most fundamental network security '
-            'controls.',
-      ),
-      LessonSection(
-        heading: 'Other Devices to Know',
+        heading: 'Essential Ports to Know',
         bullets: [
-          'Access Points — provide Wi-Fi connectivity',
-          'Load Balancers — distribute traffic across multiple servers',
-          'IDS/IPS — Intrusion Detection/Prevention Systems that watch for and can block suspicious traffic',
+          '21 — FTP (unencrypted file transfer; avoid)',
+          '22 — SSH (encrypted remote administration)',
+          '25 — SMTP (email relay; should be restricted externally)',
+          '53 — DNS (both UDP and TCP; frequently targeted for tunneling/poisoning)',
+          '80 — HTTP (unencrypted web; should redirect to HTTPS)',
+          '443 — HTTPS (encrypted web; TLS required)',
+          '445 — SMB (Windows file sharing; frequent ransomware propagation vector)',
+          '3389 — RDP (Windows Remote Desktop; very frequently brute-forced when exposed)',
         ],
+      ),
+      LessonSection(
+        heading: 'Port Scanning',
+        body:
+            'Attackers use tools like nmap to discover which ports are '
+            'open on a target. Security teams run the same scans to audit '
+            'their own exposure. A port scan result showing 3389 or 445 '
+            'directly exposed to the internet is an immediate finding.',
       ),
     ],
   ),
 
   // 5 ----------------------------------------------------------------------
   Lesson(
-    title: 'DNS Explained',
+    title: 'Firewalls, Routers & Network Devices',
     sections: [
       LessonSection(
-        heading: 'What DNS Does',
+        heading: 'Routers',
         body:
-            'DNS (Domain Name System) translates human-friendly domain '
-            'names like example.com into the IP addresses computers '
-            'actually use to find each other. It\'s often called the '
-            '"phone book of the internet."',
+            'Routers forward traffic between networks based on destination '
+            'IP address. They are the gateway between your internal network '
+            'and the internet. Most also include basic packet-filtering '
+            'capability.',
       ),
       LessonSection(
-        heading: 'Why Attackers Target DNS',
+        heading: 'Firewalls',
         bullets: [
-          'DNS spoofing — feeding a device a false IP address to redirect it to a malicious site',
-          'DNS tunneling — hiding stolen data inside DNS traffic to sneak past defenses',
-          'Typosquatting — registering misspelled domains to catch mistyped URLs',
+          'Packet filter (stateless) — inspects individual packets against simple rules',
+          'Stateful firewall — tracks connection state; allows return traffic from established sessions',
+          'Next-Generation Firewall (NGFW) — adds application-layer inspection, IPS, and threat intelligence',
+          'Web Application Firewall (WAF) — specifically protects HTTP/S traffic from application-layer attacks like SQLi and XSS',
         ],
       ),
       LessonSection(
-        heading: 'Defensive Measures',
+        heading: 'IDS vs. IPS',
         bullets: [
-          'DNSSEC — cryptographically verifies DNS responses haven\'t been tampered with',
-          'DNS filtering — blocking known-malicious domains before a connection is made',
+          'IDS (Intrusion Detection System) — monitors and alerts on suspicious activity; passive',
+          'IPS (Intrusion Prevention System) — monitors and actively blocks suspicious traffic; inline',
         ],
+      ),
+      LessonSection(
+        heading: 'Switches',
+        body:
+            'Switches connect devices within the same local network, '
+            'forwarding traffic only to the intended recipient\'s port — '
+            'more efficient and more private than a hub. VLANs (Virtual '
+            'LANs) allow a single physical switch to carry multiple '
+            'isolated logical networks.',
       ),
     ],
   ),
 
   // 6 ----------------------------------------------------------------------
   Lesson(
-    title: 'VPNs & Encryption in Transit',
+    title: 'DNS Architecture & Security',
     sections: [
       LessonSection(
-        heading: 'What is a VPN?',
+        heading: 'How DNS Resolution Works',
         body:
-            'A Virtual Private Network creates an encrypted tunnel between '
-            'a device and a remote network, so traffic traveling across an '
-            'untrusted network (like public Wi-Fi) stays private.',
+            'When you type a domain name, your device queries a resolver '
+            '(usually your ISP\'s or a public one like 8.8.8.8), which '
+            'recursively queries authoritative servers until it gets the '
+            'IP address. This hierarchy is what attackers target.',
       ),
       LessonSection(
-        heading: 'Common Uses',
+        heading: 'DNS-Based Attacks',
         bullets: [
-          'Remote employees securely accessing company resources',
-          'Protecting traffic on untrusted networks',
-          'Connecting separate office locations into one private network (site-to-site VPN)',
+          'DNS Cache Poisoning — injecting false records into a resolver\'s cache, redirecting users to attacker-controlled IPs',
+          'DNS Tunneling — encoding data in DNS queries to exfiltrate data or establish C2 channels through firewalls that allow DNS',
+          'Typosquatting — registering near-identical domains to catch mistyped URLs',
+          'DNS Amplification — using open DNS resolvers in DDoS attacks',
         ],
       ),
       LessonSection(
-        heading: 'VPNs Aren\'t a Silver Bullet',
-        body:
-            'A VPN protects data in transit, but it doesn\'t protect '
-            'against a compromised endpoint, a phished credential, or a '
-            'malicious website. It\'s one layer in a broader defense '
-            'strategy, not a replacement for the rest.',
+        heading: 'Defensive Measures',
+        bullets: [
+          'DNSSEC — cryptographically signs DNS records to verify they haven\'t been tampered with',
+          'DNS over HTTPS (DoH) / DNS over TLS (DoT) — encrypts DNS queries to prevent interception',
+          'DNS filtering/RPZ — blocking lookups to known-malicious domains before a connection is made',
+          'Monitoring unusual DNS query volumes — a signal of tunneling or beaconing',
+        ],
       ),
     ],
   ),
 
   // 7 ----------------------------------------------------------------------
   Lesson(
-    title: 'Common Network Attacks',
+    title: 'VPNs, TLS & Encryption in Transit',
     sections: [
       LessonSection(
-        heading: 'Man-in-the-Middle (MITM)',
+        heading: 'TLS: The Encryption Behind HTTPS',
         body:
-            'An attacker secretly positions themselves between two parties '
-            'communicating, intercepting or altering traffic without '
-            'either side realizing it.',
+            'Transport Layer Security (TLS) is the protocol that encrypts '
+            'traffic between a client and a server — what makes the '
+            '"S" in HTTPS. It uses asymmetric encryption to exchange '
+            'keys, then symmetric encryption for the session itself. '
+            'TLS 1.3 (current) is significantly faster and more secure '
+            'than older versions.',
       ),
       LessonSection(
-        heading: 'Packet Sniffing',
+        heading: 'VPNs',
         body:
-            'Capturing traffic as it travels across a network. On '
-            'unencrypted connections, this can expose sensitive data — '
-            'which is exactly why encrypting traffic (HTTPS, VPNs) matters.',
+            'A VPN creates an encrypted tunnel between a client and a '
+            'VPN server, protecting traffic from eavesdropping on '
+            'untrusted networks. Used for remote access and site-to-site '
+            'connectivity between offices.',
       ),
       LessonSection(
-        heading: 'Spoofing',
-        body:
-            'Disguising traffic to appear as if it\'s coming from a '
-            'trusted source — for example, faking a source IP or MAC '
-            'address to bypass access controls.',
-      ),
-      LessonSection(
-        heading: 'Denial-of-Service (DoS/DDoS)',
-        body:
-            'Flooding a network or service with traffic until it can\'t '
-            'respond to legitimate requests, making it unavailable.',
-      ),
-      LessonSection(
-        heading: 'Core Defenses',
+        heading: 'VPN Protocols',
         bullets: [
-          'Encrypt traffic end-to-end wherever possible',
-          'Segment networks so a breach in one area doesn\'t expose everything',
-          'Monitor traffic for unusual patterns',
-          'Keep network device firmware patched',
+          'OpenVPN — mature, open-source, highly configurable',
+          'WireGuard — modern, fast, minimal codebase; increasingly preferred',
+          'IPsec — widely used for site-to-site VPNs',
+          'PPTP/L2TP — older protocols; L2TP with IPsec is acceptable; PPTP is broken and should not be used',
+        ],
+      ),
+      LessonSection(
+        heading: 'What VPNs Don\'t Protect Against',
+        body:
+            'A VPN protects data in transit but does nothing against '
+            'a compromised endpoint, phished credentials, or malware '
+            'already on the device. It\'s one layer — not a complete '
+            'solution on its own.',
+      ),
+    ],
+  ),
+
+  // 8 ----------------------------------------------------------------------
+  Lesson(
+    title: 'Wireless Network Security',
+    sections: [
+      LessonSection(
+        heading: 'Wi-Fi Security Standards',
+        bullets: [
+          'WEP — broken; never use',
+          'WPA/WPA2-TKIP — deprecated; avoid',
+          'WPA2-AES (CCMP) — acceptable; widely deployed',
+          'WPA3 — current standard; required for new devices; forward secrecy prevents past traffic decryption if key is later compromised',
+        ],
+      ),
+      LessonSection(
+        heading: 'Common Wireless Attacks',
+        bullets: [
+          'Evil Twin / Rogue AP — attacker sets up a Wi-Fi hotspot with the same name as a legitimate one, intercepts traffic',
+          'WPA2 PMKID/KRACK attacks — vulnerabilities in WPA2 allowing key recovery',
+          'Deauthentication attacks — forcing devices off a network to capture the reconnection handshake',
+          'Wardriving — scanning for open or weakly secured networks from a moving vehicle',
+        ],
+      ),
+      LessonSection(
+        heading: 'Best Practices',
+        bullets: [
+          'Use WPA3 or WPA2-AES; disable WEP/WPA-TKIP',
+          'Separate guest Wi-Fi from corporate networks',
+          'Use 802.1X with a RADIUS server for enterprise authentication instead of pre-shared keys',
+          'Avoid sensitive activity on public/untrusted Wi-Fi without a VPN',
         ],
       ),
     ],
   ),
 
-  // 8 ------------------------------------------------------------------ Quiz
+  // 9 ----------------------------------------------------------------------
+  Lesson(
+    title: 'Common Network Attacks & Defenses',
+    sections: [
+      LessonSection(
+        heading: 'Man-in-the-Middle (MITM)',
+        body:
+            'An attacker positions themselves between two communicating '
+            'parties, reading or modifying traffic without either side '
+            'knowing. Defense: encrypt all traffic so interception yields '
+            'only ciphertext; verify certificate authenticity.',
+      ),
+      LessonSection(
+        heading: 'ARP Spoofing',
+        body:
+            'ARP maps IP addresses to MAC addresses on a local network. '
+            'An attacker sends fake ARP replies to associate their MAC '
+            'with a legitimate IP, redirecting traffic through their '
+            'machine. Defense: dynamic ARP inspection on managed switches.',
+      ),
+      LessonSection(
+        heading: 'DDoS Attacks',
+        body:
+            'Distributed Denial of Service overwhelms a target with '
+            'traffic from many sources simultaneously. Types include '
+            'volumetric (bandwidth exhaustion), protocol (SYN floods), '
+            'and application-layer (HTTP request floods). Defense: '
+            'scrubbing centers, rate limiting, CDN absorption, anycast.',
+      ),
+      LessonSection(
+        heading: 'Network-Layer Defense Principles',
+        bullets: [
+          'Deny by default — block everything not explicitly permitted',
+          'Encrypt in transit — assume networks are untrusted',
+          'Segment — limit blast radius of any single compromise',
+          'Monitor — detect anomalies before they become incidents',
+          'Patch — network device firmware is software; it has vulnerabilities too',
+        ],
+      ),
+    ],
+  ),
+
+  // 10 ----------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
     quiz: [
       QuizQuestion(
-        question: 'Which OSI layer is responsible for IP addressing and '
-            'routing between networks?',
-        options: ['Physical', 'Network', 'Transport', 'Application'],
-        correctIndex: 1,
-        explanation:
-            'The Network layer handles IP addressing and routing between '
-            'different networks.',
-      ),
-      QuizQuestion(
-        question: 'Which type of IP address is NOT directly reachable '
-            'from the public internet?',
+        question: 'What is the purpose of network segmentation?',
         options: [
-          'A public IP address',
-          'A private IP address',
-          'Any IPv6 address',
-          'A static IP address',
+          'To make DNS queries faster',
+          'To limit lateral movement if one part of the network is compromised',
+          'To increase available bandwidth',
+          'To replace firewalls',
         ],
         correctIndex: 1,
-        explanation:
-            'Private IP addresses are used inside local networks and '
-            'aren\'t routable on the public internet.',
+        explanation: 'Segmentation contains breaches by isolating different parts of the network from each other.',
       ),
       QuizQuestion(
-        question: 'Which port is associated with encrypted web traffic '
-            '(HTTPS)?',
-        options: ['21', '80', '443', '53'],
+        question: 'Which port is most commonly associated with unencrypted '
+            'remote desktop access on Windows?',
+        options: ['22', '443', '3389', '25'],
         correctIndex: 2,
-        explanation: 'Port 443 is the standard port for HTTPS traffic.',
+        explanation: 'Port 3389 is RDP — Windows Remote Desktop Protocol — a very common brute-force target when exposed.',
       ),
       QuizQuestion(
-        question: 'What is the primary job of a firewall?',
+        question: 'An attacker injects false DNS records into a resolver\'s '
+            'cache, redirecting users to a malicious site. This is:',
+        options: ['ARP spoofing', 'DNS cache poisoning', 'DNS tunneling', 'IP spoofing'],
+        correctIndex: 1,
+        explanation: 'DNS cache poisoning corrupts the resolver\'s cached records to redirect lookups.',
+      ),
+      QuizQuestion(
+        question: 'WPA3 offers an important improvement over WPA2. What is it?',
         options: [
-          'Translate domain names into IP addresses',
-          'Allow or block traffic based on defined rules',
-          'Distribute traffic evenly across servers',
-          'Encrypt traffic between two endpoints',
+          'It removes the need for a password',
+          'It provides forward secrecy, so past traffic can\'t be decrypted if the key is later compromised',
+          'It uses TKIP instead of AES',
+          'It disables guest network access',
         ],
         correctIndex: 1,
-        explanation:
-            'Firewalls inspect traffic and permit or deny it according to '
-            'configured rules.',
+        explanation: 'WPA3\'s Simultaneous Authentication of Equals (SAE) provides forward secrecy.',
       ),
       QuizQuestion(
-        question: 'DNS is often described as the "phone book of the '
-            'internet" because it:',
+        question: 'An attacker sets up a rogue Wi-Fi hotspot with the same '
+            'name as a coffee shop\'s real network. This is called:',
+        options: ['DNS tunneling', 'SYN flooding', 'An Evil Twin attack', 'ARP poisoning'],
+        correctIndex: 2,
+        explanation: 'An Evil Twin or Rogue AP mimics a legitimate network to intercept traffic.',
+      ),
+      QuizQuestion(
+        question: 'What does a WAF (Web Application Firewall) specifically protect?',
         options: [
-          'Stores phone numbers for IT support',
-          'Translates domain names into IP addresses',
-          'Encrypts domain traffic',
-          'Blocks malicious websites automatically',
+          'Physical network cables',
+          'HTTP/HTTPS traffic from application-layer attacks like SQL injection',
+          'Wi-Fi authentication',
+          'DNS query resolution',
         ],
         correctIndex: 1,
-        explanation:
-            'DNS resolves human-readable domain names to the IP addresses '
-            'computers use to communicate.',
+        explanation: 'A WAF inspects HTTP/S traffic specifically to block application-layer attacks.',
       ),
       QuizQuestion(
-        question: 'What does a VPN primarily protect?',
+        question: 'Which is NOT a valid reason to use TCP over UDP?',
         options: [
-          'Data stored on a hard drive',
-          'Data while it travels across a network',
-          'Passwords saved in a browser',
-          'Files inside a compressed archive',
-        ],
-        correctIndex: 1,
-        explanation:
-            'A VPN creates an encrypted tunnel that protects data in '
-            'transit across untrusted networks.',
-      ),
-      QuizQuestion(
-        question: 'An attacker secretly intercepts communication between '
-            'two parties without either side knowing. This is known as:',
-        options: [
-          'A denial-of-service attack',
-          'DNS tunneling',
-          'A man-in-the-middle attack',
-          'Subnetting',
+          'You need guaranteed delivery of every packet',
+          'You need connection state to be established',
+          'You need the lowest possible latency for real-time streaming',
+          'You need retransmission of lost packets',
         ],
         correctIndex: 2,
-        explanation:
-            'A man-in-the-middle attack involves secretly intercepting '
-            'communication between two parties.',
+        explanation: 'Low latency real-time streaming (VoIP, video) benefits from UDP\'s lack of overhead, not TCP.',
       ),
       QuizQuestion(
-        question: 'Why might an organization segment its network into '
-            'smaller subnets?',
+        question: 'DNS tunneling is dangerous because:',
         options: [
-          'To make Wi-Fi passwords longer',
-          'To limit how far an attacker can move if one segment is compromised',
-          'To increase the number of public IP addresses available',
-          'To remove the need for firewalls',
+          'It breaks DNS resolution permanently',
+          'It can be used to exfiltrate data or establish command-and-control through firewalls that permit DNS',
+          'It requires root access to execute',
+          'It only works on Linux systems',
         ],
         correctIndex: 1,
-        explanation:
-            'Segmentation contains the impact of a breach by isolating '
-            'parts of the network from each other.',
+        explanation: 'DNS tunneling encodes data inside DNS queries, which many firewalls allow by default.',
       ),
     ],
   ),

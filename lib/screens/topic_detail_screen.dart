@@ -207,7 +207,19 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
                     ),
                   );
                 },
-                leading: Icon(lesson.isQuiz ? Icons.quiz_outlined : Icons.book),
+                leading: Icon(
+                  lesson.isAudio
+                      ? Icons.headphones
+                      : lesson.isQuiz
+                          ? Icons.quiz_outlined
+                          : Icons.menu_book,
+                ),
+                title: Text(lesson.title),
+                subtitle: lesson.isAudio
+                    ? const Text('Audio Course',
+                        style: TextStyle(
+                            fontSize: 12, color: Colors.blue))
+                    : null,
                 title: Text(lesson.title),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               );
