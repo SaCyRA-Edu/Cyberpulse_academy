@@ -357,90 +357,281 @@ const List<Lesson> capstoneLessons = [
     title: 'Capstone Assessment',
     quiz: [
       QuizQuestion(
-        question: 'A web server is compromised, but the attacker cannot '
-            'read /etc/passwd or connect to internal databases, even '
-            'though the server runs as root. Which control is most likely '
-            'responsible?',
+        question: 'A web server compromised by an attacker cannot read /etc/passwd even running as root. What control is responsible?',
         options: [
           'BitLocker',
-          'Mandatory Access Control (SELinux/AppArmor)',
+          'Mandatory Access Control such as SELinux or AppArmor',
           'A host firewall rule',
           'NTFS permissions',
         ],
         correctIndex: 1,
-        explanation: 'MAC policies restrict what even root processes can do — a compromised web server confined by SELinux/AppArmor can\'t access resources outside its policy.',
+        explanation: 'MAC policies restrict what even root processes can do — confining the compromised web server.',
       ),
       QuizQuestion(
-        question: 'In the STRIDE model, "Tampering" maps to which CIA '
-            'Triad property?',
-        options: ['Confidentiality', 'Integrity', 'Availability', 'Authentication'],
+        question: 'In STRIDE Tampering maps to which CIA Triad property?',
+        options: [
+          'Confidentiality',
+          'Integrity',
+          'Availability',
+          'Authentication',
+        ],
         correctIndex: 1,
         explanation: 'Tampering = unauthorized modification = an Integrity violation.',
       ),
       QuizQuestion(
-        question: 'An organization\'s cloud storage buckets are set to public '
-            'read access. Which type of tool would most reliably catch '
-            'this misconfiguration continuously?',
-        options: ['WAF', 'CASB', 'CSPM', 'SOAR'],
-        correctIndex: 2,
-        explanation: 'CSPM (Cloud Security Posture Management) continuously audits cloud configuration for misconfigurations like public buckets.',
-      ),
-      QuizQuestion(
-        question: 'A penetration tester discovers credentials for the '
-            'cloud console in a public GitHub repository. Which Kill Chain '
-            'stage would they use these credentials in?',
-        options: ['Reconnaissance', 'Weaponization', 'Initial Access', 'Lateral Movement'],
-        correctIndex: 2,
-        explanation: 'Using stolen credentials to log in to a system is Initial Access — the first foothold in the target environment.',
-      ),
-      QuizQuestion(
-        question: 'Zero Trust\'s "Assume Breach" principle means:',
+        question: 'Which tool continuously audits cloud configuration for misconfigurations like public storage buckets?',
         options: [
-          'Do not deploy any security controls since breaches are inevitable',
-          'Design systems expecting a component will be compromised, and minimize blast radius and lateral movement',
-          'Alert leadership immediately that a breach has occurred',
+          'WAF',
+          'CASB',
+          'CSPM',
+          'SOAR',
+        ],
+        correctIndex: 2,
+        explanation: 'CSPM (Cloud Security Posture Management) continuously monitors cloud config for misconfigurations.',
+      ),
+      QuizQuestion(
+        question: 'Zero Trust Assume Breach principle means:',
+        options: [
+          'Do not deploy security controls',
+          'Design systems expecting compromise and minimize blast radius and lateral movement',
+          'Alert leadership that a breach occurred',
           'Assume all external traffic is malicious',
         ],
         correctIndex: 1,
-        explanation: 'Assume Breach is a design principle: engineer for the scenario where something is already compromised, to limit damage.',
+        explanation: 'Assume Breach is a design principle: engineer for the scenario where something is already compromised.',
       ),
       QuizQuestion(
-        question: 'Why should forensic analysis always be performed on a '
-            'copy rather than the original evidence?',
+        question: 'Why must forensic analysis be performed on a copy not the original?',
         options: [
           'Copies are faster to analyze',
-          'To preserve the original\'s integrity — any analysis could inadvertently modify it, invalidating the chain of custody',
+          'Analysis can modify timestamps and artifacts — a copy preserves the original integrity',
           'Legal requirements prohibit touching the original',
-          'Analysis tools only work on copies',
+          'Tools only work on copies',
         ],
         correctIndex: 1,
-        explanation: 'Analysis can modify timestamps, cache files, and other artefacts. Working from a verified copy preserves the original\'s integrity.',
+        explanation: 'Working from a verified copy preserves the originals integrity for chain of custody.',
       ),
       QuizQuestion(
-        question: 'An organization passes its annual SOC 2 audit but is '
-            'breached two weeks later via a vulnerability that wasn\'t '
-            'in the audit scope. This illustrates:',
+        question: 'A pen tester discovers leaked credentials on GitHub then logs into the cloud console. What Kill Chain stage?',
         options: [
-          'That audits are useless',
-          'That compliance confirms a baseline was met at audit time, not that the organization is fully secure',
-          'That the auditor was negligent',
-          'That SOC 2 should be replaced with ISO 27001',
+          'Reconnaissance',
+          'Weaponization',
+          'Initial Access',
+          'Lateral Movement',
         ],
-        correctIndex: 1,
-        explanation: 'Compliance is a point-in-time snapshot of a defined scope — not a guarantee of comprehensive security.',
+        correctIndex: 2,
+        explanation: 'Using stolen credentials to gain the first foothold is Initial Access.',
       ),
       QuizQuestion(
-        question: 'Which security maturity level involves implementing '
-            'centralized logging, SIEM, and EDR across the environment?',
+        question: 'Why is compliance not the same as security?',
         options: [
-          'Level 1 — Basic hygiene',
-          'Level 2 — Visibility',
-          'Level 3 — Proactive defense',
-          'Level 4 — Adaptive',
+          'They are identical',
+          'Compliance confirms a defined baseline was met at audit time not that the org is fully secure',
+          'Compliance only applies to small companies',
+          'Security frameworks never include compliance requirements',
         ],
         correctIndex: 1,
-        explanation: 'Centralized logging, SIEM, and EDR are core Level 2 (Visibility) capabilities that enable detection before Level 3 proactive work begins.',
+        explanation: 'Compliance is a floor not a ceiling — it confirms a snapshot not ongoing security.',
       ),
+      QuizQuestion(
+        question: 'Security maturity Level 2 Visibility typically includes:',
+        options: [
+          'Asset inventory only',
+          'Centralized logging SIEM and EDR across the environment',
+          'Threat hunting and red team exercises',
+          'GRC program and advanced automation',
+        ],
+        correctIndex: 1,
+        explanation: 'Centralized logging SIEM and EDR are core Level 2 capabilities enabling detection.',
+      ),
+      QuizQuestion(
+        question: 'Defense in depth means:',
+        options: [
+          'One extremely strong perimeter control',
+          'Layering multiple independent controls so failure of any one does not mean total compromise',
+          'Only securing the network boundary',
+          'Avoiding firewalls',
+        ],
+        correctIndex: 1,
+        explanation: 'Defense in depth layers controls so failures at one layer are caught by others.',
+      ),
+      QuizQuestion(
+        question: 'Red teaming differs from penetration testing primarily because:',
+        options: [
+          'Red teams use different tools',
+          'Red teams simulate real adversary behavior over a longer horizon testing detection and response not just finding vulnerabilities',
+          'Red teams only test physical security',
+          'Pen tests are illegal',
+        ],
+        correctIndex: 1,
+        explanation: 'Red teams are objective-based adversary simulations while pen tests are time-boxed technical vulnerability assessments.',
+      ),
+      QuizQuestion(
+        question: 'The shared responsibility model in cloud security means:',
+        options: [
+          'The cloud provider is responsible for everything',
+          'Security duties are split between provider and customer depending on the service model',
+          'The customer is responsible for nothing',
+          'Shared accounts are acceptable',
+        ],
+        correctIndex: 1,
+        explanation: 'In IaaS the customer owns the OS upward; in SaaS the customer mainly owns data and access.',
+      ),
+      QuizQuestion(
+        question: 'PASTA threat modeling is risk-centric and considers:',
+        options: [
+          'Only technical vulnerabilities',
+          'Business objectives through technical decomposition to attack simulation',
+          'Only network-layer threats',
+          'Only known CVEs',
+        ],
+        correctIndex: 1,
+        explanation: 'PASTA is a seven-stage risk-centric methodology aligning business risk with technical threat analysis.',
+      ),
+      QuizQuestion(
+        question: 'Memory forensics using tools like Volatility can reveal:',
+        options: [
+          'Files on encrypted disk',
+          'Running processes network connections encryption keys and credentials not visible on disk',
+          'Web browser history only',
+          'Hardware serial numbers',
+        ],
+        correctIndex: 1,
+        explanation: 'RAM contains ephemeral evidence including malware injected code and credentials that never touch disk.',
+      ),
+      QuizQuestion(
+        question: 'The NIST Cybersecurity Framework five functions are:',
+        options: [
+          'Plan Do Check Act and Improve',
+          'Identify Protect Detect Respond and Recover',
+          'Prevent Detect Respond Recover and Review',
+          'Assess Plan Implement Monitor and Audit',
+        ],
+        correctIndex: 1,
+        explanation: 'The NIST CSF five functions cover the full security lifecycle.',
+      ),
+      QuizQuestion(
+        question: 'Cloud misconfiguration leading to a public S3 bucket is best caught continuously by:',
+        options: [
+          'Annual penetration test',
+          'CSPM tool that continuously monitors cloud resource configurations',
+          'Antivirus scan',
+          'Network IDS',
+        ],
+        correctIndex: 1,
+        explanation: 'CSPM provides continuous automated monitoring of cloud configurations.',
+      ),
+      QuizQuestion(
+        question: 'CWPP (Cloud Workload Protection Platform) is used for:',
+        options: [
+          'Managing cloud billing',
+          'Securing cloud workloads including VMs containers and serverless functions',
+          'DNS management',
+          'Identity governance',
+        ],
+        correctIndex: 1,
+        explanation: 'CWPP secures the workloads running in cloud environments.',
+      ),
+      QuizQuestion(
+        question: 'Selling security to leadership is most effective when you:',
+        options: [
+          'Use technical CVE scores',
+          'Translate technical risk into business terms like financial impact and regulatory exposure',
+          'Demand budget without justification',
+          'Focus only on compliance requirements',
+        ],
+        correctIndex: 1,
+        explanation: 'Leadership makes business decisions — security must be framed in business risk language to resonate.',
+      ),
+      QuizQuestion(
+        question: 'Which is a core Zero Trust pillar?',
+        options: [
+          'Implicit trust within the network perimeter',
+          'Device health attestation before granting access',
+          'Open network access for productivity',
+          'Single-factor authentication',
+        ],
+        correctIndex: 1,
+        explanation: 'Zero Trust requires verifying device health explicitly before granting access regardless of network location.',
+      ),
+      QuizQuestion(
+        question: 'ISO/IEC 27001 is:',
+        options: [
+          'A US government regulation',
+          'An international standard for an Information Security Management System that is auditable and certifiable',
+          'A list of approved security tools',
+          'A cloud security framework only',
+        ],
+        correctIndex: 1,
+        explanation: 'ISO 27001 defines requirements for an ISMS and enables formal certification.',
+      ),
+      QuizQuestion(
+        question: 'Chain of custody in digital forensics requires:',
+        options: [
+          'Immediate reimaging of evidence',
+          'Documenting every step of who handled evidence when and how to maintain integrity',
+          'Destroying duplicate copies',
+          'Working directly on original evidence',
+        ],
+        correctIndex: 1,
+        explanation: 'Chain of custody documentation ensures evidence integrity and legal defensibility.',
+      ),
+      QuizQuestion(
+        question: 'A CASB (Cloud Access Security Broker) is used to:',
+        options: [
+          'Cache web content',
+          'Control and monitor cloud service usage enforcing security policies',
+          'Route network traffic',
+          'Manage patch deployment',
+        ],
+        correctIndex: 1,
+        explanation: 'CASB sits between users and cloud services enforcing access data and threat policies.',
+      ),
+      QuizQuestion(
+        question: 'STRIDE Elevation of Privilege maps to:',
+        options: [
+          'Confidentiality failure',
+          'Integrity failure',
+          'Authorization failure — gaining capabilities beyond what was granted',
+          'Availability failure',
+        ],
+        correctIndex: 2,
+        explanation: 'Elevation of Privilege is gaining more capabilities than authorized — an authorization control failure.',
+      ),
+      QuizQuestion(
+        question: 'The Repudiation threat in STRIDE is mitigated by:',
+        options: [
+          'Encryption',
+          'Audit logging and digital signatures that prove who performed an action',
+          'Availability redundancy',
+          'Firewall rules',
+        ],
+        correctIndex: 1,
+        explanation: 'Non-repudiation controls like audit logs and digital signatures prevent denial of actions.',
+      ),
+      QuizQuestion(
+        question: 'Security maturity Level 3 Proactive Defense typically includes:',
+        options: [
+          'Basic antivirus only',
+          'Threat hunting detection engineering and red team exercises',
+          'Asset inventory',
+          'SIEM deployment',
+        ],
+        correctIndex: 1,
+        explanation: 'Level 3 moves beyond reactive detection to proactively searching for and testing against threats.',
+      ),
+      QuizQuestion(
+        question: 'Why are vendor-neutral security concepts more durable than vendor-specific knowledge?',
+        options: [
+          'Vendor products are low quality',
+          'Vendor-neutral concepts apply across any platform or product while specific tools change constantly',
+          'Certifications do not cover vendor products',
+          'Vendor products are never secure',
+        ],
+        correctIndex: 1,
+        explanation: 'Foundational concepts like CIA Triad and Zero Trust remain relevant regardless of which tools or vendors are in use.',
+      ),
+
     ],
   ),
 ];

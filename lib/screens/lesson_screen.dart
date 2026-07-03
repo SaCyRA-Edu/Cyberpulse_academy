@@ -1,6 +1,9 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '../data/lesson_model.dart';
+
+const int _quizLength = 20;
 
 class LessonScreen extends StatefulWidget {
   final Lesson lesson;
@@ -12,7 +15,8 @@ class LessonScreen extends StatefulWidget {
 }
 
 class _LessonScreenState extends State<LessonScreen> {
-  // Quiz state: selected option index per question (-1 = unanswered).
+  // Quiz state — shuffled and capped at _quizLength each session.
+  late List<QuizQuestion> _activeQuiz;
   late List<int> _selectedAnswers;
   bool _submitted = false;
 
@@ -24,7 +28,13 @@ class _LessonScreenState extends State<LessonScreen> {
   void initState() {
     super.initState();
     final quiz = widget.lesson.quiz;
-    _selectedAnswers = quiz != null ? List.filled(quiz.length, -1) : [];
+    if (quiz != null) {
+      final shuffled = List<QuizQuestion>.from(quiz)..shuffle(Random());
+      _activeQuiz = shuffled.take(_quizLength).toList();
+    } else {
+      _activeQuiz = [];
+    }
+    _selectedAnswers = List.filled(_activeQuiz.length, -1);
 
     _tts.setCompletionHandler(() {
       if (mounted) setState(() => _isSpeaking = false);
@@ -72,11 +82,9 @@ class _LessonScreenState extends State<LessonScreen> {
   }
 
   int get _score {
-    final quiz = widget.lesson.quiz;
-    if (quiz == null) return 0;
     var score = 0;
-    for (var i = 0; i < quiz.length; i++) {
-      if (_selectedAnswers[i] == quiz[i].correctIndex) score++;
+    for (var i = 0; i < _activeQuiz.length; i++) {
+      if (_selectedAnswers[i] == _activeQuiz[i].correctIndex) score++;
     }
     return score;
   }
@@ -100,7 +108,7 @@ class _LessonScreenState extends State<LessonScreen> {
         ],
       ),
       body: lesson.isQuiz
-          ? _buildQuiz(lesson.quiz!)
+          ? _buildQuiz(_activeQuiz)
           : lesson.isAudio
               ? _buildAudioLesson(lesson)
               : _buildReadingContent(lesson),
@@ -273,9 +281,9 @@ class _LessonScreenState extends State<LessonScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Test what you\'ve learned across this module. (80% needed to pass)',
-            style: TextStyle(fontSize: 16, color: Colors.grey),
+          Text(
+            'Showing ${quiz.length} randomly selected questions. (80% to pass)',
+            style: const TextStyle(fontSize: 14, color: Colors.grey),
           ),
           const SizedBox(height: 16),
           if (_submitted) _buildScoreBanner(quiz.length),
@@ -286,11 +294,16 @@ class _LessonScreenState extends State<LessonScreen> {
             child: ElevatedButton(
               onPressed: _submitted
                   ? () => setState(() {
+                        final shuffled =
+                            List<QuizQuestion>.from(widget.lesson.quiz!)
+                              ..shuffle(Random());
+                        _activeQuiz = shuffled.take(_quizLength).toList();
+                        _selectedAnswers =
+                            List.filled(_activeQuiz.length, -1);
                         _submitted = false;
-                        _selectedAnswers = List.filled(quiz.length, -1);
                       })
                   : (_allAnswered ? () => setState(() => _submitted = true) : null),
-              child: Text(_submitted ? 'Retake Quiz' : 'Submit Quiz'),
+              child: Text(_submitted ? 'Retake Quiz (New Questions)' : 'Submit Quiz'),
             ),
           ),
           const SizedBox(height: 30),

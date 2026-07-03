@@ -4,7 +4,7 @@ import '../data/levels_data.dart';
 import '../data/exam_model.dart';
 import '../services/progress_service.dart';
 
-const int _examLength = 10;
+const int _examLength = 20;
 const double _passThreshold = 80.0;
 
 class LevelExamScreen extends StatefulWidget {
