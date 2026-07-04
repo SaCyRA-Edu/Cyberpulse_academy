@@ -6,6 +6,7 @@ const List<Lesson> capstoneLessons = [
   Lesson(
     title: 'From Beginner to Security Professional: Your Roadmap',
     isAudio: true,
+    estimatedMinutes: 6,
     sections: [
       LessonSection(
         heading: 'Capstone — Audio Introduction',
@@ -67,25 +68,32 @@ const List<Lesson> capstoneLessons = [
   // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'Security Architecture: Defense in Depth',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
-        heading: 'The Core Principle',
+        heading: 'The Core Principle, Revisited One Last Time',
         body:
-            'Defense in depth layers multiple, independent controls so '
-            'that if any one fails, others remain. No single control is '
-            'treated as sufficient — each layer assumes the previous one '
-            'may eventually fail.',
+            'You\'ve encountered pieces of this idea throughout the '
+            'course — a firewall backed up by endpoint protection, MFA '
+            'backed up by least privilege, a network firewall backed up '
+            'by a host firewall. Defense in depth is the name for '
+            'deliberately layering multiple, genuinely independent '
+            'security controls so that if any single one fails, others '
+            'remain standing behind it. No individual control is ever '
+            'treated as sufficient on its own — each layer is designed '
+            'assuming the layer in front of it may eventually be '
+            'bypassed.',
       ),
       LessonSection(
-        heading: 'The Layers in Practice',
+        heading: 'The Layers, End to End',
         bullets: [
-          'Perimeter — firewalls, DDoS mitigation, network monitoring',
-          'Network — segmentation, IDS/IPS, encrypted transit',
-          'Identity — MFA, least privilege, privileged access workstations',
-          'Endpoint — EDR, FIM, patch management, application control',
-          'Application — input validation, WAF, dependency scanning, secure SDLC',
-          'Data — encryption at rest, DLP, data classification',
-          'Detection — SIEM, SOC, threat hunting, incident response',
+          'Perimeter — firewalls, DDoS mitigation, and network-edge monitoring',
+          'Network — segmentation, IDS/IPS, and encrypted transit',
+          'Identity — MFA, least privilege, and privileged access workstations',
+          'Endpoint — EDR, file integrity monitoring, patch management, and application control',
+          'Application — input validation, web application firewalls, dependency scanning, and secure development practices',
+          'Data — encryption at rest, data loss prevention, and data classification',
+          'Detection — SIEM, SOC operations, threat hunting, and incident response',
         ],
       ),
       LessonSection(
@@ -97,551 +105,709 @@ const List<Lesson> capstoneLessons = [
         ),
       ),
       LessonSection(
-        heading: 'Why Mature Organizations Think This Way',
+        heading: 'A Worked Example That Ties the Whole Course Together',
         body:
-            'Junior practitioners look for "the" fix. Experienced '
-            'architects design for failure — they assume every control '
-            'will eventually fail and ask: "what catches it when it does?" '
-            'This mindset shift is one of the most significant transitions '
-            'in moving from practitioner to architect.',
+            'Consider a phishing email that manages to slip past the '
+            'email gateway\'s spam filter — the exact scenario from your '
+            'Email Security module. In a defense-in-depth environment, '
+            'that\'s not the end of the story. Endpoint protection can '
+            'still block the malware the email tried to deliver. If '
+            'that fails too, network segmentation limits how far any '
+            'resulting compromise can spread. And if an attacker still '
+            'manages to establish a foothold, a SOC analyst monitoring '
+            'the SIEM eventually notices the unusual activity and '
+            'escalates it. No single layer needed to be perfect — '
+            'together, they held.',
+      ),
+      LessonSection(
+        heading: 'Why This Mindset Separates Architects From Practitioners',
+        body:
+            'Junior security practitioners often instinctively look for '
+            '"the" fix — the one control that solves the problem. '
+            'Experienced security architects think differently: they '
+            'design deliberately for failure at every layer, because '
+            'they\'ve learned, usually the hard way, that any individual '
+            'control can and eventually will fail. This shift in '
+            'mindset — from finding the fix to designing for resilience '
+            '— is one of the most significant transitions in moving from '
+            'security practitioner to security architect.',
       ),
     ],
   ),
 
+  // 3 ----------------------------------------------------------------------
   Lesson(
     title: 'Threat Modeling with STRIDE & PASTA',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
-        heading: 'Why Threat Model?',
+        heading: 'Why Threat Model Before Building, Not After',
         body:
-            'Finding vulnerabilities before they\'re deployed is orders '
-            'of magnitude cheaper than finding them after an incident. '
-            'Threat modeling is the structured process for doing that — '
-            'applied during design, not as an afterthought.',
+            'Finding a vulnerability during design, before a single line '
+            'of code is written, is dramatically cheaper than finding '
+            'the same vulnerability after deployment — and immeasurably '
+            'cheaper than discovering it because an attacker found it '
+            'first. Threat modeling is the structured, disciplined '
+            'process for systematically asking "what could go wrong '
+            'here?" during design, rather than treating security as an '
+            'afterthought bolted on once a system already exists.',
       ),
       LessonSection(
-        heading: 'STRIDE',
+        heading: 'STRIDE: Six Categories of Threat',
         bullets: [
           'Spoofing — pretending to be something or someone else',
           'Tampering — unauthorized modification of data or code',
-          'Repudiation — denying having performed an action',
-          'Information Disclosure — exposing data to unauthorized parties',
-          'Denial of Service — degrading or denying availability',
-          'Elevation of Privilege — gaining capabilities beyond what was authorized',
+          'Repudiation — denying having performed a specific action',
+          'Information Disclosure — exposing data to parties who shouldn\'t see it',
+          'Denial of Service — degrading or completely denying availability',
+          'Elevation of Privilege — gaining capabilities beyond what was ever authorized',
         ],
       ),
       LessonSection(
-        heading: 'PASTA (Process for Attack Simulation & Threat Analysis)',
+        heading: 'Noticing STRIDE\'s Direct Connection to the CIA Triad',
         body:
-            'A seven-stage risk-centric methodology that moves from '
-            'business objectives through technical decomposition to '
-            'attack simulation and risk mitigation. More comprehensive '
-            'than STRIDE alone — better suited to complex systems where '
-            'business risk context matters as much as technical detail.',
+            'If several of these categories feel familiar, that\'s '
+            'because STRIDE is essentially the CIA Triad from your very '
+            'first module, reorganized into a more actionable, '
+            'threat-oriented lens. Tampering and Information Disclosure '
+            'map directly onto Integrity and Confidentiality '
+            'respectively. Denial of Service maps directly onto '
+            'Availability. Spoofing, Repudiation, and Elevation of '
+            'Privilege add authentication, accountability, and '
+            'authorization as additional dimensions the original triad '
+            'doesn\'t explicitly separate out.',
       ),
       LessonSection(
-        heading: 'How to Run a Threat Model',
-        bullets: [
-          '1. Diagram the system — identify components, data flows, and trust boundaries',
-          '2. Identify threats — apply STRIDE to each trust boundary crossing',
-          '3. Assess — how likely and how severe is each threat?',
-          '4. Mitigate — what controls address each threat?',
-          '5. Validate — are existing controls actually effective?',
-        ],
+        heading: 'PASTA: A More Comprehensive, Risk-Centric Alternative',
+        body:
+            'PASTA (Process for Attack Simulation and Threat Analysis) '
+            'is a seven-stage methodology that moves systematically from '
+            'business objectives, through detailed technical '
+            'decomposition of the system, all the way to active attack '
+            'simulation and concrete risk mitigation planning. It\'s '
+            'considerably more comprehensive than STRIDE alone, and '
+            'better suited to complex systems where genuine business '
+            'risk context matters just as much as technical '
+            'vulnerability detail.',
+      ),
+      LessonSection(
+        heading: 'A Practical Threat Modeling Workflow',
+        body:
+            'Regardless of which specific methodology a team chooses, a '
+            'practical threat model generally follows the same core '
+            'sequence.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.processFlow,
+          steps: ['Diagram', 'Identify Threats', 'Assess', 'Mitigate', 'Validate'],
+          caption:
+              'This sequence repeats as a system evolves — a threat '
+              'model built once at launch quickly goes stale.',
+        ),
       ),
     ],
   ),
 
+  // 4 ----------------------------------------------------------------------
   Lesson(
     title: 'Ethical Hacking Methodology',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
-        heading: 'What Makes Testing "Ethical"',
+        heading: 'What Actually Makes Testing "Ethical"',
         body:
-            'The only thing separating a penetration tester from an '
-            'attacker is written, explicit authorization. The Rules of '
-            'Engagement (RoE) document defines scope, permitted techniques, '
-            'emergency contacts, and handling of found data. Testing '
-            'without an RoE — no matter the intent — is illegal in most '
-            'jurisdictions.',
+            'The single thing separating a penetration tester from a '
+            'criminal attacker isn\'t skill, tools, or technique — it\'s '
+            'explicit, documented, written authorization. The Rules of '
+            'Engagement (RoE) document defines precisely what systems '
+            'are in scope, which specific techniques are permitted, who '
+            'to contact if something unexpected happens during testing, '
+            'and how any discovered sensitive data must be handled. '
+            'Testing systems without an RoE in place — regardless of how '
+            'good the underlying intentions might be — is illegal in '
+            'most jurisdictions, full stop.',
       ),
       LessonSection(
-        heading: 'The Standard Phases',
+        heading: 'The Standard Phases of an Engagement',
         bullets: [
-          'Scoping & RoE — agree what\'s in scope, what techniques are permitted',
-          'Reconnaissance — passive (OSINT, DNS, Shodan) and active (scanning, enumeration)',
-          'Vulnerability Analysis — identifying potential weaknesses',
-          'Exploitation — attempting to validate and exploit findings',
-          'Post-Exploitation — demonstrating impact (privilege escalation, lateral movement, data access)',
-          'Reporting — full documentation of findings, evidence, and remediation guidance',
-          'Remediation Verification — confirming fixes actually worked',
+          'Scoping & RoE — formally agreeing what\'s in scope and precisely which techniques are permitted before any testing begins',
+          'Reconnaissance — gathering information both passively (OSINT, DNS records, Shodan) and actively (scanning, enumeration)',
+          'Vulnerability Analysis — systematically identifying potential weaknesses across the in-scope systems',
+          'Exploitation — attempting to actually validate and exploit the findings identified during analysis',
+          'Post-Exploitation — demonstrating real, concrete impact through privilege escalation, lateral movement, or actual data access',
+          'Reporting — thoroughly documenting every finding, the supporting evidence, and clear remediation guidance',
+          'Remediation Verification — confirming after the fact that fixes were actually implemented and genuinely effective',
         ],
       ),
       LessonSection(
-        heading: 'Red Team vs. Penetration Test',
+        heading: 'Penetration Testing vs. Red Teaming',
         bullets: [
-          'Penetration test — time-boxed, comprehensive coverage of a defined scope; finds technical vulnerabilities',
-          'Red team — objective-based, long-horizon simulation of a real adversary; tests detection and response capability',
-          'Purple team — red and blue working collaboratively to improve detection coverage',
+          'Penetration test — a time-boxed engagement providing comprehensive technical coverage of a clearly defined scope; primarily focused on finding vulnerabilities',
+          'Red team — an objective-based, typically longer-horizon simulation of a real adversary; focused specifically on testing an organization\'s detection and response capability, not just finding flaws',
+          'Purple team — red and blue teams working together deliberately and collaboratively, using the exercise itself to directly improve detection coverage rather than treating it purely as a pass/fail test',
         ],
+      ),
+      LessonSection(
+        heading: 'Connecting This Back to the SOC Module',
+        body:
+            'Remember from your SOC Operations module how MITRE ATT&CK '
+            'gives defenders a shared vocabulary for describing attacker '
+            'behavior? Ethical hackers use exactly the same framework '
+            'from the opposite direction — planning an engagement around '
+            'specific ATT&CK techniques, then reporting findings mapped '
+            'back to that same framework, so the defending SOC can '
+            'directly translate red team findings into concrete '
+            'detection engineering priorities.',
       ),
     ],
   ),
 
+  // 5 ----------------------------------------------------------------------
   Lesson(
     title: 'Digital Forensics & Chain of Custody',
+    estimatedMinutes: 8,
     sections: [
       LessonSection(
-        heading: 'What Digital Forensics Is',
+        heading: 'What Makes Forensics Different From Ordinary Investigation',
         body:
             'Digital forensics is the collection, preservation, and '
-            'analysis of digital evidence in a manner that is reliable, '
-            'repeatable, and where necessary legally defensible. Every '
-            'action on evidence must be justified and documented.',
+            'analysis of digital evidence conducted in a manner that\'s '
+            'reliable, repeatable, and where necessary, legally '
+            'defensible in court. Every single action taken on a piece '
+            'of evidence must be justified and thoroughly documented — '
+            'this discipline is what separates forensics from ordinary, '
+            'informal technical investigation.',
       ),
       LessonSection(
-        heading: 'Chain of Custody',
+        heading: 'Chain of Custody: The Non-Negotiable Requirement',
         body:
-            'Every step — who collected it, how, when, where it was '
-            'stored, and who accessed it — must be documented. A broken '
-            'chain of custody can make evidence inadmissible and '
-            'undermine an entire investigation.',
+            'Every step touching a piece of evidence — who collected it, '
+            'exactly how, precisely when, where it was subsequently '
+            'stored, and who accessed it afterward — must be documented '
+            'meticulously. A broken chain of custody can render '
+            'otherwise compelling evidence inadmissible in legal '
+            'proceedings, and can undermine confidence in an entire '
+            'investigation\'s findings even outside a courtroom.',
       ),
       LessonSection(
-        heading: 'Core Principles',
+        heading: 'Core Forensic Principles',
         bullets: [
-          'Work from copies — never analyze the original; create a forensic image (dd, FTK Imager) and verify with hash',
-          'Order of volatility — collect most volatile first: memory (RAM), running processes, network state, then disk',
-          'Document everything — timestamps, commands run, tools used, findings',
-          'Integrity verification — hash evidence at acquisition and verify before and after analysis',
+          'Work from copies — never analyze the original evidence directly; create a verified forensic image and confirm its integrity with a cryptographic hash before beginning any analysis',
+          'Order of volatility — collect the most easily lost evidence first: memory (RAM) and running process state, then network connection state, then disk contents last',
+          'Document everything — every timestamp, every command run, every tool used, and every finding, without exception',
+          'Verify integrity throughout — hash evidence immediately at the point of acquisition, and re-verify that hash before and after every stage of analysis',
         ],
       ),
       LessonSection(
-        heading: 'Memory Forensics',
+        heading: 'Memory Forensics: Evidence That Exists Nowhere Else',
         body:
-            'RAM contains running processes, network connections, '
-            'encryption keys, and credentials that don\'t exist anywhere '
-            'on disk. Tools like Volatility analyze memory dumps to find '
-            'injected malware, command history, and attacker infrastructure '
-            'that would otherwise be invisible.',
+            'RAM contains running processes, active network connections, '
+            'encryption keys, and credentials that frequently don\'t '
+            'exist anywhere on disk at all. Tools like Volatility analyze '
+            'memory dumps captured from a live or recently-powered '
+            'system to uncover injected malware, complete command '
+            'history, and attacker infrastructure that would otherwise '
+            'remain completely invisible to an investigator working from '
+            'disk images alone.',
+      ),
+      LessonSection(
+        heading: 'How This Overlaps With Incident Response',
+        body:
+            'Recall from your SOC Operations module that containment '
+            'deliberately avoids immediately reimaging a compromised '
+            'machine, specifically to preserve exactly this kind of '
+            'volatile evidence. Forensics and incident response overlap '
+            'heavily in practice — a SOC investigating an active breach '
+            'is effectively performing lightweight forensics in real '
+            'time, while dedicated forensic specialists may later conduct '
+            'a far deeper, more rigorous analysis specifically for legal '
+            'proceedings or insurance claims.',
       ),
     ],
   ),
 
+  // 6 ----------------------------------------------------------------------
   Lesson(
     title: 'Zero Trust Architecture',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
-        heading: 'Why the Perimeter Model Failed',
+        heading: 'Why the Old Perimeter Model Stopped Working',
         body:
-            'The castle-and-moat model assumed everything inside the '
-            'network was trusted. Cloud services, remote work, personal '
-            'devices, and sophisticated phishing have made "inside the '
-            'network" meaningless as a security boundary. Zero Trust '
-            'replaces the boundary with continuous verification.',
+            'The traditional "castle and moat" security model assumed '
+            'that everything inside the network perimeter could be '
+            'trusted, while everything outside it was treated with '
+            'suspicion. Cloud services, remote work, personal devices, '
+            'and increasingly sophisticated phishing have made "inside '
+            'the network" an essentially meaningless boundary — an '
+            'employee working from a coffee shop on a personal laptop, '
+            'accessing a cloud application, was never genuinely "inside" '
+            'anything a traditional perimeter could actually protect.',
       ),
       LessonSection(
         heading: 'The Three Zero Trust Principles',
         bullets: [
-          'Verify explicitly — authenticate and authorize every request based on all available data: identity, device health, location, behavior',
-          'Use least privilege access — grant minimum required access; use just-in-time (JIT) and just-enough-access (JEA)',
-          'Assume breach — design systems expecting that some component will be compromised; minimize blast radius and lateral movement',
+          'Verify explicitly — authenticate and authorize every single request using all available signal: identity, device health, location, and observed behavior patterns',
+          'Use least privilege access — grant only the minimum access genuinely required, using just-in-time and just-enough-access wherever practically possible',
+          'Assume breach — design every system on the explicit assumption that some component will eventually be compromised, and engineer specifically to minimize blast radius and lateral movement when it happens',
         ],
       ),
       LessonSection(
-        heading: 'Zero Trust Pillars',
+        heading: 'Recognizing Zero Trust as a Synthesis of Everything You\'ve Learned',
+        body:
+            'Zero Trust isn\'t really a brand-new idea — it\'s a formal '
+            'name for combining principles you\'ve already studied '
+            'throughout this course into one coherent architecture. '
+            'Least privilege from your very first module. MFA and strong '
+            'authentication from the same module. Network segmentation '
+            'and microsegmentation from Networking. Continuous monitoring '
+            'from SOC Operations. Zero Trust\'s genuine contribution is '
+            'insisting that all of these principles apply everywhere, '
+            'continuously, rather than being relaxed once something is '
+            'considered "inside" a trusted boundary.',
+      ),
+      LessonSection(
+        heading: 'The Six Zero Trust Pillars',
         bullets: [
-          'Identity — strong authentication, MFA, identity risk scoring',
-          'Devices — device health attestation before granting access',
-          'Network — microsegmentation, encrypted east-west traffic',
-          'Applications — application-level access control, CASB',
-          'Data — classification, DLP, encryption, rights management',
-          'Visibility — comprehensive logging and analytics across all pillars',
+          'Identity — strong authentication, MFA, and continuous identity risk scoring',
+          'Devices — verifying device health and compliance before granting any access',
+          'Network — microsegmentation and encrypted traffic even between systems on the "same" network',
+          'Applications — application-level access control and cloud access security brokers',
+          'Data — classification, data loss prevention, encryption, and rights management',
+          'Visibility & Analytics — comprehensive logging and analysis feeding back across every other pillar',
         ],
       ),
     ],
   ),
 
+  // 7 ----------------------------------------------------------------------
   Lesson(
     title: 'Cloud Security Architecture',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
         heading: 'The Shared Responsibility Model',
         body:
-            'Cloud security responsibilities are split between the '
-            'provider and the customer. The exact split depends on the '
-            'service model: in IaaS (like EC2), the customer owns the OS '
-            'upward; in PaaS, the provider owns more; in SaaS, the '
-            'customer is primarily responsible for data and access.',
+            'Cloud security responsibility is genuinely split between '
+            'the cloud provider and the customer, and exactly where that '
+            'line falls depends heavily on the specific service model in '
+            'use. In IaaS (Infrastructure as a Service, like a raw '
+            'virtual machine), the customer is responsible for '
+            'everything from the operating system upward. In PaaS '
+            '(Platform as a Service), the provider takes on '
+            'considerably more of that responsibility. In SaaS '
+            '(Software as a Service), the customer is primarily '
+            'responsible for their own data and who has access to it — '
+            'the underlying infrastructure and application itself belong '
+            'entirely to the provider.',
       ),
       LessonSection(
-        heading: 'Common Cloud Security Misconfigurations',
+        heading: 'Misconfigurations, Not Exotic Attacks, Cause Most Cloud Breaches',
         bullets: [
-          'Publicly accessible storage buckets (S3, Azure Blob) — a consistently common source of large data breaches',
-          'Overly permissive IAM roles — violating least privilege in the cloud',
-          'No MFA on cloud console access',
-          'Security groups/NSGs with 0.0.0.0/0 inbound rules on sensitive ports',
-          'Logging disabled — CloudTrail, Azure Monitor, GCP Audit Logs must be active',
+          'Publicly accessible storage buckets (Amazon S3, Azure Blob Storage) — consistently one of the single most common sources of large-scale data breaches',
+          'Overly permissive IAM roles — granting far broader cloud permissions than a role genuinely needs, directly violating least privilege',
+          'No MFA enforced on cloud console access — leaving the entire cloud environment protected by password alone',
+          'Security groups or network security groups with 0.0.0.0/0 inbound rules on sensitive ports — effectively exposing a service to the entire internet',
+          'Logging disabled entirely — CloudTrail, Azure Monitor, or GCP Audit Logs left inactive, eliminating visibility into what actually happened during an incident',
         ],
       ),
       LessonSection(
-        heading: 'Cloud Security Tooling',
+        heading: 'Purpose-Built Cloud Security Tooling',
         bullets: [
-          'CSPM (Cloud Security Posture Management) — continuously audits cloud config for misconfigurations',
-          'CWPP (Cloud Workload Protection Platform) — secures workloads (VMs, containers, functions)',
-          'CASB (Cloud Access Security Broker) — controls and monitors cloud service usage',
-          'Native tools: AWS Security Hub, Azure Defender for Cloud, GCP Security Command Center',
+          'CSPM (Cloud Security Posture Management) — continuously and automatically audits cloud configuration against best practices, flagging exactly these kinds of misconfigurations',
+          'CWPP (Cloud Workload Protection Platform) — secures individual workloads: virtual machines, containers, and serverless functions',
+          'CASB (Cloud Access Security Broker) — sits between users and cloud services, monitoring and controlling how those services are actually used',
+          'Native provider tools — AWS Security Hub, Microsoft Defender for Cloud, and Google Cloud Security Command Center all provide built-in visibility for their respective platforms',
         ],
+      ),
+      LessonSection(
+        heading: 'Why This Requires Rethinking Some Earlier Assumptions',
+        body:
+            'Notice how several concepts from earlier in the course need '
+            'genuine reinterpretation in a cloud context. Network '
+            'segmentation, from your Networking module, still matters '
+            'enormously — but it now happens through security groups and '
+            'virtual private clouds rather than physical switches and '
+            'VLANs. Least privilege still matters — but it now applies '
+            'to IAM roles and API permissions rather than traditional '
+            'Unix file permissions. The underlying principles carry over '
+            'directly; only their specific technical implementation '
+            'changes.',
       ),
     ],
   ),
 
+  // 8 ----------------------------------------------------------------------
   Lesson(
     title: 'Governance, Risk & Compliance (GRC)',
+    estimatedMinutes: 8,
     sections: [
       LessonSection(
-        heading: 'What GRC Covers',
+        heading: 'The Three Components of GRC',
         bullets: [
-          'Governance — the decision-making structures, policies, and accountability frameworks that direct a security program',
-          'Risk — identifying, assessing, treating, and monitoring risk across the organization',
-          'Compliance — meeting legal, regulatory, and contractual obligations (GDPR, HIPAA, PCI-DSS, ISO 27001)',
+          'Governance — the decision-making structures, formal policies, and accountability frameworks that direct an organization\'s entire security program',
+          'Risk — identifying, assessing, treating, and continuously monitoring risk across the organization, directly building on your Fundamentals module\'s risk management process',
+          'Compliance — meeting the specific legal, regulatory, and contractual obligations an organization is actually subject to, such as GDPR, HIPAA, or PCI-DSS',
         ],
       ),
       LessonSection(
-        heading: 'Key Frameworks',
+        heading: 'The Major Frameworks You\'ll Encounter',
         bullets: [
-          'NIST Cybersecurity Framework (CSF) — vendor-neutral; five functions: Identify, Protect, Detect, Respond, Recover',
-          'ISO/IEC 27001 — international standard for an Information Security Management System (ISMS); auditable and certifiable',
-          'NIST SP 800-53 — detailed control catalog used by US federal agencies',
-          'CIS Controls — pragmatic 18-control prioritized list; good starting point for many organizations',
+          'NIST Cybersecurity Framework (CSF) — vendor-neutral, organized around five core functions: Identify, Protect, Detect, Respond, Recover',
+          'ISO/IEC 27001 — an international standard defining requirements for a full Information Security Management System (ISMS), and one an organization can be formally, externally audited and certified against',
+          'NIST SP 800-53 — a highly detailed control catalog widely used by US federal agencies and their contractors',
+          'CIS Controls — a pragmatic, prioritized list of 18 controls that\'s become a popular, accessible starting point for organizations building a program essentially from scratch',
         ],
       ),
       LessonSection(
-        heading: 'Compliance ≠ Security',
+        heading: 'Compliance Is a Floor, Never a Ceiling',
         body:
-            'Passing an audit confirms you met a defined baseline on the '
-            'audit date. It says nothing about whether you\'re secure '
-            'today, tomorrow, or against threats the standard didn\'t '
-            'anticipate. Mature security programs use frameworks as a '
-            'floor, not a ceiling.',
+            'Passing a compliance audit confirms that an organization '
+            'met a specific, defined baseline on the specific date that '
+            'audit took place. It says nothing whatsoever about whether '
+            'that organization remains secure the following day, the '
+            'following month, or against a threat the underlying '
+            'standard simply never anticipated. Mature, genuinely '
+            'effective security programs treat compliance frameworks as '
+            'a floor to build upward from, never as a ceiling defining '
+            '"done."',
+      ),
+      LessonSection(
+        heading: 'Why GRC Sits at the Top of This Course\'s Structure',
+        body:
+            'Notice that GRC is the domain that ties every earlier '
+            'module together into one coherent whole. Governance sets '
+            'the policies you studied back in Fundamentals. Risk '
+            'management prioritizes exactly which technical controls '
+            '— from Networking, Windows, Linux, SOC operations — actually '
+            'get built and in what order. Compliance ensures the whole '
+            'program actually satisfies real external legal and '
+            'contractual obligations. GRC isn\'t a separate, isolated '
+            'topic bolted onto security — it\'s the connective structure '
+            'that turns a scattered collection of individual technical '
+            'controls into an actual, coherent program.',
       ),
     ],
   ),
 
+  // 9 ----------------------------------------------------------------------
   Lesson(
     title: 'Building a Security Program from Scratch',
+    estimatedMinutes: 8,
     sections: [
       LessonSection(
-        heading: 'Where to Start',
+        heading: 'Where Every New Security Program Should Actually Start',
         body:
-            'Most new security programs fail because they try to do '
-            'everything at once. The right starting point is always '
-            'the same: understand what assets you have, what the most '
-            'likely threats to those assets are, and which gaps have '
-            'the highest risk. Everything else flows from that.',
+            'Most brand-new security programs fail not because of a '
+            'shortage of good intentions, but because they try to do far '
+            'too much simultaneously right from day one. The correct '
+            'starting point is always the same, regardless of '
+            'organization size or industry: understand precisely what '
+            'assets actually exist, identify the most realistic threats '
+            'to those specific assets, and determine which gaps carry '
+            'the highest genuine risk. Everything else in the program '
+            'flows logically from that initial foundation.',
       ),
       LessonSection(
         heading: 'A Practical Maturity Progression',
+        body:
+            'Security programs generally mature through a recognizable, '
+            'sequential set of stages rather than jumping straight to '
+            'advanced capability.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.processFlow,
+          steps: ['Basic Hygiene', 'Visibility', 'Proactive Defense', 'Adaptive'],
+          caption:
+              'Skipping straight to advanced capabilities like threat '
+              'hunting before basic hygiene (patching, MFA, backups) is '
+              'in place is a common, costly mistake.',
+        ),
+      ),
+      LessonSection(
+        heading: 'What Each Stage Actually Involves',
         bullets: [
-          'Level 1 (Basic hygiene) — asset inventory, patch management, MFA, backups, incident response plan',
-          'Level 2 (Visibility) — centralized logging, SIEM, EDR, vulnerability management',
-          'Level 3 (Proactive defense) — threat hunting, detection engineering, red team exercises, GRC program',
-          'Level 4 (Adaptive) — continuous improvement, threat intelligence integration, advanced automation',
+          'Basic hygiene — asset inventory, patch management, MFA, backups, and a documented incident response plan',
+          'Visibility — centralized logging, SIEM, EDR, and formal vulnerability management',
+          'Proactive defense — threat hunting, detection engineering, red team exercises, and a functioning GRC program',
+          'Adaptive — continuous improvement, deep threat intelligence integration, and advanced automation across the entire program',
         ],
       ),
       LessonSection(
-        heading: 'Selling Security to Leadership',
+        heading: 'Translating Technical Risk Into Business Risk',
         body:
-            'Security spending is a business decision. Leaders who '
-            'control budgets need to understand risk in business terms '
-            '— potential financial impact, regulatory exposure, '
-            'reputational risk — not technical CVE scores. The security '
-            'professional\'s job includes translating technical risk into '
-            'business risk that leadership can act on.',
+            'Security spending is ultimately always a business decision, '
+            'made by leaders who control budgets and typically think in '
+            'terms of business outcomes rather than technical detail. '
+            'Those leaders need risk explained in terms they can '
+            'directly act on — potential financial impact, concrete '
+            'regulatory exposure, tangible reputational risk — rather '
+            'than a raw technical CVE severity score that means little '
+            'outside a security team. A meaningful part of any security '
+            'professional\'s actual job, at every level, is learning to '
+            'translate technical risk into the business risk language '
+            'that leadership can genuinely use to make good decisions.',
       ),
     ],
   ),
 
+  // 10 -------------------------------------------------------- Assessment
   Lesson(
     title: 'Capstone Assessment',
     estimatedMinutes: 15,
     quiz: [
       QuizQuestion(
-        question: 'A web server compromised by an attacker cannot read /etc/passwd even running as root. What control is responsible?',
+        question: 'A web server is compromised, but the attacker cannot read /etc/passwd or connect to internal databases, even though the server runs as root. Which control is most likely responsible?',
         options: [
           'BitLocker',
-          'Mandatory Access Control such as SELinux or AppArmor',
+          'Mandatory Access Control (SELinux/AppArmor)',
           'A host firewall rule',
           'NTFS permissions',
         ],
         correctIndex: 1,
-        explanation: 'MAC policies restrict what even root processes can do — confining the compromised web server.',
+        explanation: 'MAC policies restrict what even root processes can do — a compromised web server confined by SELinux/AppArmor can\'t access resources outside its policy.',
       ),
       QuizQuestion(
-        question: 'In STRIDE Tampering maps to which CIA Triad property?',
-        options: [
-          'Confidentiality',
-          'Integrity',
-          'Availability',
-          'Authentication',
-        ],
+        question: 'In the STRIDE model, "Tampering" maps to which CIA Triad property?',
+        options: ['Confidentiality', 'Integrity', 'Availability', 'Authentication'],
         correctIndex: 1,
         explanation: 'Tampering = unauthorized modification = an Integrity violation.',
       ),
       QuizQuestion(
-        question: 'Which tool continuously audits cloud configuration for misconfigurations like public storage buckets?',
-        options: [
-          'WAF',
-          'CASB',
-          'CSPM',
-          'SOAR',
-        ],
+        question: 'An organization\'s cloud storage buckets are set to public read access. Which type of tool would most reliably catch this misconfiguration continuously?',
+        options: ['WAF', 'CASB', 'CSPM', 'SOAR'],
         correctIndex: 2,
-        explanation: 'CSPM (Cloud Security Posture Management) continuously monitors cloud config for misconfigurations.',
+        explanation: 'CSPM (Cloud Security Posture Management) continuously audits cloud configuration for misconfigurations like public buckets.',
       ),
       QuizQuestion(
-        question: 'Zero Trust Assume Breach principle means:',
+        question: 'A penetration tester discovers credentials for the cloud console in a public GitHub repository. Which Kill Chain stage would they use these credentials in?',
+        options: ['Reconnaissance', 'Weaponization', 'Initial Access', 'Lateral Movement'],
+        correctIndex: 2,
+        explanation: 'Using stolen credentials to log in to a system is Initial Access — the first foothold in the target environment.',
+      ),
+      QuizQuestion(
+        question: 'Zero Trust\'s "Assume Breach" principle means:',
         options: [
-          'Do not deploy security controls',
-          'Design systems expecting compromise and minimize blast radius and lateral movement',
-          'Alert leadership that a breach occurred',
+          'Do not deploy any security controls since breaches are inevitable',
+          'Design systems expecting a component will be compromised, and minimize blast radius and lateral movement',
+          'Alert leadership immediately that a breach has occurred',
           'Assume all external traffic is malicious',
         ],
         correctIndex: 1,
-        explanation: 'Assume Breach is a design principle: engineer for the scenario where something is already compromised.',
+        explanation: 'Assume Breach is a design principle: engineer for the scenario where something is already compromised, to limit damage.',
       ),
       QuizQuestion(
-        question: 'Why must forensic analysis be performed on a copy not the original?',
+        question: 'Why should forensic analysis always be performed on a copy rather than the original evidence?',
         options: [
           'Copies are faster to analyze',
-          'Analysis can modify timestamps and artifacts — a copy preserves the original integrity',
+          'To preserve the original\'s integrity — any analysis could inadvertently modify it, invalidating the chain of custody',
           'Legal requirements prohibit touching the original',
-          'Tools only work on copies',
+          'Analysis tools only work on copies',
         ],
         correctIndex: 1,
-        explanation: 'Working from a verified copy preserves the originals integrity for chain of custody.',
+        explanation: 'Analysis can modify timestamps, cache files, and other artefacts. Working from a verified copy preserves the original\'s integrity.',
       ),
       QuizQuestion(
-        question: 'A pen tester discovers leaked credentials on GitHub then logs into the cloud console. What Kill Chain stage?',
+        question: 'An organization passes its annual SOC 2 audit but is breached two weeks later via a vulnerability that wasn\'t in the audit scope. This illustrates:',
         options: [
-          'Reconnaissance',
-          'Weaponization',
-          'Initial Access',
-          'Lateral Movement',
-        ],
-        correctIndex: 2,
-        explanation: 'Using stolen credentials to gain the first foothold is Initial Access.',
-      ),
-      QuizQuestion(
-        question: 'Why is compliance not the same as security?',
-        options: [
-          'They are identical',
-          'Compliance confirms a defined baseline was met at audit time not that the org is fully secure',
-          'Compliance only applies to small companies',
-          'Security frameworks never include compliance requirements',
+          'That audits are useless',
+          'That compliance confirms a baseline was met at audit time, not that the organization is fully secure',
+          'That the auditor was negligent',
+          'That SOC 2 should be replaced with ISO 27001',
         ],
         correctIndex: 1,
-        explanation: 'Compliance is a floor not a ceiling — it confirms a snapshot not ongoing security.',
+        explanation: 'Compliance is a point-in-time snapshot of a defined scope — not a guarantee of comprehensive security.',
       ),
       QuizQuestion(
-        question: 'Security maturity Level 2 Visibility typically includes:',
+        question: 'Which security maturity level involves implementing centralized logging, SIEM, and EDR across the environment?',
         options: [
-          'Asset inventory only',
-          'Centralized logging SIEM and EDR across the environment',
-          'Threat hunting and red team exercises',
-          'GRC program and advanced automation',
+          'Basic Hygiene',
+          'Visibility',
+          'Proactive Defense',
+          'Adaptive',
         ],
         correctIndex: 1,
-        explanation: 'Centralized logging SIEM and EDR are core Level 2 capabilities enabling detection.',
+        explanation: 'Centralized logging, SIEM, and EDR are core Visibility-stage capabilities that enable detection before Proactive Defense work begins.',
       ),
       QuizQuestion(
-        question: 'Defense in depth means:',
+        question: 'What is the Rules of Engagement (RoE) document used for in ethical hacking?',
         options: [
-          'One extremely strong perimeter control',
-          'Layering multiple independent controls so failure of any one does not mean total compromise',
-          'Only securing the network boundary',
-          'Avoiding firewalls',
+          'Marketing the penetration testing firm\'s services',
+          'Defining scope, permitted techniques, and emergency contacts before testing begins',
+          'Recording the final invoice for a testing engagement',
+          'Listing every employee at the target organization',
         ],
         correctIndex: 1,
-        explanation: 'Defense in depth layers controls so failures at one layer are caught by others.',
+        explanation: 'The RoE is what makes penetration testing legal — it defines exactly what is authorized before any testing starts.',
       ),
       QuizQuestion(
-        question: 'Red teaming differs from penetration testing primarily because:',
+        question: 'What does "purple teaming" specifically add beyond running red team and blue team exercises separately?',
         options: [
-          'Red teams use different tools',
-          'Red teams simulate real adversary behavior over a longer horizon testing detection and response not just finding vulnerabilities',
-          'Red teams only test physical security',
-          'Pen tests are illegal',
+          'A third independent team that scores the other two',
+          'Direct, deliberate collaboration between red and blue during the exercise to improve detection coverage in real time',
+          'A requirement that all findings remain confidential forever',
+          'Replacing the SOC with the red team permanently',
         ],
         correctIndex: 1,
-        explanation: 'Red teams are objective-based adversary simulations while pen tests are time-boxed technical vulnerability assessments.',
+        explanation: 'Purple teaming is defined by active collaboration between the offensive and defensive teams, not just sequential separate exercises.',
       ),
       QuizQuestion(
-        question: 'The shared responsibility model in cloud security means:',
+        question: 'In the shared responsibility model, who is primarily responsible for data and access control in a SaaS application?',
         options: [
-          'The cloud provider is responsible for everything',
-          'Security duties are split between provider and customer depending on the service model',
-          'The customer is responsible for nothing',
-          'Shared accounts are acceptable',
+          'The cloud provider entirely',
+          'The customer',
+          'Neither party — SaaS has no shared responsibility model',
+          'A third-party auditor',
         ],
         correctIndex: 1,
-        explanation: 'In IaaS the customer owns the OS upward; in SaaS the customer mainly owns data and access.',
+        explanation: 'In SaaS, the provider owns infrastructure and the application; the customer remains responsible for their own data and access.',
       ),
       QuizQuestion(
-        question: 'PASTA threat modeling is risk-centric and considers:',
+        question: 'Which of the following is a core Zero Trust pillar covering device health verification?',
+        options: ['Identity', 'Devices', 'Network', 'Data'],
+        correctIndex: 1,
+        explanation: 'The Devices pillar specifically covers verifying device health and compliance before granting access.',
+      ),
+      QuizQuestion(
+        question: 'PASTA differs from STRIDE primarily by:',
         options: [
-          'Only technical vulnerabilities',
-          'Business objectives through technical decomposition to attack simulation',
-          'Only network-layer threats',
-          'Only known CVEs',
+          'Being simpler and faster to apply',
+          'Being a more comprehensive, risk-centric methodology tying business objectives to technical threat analysis',
+          'Only applying to cloud systems',
+          'Replacing the need for a Rules of Engagement document',
         ],
         correctIndex: 1,
-        explanation: 'PASTA is a seven-stage risk-centric methodology aligning business risk with technical threat analysis.',
+        explanation: 'PASTA is a seven-stage methodology explicitly connecting business risk context to technical attack simulation, more comprehensive than STRIDE alone.',
       ),
       QuizQuestion(
-        question: 'Memory forensics using tools like Volatility can reveal:',
+        question: 'Why is order of volatility important when collecting digital evidence?',
         options: [
-          'Files on encrypted disk',
-          'Running processes network connections encryption keys and credentials not visible on disk',
-          'Web browser history only',
-          'Hardware serial numbers',
+          'It determines which evidence is legally admissible',
+          'More volatile evidence like RAM contents disappears first and must be captured before less volatile evidence like disk images',
+          'It only matters for cloud-based systems',
+          'It determines who is allowed to collect evidence',
         ],
         correctIndex: 1,
-        explanation: 'RAM contains ephemeral evidence including malware injected code and credentials that never touch disk.',
+        explanation: 'Volatile evidence such as memory and running processes is lost quickly, so it must be prioritized for collection first.',
       ),
       QuizQuestion(
-        question: 'The NIST Cybersecurity Framework five functions are:',
+        question: 'A company\'s IAM roles grant far more cloud permissions than any role actually needs. This is a direct violation of:',
+        options: ['Defense in depth', 'The principle of least privilege', 'Chain of custody', 'The Cyber Kill Chain'],
+        correctIndex: 1,
+        explanation: 'Overly permissive IAM roles violate least privilege — a foundational principle carried from the very first module into cloud architecture.',
+      ),
+      QuizQuestion(
+        question: 'What is the primary purpose of the "Lessons Learned" style review at the end of a threat modeling or security program cycle?',
         options: [
-          'Plan Do Check Act and Improve',
-          'Identify Protect Detect Respond and Recover',
-          'Prevent Detect Respond Recover and Review',
-          'Assess Plan Implement Monitor and Audit',
+          'To assign blame for past incidents',
+          'To feed findings back into improved controls, policy, and training for the next cycle',
+          'To close out the project permanently with no further review',
+          'To satisfy a one-time compliance requirement only',
         ],
         correctIndex: 1,
-        explanation: 'The NIST CSF five functions cover the full security lifecycle.',
+        explanation: 'Continuous improvement — feeding findings back into the next cycle — is what keeps a security program (and a threat model) from going stale.',
       ),
       QuizQuestion(
-        question: 'Cloud misconfiguration leading to a public S3 bucket is best caught continuously by:',
+        question: 'NIST CSF\'s five core functions are:',
         options: [
-          'Annual penetration test',
-          'CSPM tool that continuously monitors cloud resource configurations',
-          'Antivirus scan',
-          'Network IDS',
+          'Plan, Do, Check, Act, Improve',
+          'Identify, Protect, Detect, Respond, Recover',
+          'Prevent, Detect, Respond, Recover, Review',
+          'Assess, Plan, Implement, Monitor, Audit',
         ],
         correctIndex: 1,
-        explanation: 'CSPM provides continuous automated monitoring of cloud configurations.',
+        explanation: 'The NIST Cybersecurity Framework organizes its guidance around these five functions covering the full security lifecycle.',
       ),
       QuizQuestion(
-        question: 'CWPP (Cloud Workload Protection Platform) is used for:',
+        question: 'A CWPP (Cloud Workload Protection Platform) is specifically used to:',
         options: [
-          'Managing cloud billing',
-          'Securing cloud workloads including VMs containers and serverless functions',
-          'DNS management',
-          'Identity governance',
+          'Manage cloud billing and cost optimization',
+          'Secure individual cloud workloads such as VMs, containers, and serverless functions',
+          'Manage DNS records for cloud-hosted domains',
+          'Handle identity federation between cloud providers',
         ],
         correctIndex: 1,
-        explanation: 'CWPP secures the workloads running in cloud environments.',
+        explanation: 'CWPP focuses specifically on protecting the workloads running inside a cloud environment.',
       ),
       QuizQuestion(
-        question: 'Selling security to leadership is most effective when you:',
+        question: 'Why does effective security leadership require translating technical risk into business terms?',
         options: [
-          'Use technical CVE scores',
-          'Translate technical risk into business terms like financial impact and regulatory exposure',
-          'Demand budget without justification',
-          'Focus only on compliance requirements',
+          'Technical terms are always classified information',
+          'Leadership makes budget decisions based on business outcomes, not raw technical severity scores',
+          'Business terms are legally required in all security reports',
+          'Technical risk and business risk are always identical',
         ],
         correctIndex: 1,
-        explanation: 'Leadership makes business decisions — security must be framed in business risk language to resonate.',
+        explanation: 'Leaders who control security budgets need risk framed in terms they can act on — financial, regulatory, and reputational impact.',
       ),
       QuizQuestion(
-        question: 'Which is a core Zero Trust pillar?',
+        question: 'Which of the following best explains why Zero Trust is described as a synthesis rather than an entirely new invention?',
         options: [
-          'Implicit trust within the network perimeter',
-          'Device health attestation before granting access',
-          'Open network access for productivity',
-          'Single-factor authentication',
+          'It was invented before the CIA Triad',
+          'It combines least privilege, strong authentication, segmentation, and continuous monitoring into one architecture applied everywhere continuously',
+          'It only applies to government networks',
+          'It replaces the need for any authentication',
         ],
         correctIndex: 1,
-        explanation: 'Zero Trust requires verifying device health explicitly before granting access regardless of network location.',
+        explanation: 'Zero Trust\'s real contribution is insisting existing principles apply everywhere and continuously, not creating fundamentally new concepts.',
       ),
       QuizQuestion(
-        question: 'ISO/IEC 27001 is:',
+        question: 'A security program skips straight to threat hunting without first ensuring patching, MFA, and backups are reliably in place. This illustrates:',
         options: [
-          'A US government regulation',
-          'An international standard for an Information Security Management System that is auditable and certifiable',
-          'A list of approved security tools',
-          'A cloud security framework only',
+          'Correct prioritization since threat hunting is more advanced',
+          'A common, costly mistake of skipping basic hygiene before building advanced capability',
+          'A requirement of the NIST CSF',
+          'An example of defense in depth done correctly',
         ],
         correctIndex: 1,
-        explanation: 'ISO 27001 defines requirements for an ISMS and enables formal certification.',
+        explanation: 'Advanced capabilities like threat hunting are far less effective without the basic hygiene foundation already in place.',
       ),
       QuizQuestion(
-        question: 'Chain of custody in digital forensics requires:',
+        question: 'What does "Repudiation" in STRIDE specifically address?',
         options: [
-          'Immediate reimaging of evidence',
-          'Documenting every step of who handled evidence when and how to maintain integrity',
-          'Destroying duplicate copies',
-          'Working directly on original evidence',
+          'Data being read by unauthorized users',
+          'A user denying they performed an action, addressed through logging and digital signatures',
+          'A system becoming unavailable',
+          'An attacker impersonating another user',
         ],
         correctIndex: 1,
-        explanation: 'Chain of custody documentation ensures evidence integrity and legal defensibility.',
+        explanation: 'Repudiation threats are mitigated with strong audit logging and non-repudiation controls like digital signatures.',
       ),
       QuizQuestion(
-        question: 'A CASB (Cloud Access Security Broker) is used to:',
+        question: 'ISO/IEC 27001 differs from the NIST CSF primarily in that:',
         options: [
-          'Cache web content',
-          'Control and monitor cloud service usage enforcing security policies',
-          'Route network traffic',
-          'Manage patch deployment',
+          'ISO 27001 only applies to US organizations',
+          'ISO 27001 defines requirements for a certifiable Information Security Management System, while NIST CSF is a voluntary, non-certifiable framework',
+          'NIST CSF is a legal requirement everywhere',
+          'They are functionally identical with no differences',
         ],
         correctIndex: 1,
-        explanation: 'CASB sits between users and cloud services enforcing access data and threat policies.',
+        explanation: 'ISO 27001 allows for formal third-party certification of an ISMS; NIST CSF is a guidance framework without a certification process.',
       ),
       QuizQuestion(
-        question: 'STRIDE Elevation of Privilege maps to:',
+        question: 'A vendor-neutral security education, focused on concepts like least privilege and Zero Trust rather than specific products, remains valuable over time primarily because:',
         options: [
-          'Confidentiality failure',
-          'Integrity failure',
-          'Authorization failure — gaining capabilities beyond what was granted',
-          'Availability failure',
-        ],
-        correctIndex: 2,
-        explanation: 'Elevation of Privilege is gaining more capabilities than authorized — an authorization control failure.',
-      ),
-      QuizQuestion(
-        question: 'The Repudiation threat in STRIDE is mitigated by:',
-        options: [
-          'Encryption',
-          'Audit logging and digital signatures that prove who performed an action',
-          'Availability redundancy',
-          'Firewall rules',
+          'Vendor products never change',
+          'Underlying principles remain relevant even as specific tools and platforms evolve',
+          'Vendor-specific training is always more expensive',
+          'Concepts are easier to test on certification exams',
         ],
         correctIndex: 1,
-        explanation: 'Non-repudiation controls like audit logs and digital signatures prevent denial of actions.',
+        explanation: 'Tools and vendor products change constantly; the underlying principles endure and remain applicable across whatever comes next.',
       ),
       QuizQuestion(
-        question: 'Security maturity Level 3 Proactive Defense typically includes:',
+        question: 'Digital forensics and incident response overlap because:',
         options: [
-          'Basic antivirus only',
-          'Threat hunting detection engineering and red team exercises',
-          'Asset inventory',
-          'SIEM deployment',
+          'They are performed by entirely unrelated teams with no shared skills',
+          'A SOC investigating an active breach is effectively performing lightweight forensics in real time',
+          'Forensics only applies after an organization has closed permanently',
+          'Incident response never requires preserving evidence',
         ],
         correctIndex: 1,
-        explanation: 'Level 3 moves beyond reactive detection to proactively searching for and testing against threats.',
+        explanation: 'Containment decisions like avoiding immediate reimaging exist specifically to preserve evidence for forensic analysis.',
       ),
-      QuizQuestion(
-        question: 'Why are vendor-neutral security concepts more durable than vendor-specific knowledge?',
-        options: [
-          'Vendor products are low quality',
-          'Vendor-neutral concepts apply across any platform or product while specific tools change constantly',
-          'Certifications do not cover vendor products',
-          'Vendor products are never secure',
-        ],
-        correctIndex: 1,
-        explanation: 'Foundational concepts like CIA Triad and Zero Trust remain relevant regardless of which tools or vendors are in use.',
-      ),
-
     ],
   ),
 ];
