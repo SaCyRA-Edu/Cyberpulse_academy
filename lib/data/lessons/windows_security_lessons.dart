@@ -1,10 +1,12 @@
 import '../lesson_model.dart';
+import '../../widgets/diagrams.dart';
 
 const List<Lesson> windowsSecurityLessons = [
   // 1 -- AUDIO -------------------------------------------------------------
   Lesson(
     title: 'Why Windows Is the World\'s Most Targeted OS',
     isAudio: true,
+    estimatedMinutes: 6,
     sections: [
       LessonSection(
         heading: 'Windows Security — Audio Introduction',
@@ -63,357 +65,559 @@ const List<Lesson> windowsSecurityLessons = [
   // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'Windows Security Architecture',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
-        heading: 'The Windows Security Model',
+        heading: 'A Layered Foundation',
         body:
-            'Windows uses a layered security model: at the bottom is the '
-            'kernel (hardware access, process isolation), above that is '
-            'user mode (where applications run), and at the top is a set '
-            'of security subsystems including the Security Reference '
-            'Monitor (SRM), which enforces access control decisions.',
+            'Windows security is built as a series of layers, each one '
+            'assuming the layer above it might eventually be tricked or '
+            'compromised. At the very bottom sits the kernel, which '
+            'controls hardware access and enforces process isolation. '
+            'Above that runs user mode, where your applications actually '
+            'execute. Sitting on top of both is a collection of security '
+            'subsystems — most importantly the Security Reference '
+            'Monitor (SRM) — that make every single access control '
+            'decision on the system: can this process open that file? '
+            'Can this user modify that registry key? Every one of those '
+            'questions gets answered by the SRM, consistently, every '
+            'time.',
       ),
       LessonSection(
-        heading: 'Processes & Integrity Levels',
+        heading: 'Integrity Levels: A Second Dimension of Trust',
         body:
-            'Every process in Windows runs at an integrity level: '
-            'Untrusted, Low, Medium, High, or System. A process at a '
-            'lower integrity level cannot write to objects at a higher '
-            'level — a core mechanism that contains what compromised '
-            'browser tabs or downloaded files can do.',
+            'Beyond standard file and folder permissions, every process '
+            'in modern Windows also runs at an integrity level: '
+            'Untrusted, Low, Medium, High, or System. The rule is simple '
+            'but powerful — a process running at a lower integrity level '
+            'cannot write to objects at a higher integrity level, '
+            'regardless of what the file permissions would otherwise '
+            'allow. This is precisely why your web browser\'s rendering '
+            'engine, which handles untrusted content from the internet, '
+            'runs at Low integrity: even if an attacker manages to '
+            'exploit a bug in the browser, that compromised process is '
+            'still blocked from writing to most of the file system, '
+            'because it simply doesn\'t have the integrity level to do so.',
       ),
       LessonSection(
         heading: 'The Security Accounts Manager (SAM)',
         body:
-            'SAM stores local account credentials as hashes on disk '
-            '(in the registry at HKLM\\SAM). It is protected by the '
-            'kernel and cannot be read while Windows is running. '
-            'Attackers who obtain a copy (through shadow copies, offline '
-            'access, or tools like Mimikatz) can attempt to crack or '
-            'pass those hashes.',
-      ),
-    ],
-  ),
-
-  // 2 ----------------------------------------------------------------------
-  Lesson(
-    title: 'User Accounts, Groups & UAC',
-    sections: [
-      LessonSection(
-        heading: 'Account Types',
-        bullets: [
-          'Standard User — can run applications, change personal settings; cannot install software or modify system config',
-          'Administrator — full local system control; should not be used for day-to-day work',
-          'Built-in accounts (Administrator, Guest) — should be disabled or tightly controlled in managed environments',
-          'Service accounts — run background services; should have minimal permissions and no interactive login',
-        ],
-      ),
-      LessonSection(
-        heading: 'User Account Control (UAC)',
-        body:
-            'UAC is the prompt that appears when an action requires '
-            'administrator rights. It creates a security boundary: even '
-            'if you\'re logged in as an administrator, most operations '
-            'run at medium integrity until explicitly elevated. This '
-            'slows down malware that tries to make system changes silently.',
-      ),
-      LessonSection(
-        heading: 'Least Privilege in Practice',
-        body:
-            'The correct setup for most users: a standard account for '
-            'day-to-day work, a separate administrator account used only '
-            'when needed for maintenance. This limits the impact of a '
-            'compromised user session significantly.',
+            'Local account credentials are stored as cryptographic '
+            'hashes in the registry, in a protected structure called the '
+            'SAM database, located at HKLM\\SAM. While Windows is '
+            'running, the kernel actively protects this database from '
+            'being read directly, even by an administrator account. '
+            'However, attackers who obtain offline access to a machine — '
+            'through volume shadow copies, a stolen disk image, or tools '
+            'like Mimikatz that extract credentials from memory — can '
+            'attempt to crack the hashes or use them directly in a '
+            '"pass-the-hash" attack without ever needing the plaintext '
+            'password.',
       ),
     ],
   ),
 
   // 3 ----------------------------------------------------------------------
   Lesson(
-    title: 'NTFS Permissions & File System Security',
+    title: 'User Accounts, Groups & UAC',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
-        heading: 'NTFS Permission Types',
+        heading: 'The Account Types You\'ll Encounter',
         bullets: [
-          'Full Control — read, write, delete, execute, change permissions, and take ownership',
-          'Modify — read, write, delete, execute (but not change permissions)',
-          'Read & Execute — open and run files',
-          'List Folder Contents — see what\'s in a folder',
-          'Read — view file contents',
-          'Write — create and modify files',
+          'Standard User — can run most applications and adjust personal settings, but cannot install software system-wide or modify protected configuration',
+          'Administrator — has full local control over the system; should never be used for everyday tasks like browsing the web or checking email',
+          'Built-in accounts (default Administrator, Guest) — well-known targets that should be disabled or tightly restricted in any managed environment',
+          'Service accounts — run background services and should hold only the minimal permissions that specific service actually needs, with no interactive login capability at all',
         ],
       ),
       LessonSection(
-        heading: 'Allow vs. Deny',
+        heading: 'User Account Control (UAC)',
         body:
-            'NTFS has explicit Allow and explicit Deny entries. Deny '
-            'always overrides Allow when both apply to the same user. '
-            'Careful use of Deny can protect sensitive paths from specific '
-            'accounts even when broad Allow rules exist.',
+            'UAC is the familiar prompt that appears whenever an action '
+            'requires administrator-level rights, and it exists as a '
+            'genuine security boundary rather than a mere annoyance. '
+            'Even when logged in as an administrator, most day-to-day '
+            'operations run at Medium integrity by default; only actions '
+            'explicitly elevated through a UAC prompt run at High '
+            'integrity. This design specifically targets malware that '
+            'tries to make silent system-level changes — without user '
+            'awareness, a UAC-protected system forces that malware to '
+            'either trigger a visible prompt (tipping off the user) or '
+            'find a separate way to bypass UAC entirely, which is '
+            'considerably harder than simply running with the rights the '
+            'logged-in user already possesses.',
       ),
       LessonSection(
-        heading: 'Inheritance & Effective Permissions',
+        heading: 'Least Privilege in Everyday Practice',
         body:
-            'By default, child files and folders inherit permissions from '
-            'their parent. Effective permissions for a user are the '
-            'combined result of all group memberships and explicit '
-            'assignments — you can view these in the "Effective Access" '
-            'tab in the file\'s Properties → Security dialog.',
+            'The security-recommended setup for virtually every Windows '
+            'user is straightforward: maintain a standard user account '
+            'for daily work, and use a completely separate administrator '
+            'account only for the specific moments when elevated access '
+            'is genuinely required, such as installing new software or '
+            'changing system configuration. This single practice '
+            'dramatically limits the blast radius of a compromised '
+            'session — malware that infects a session running as a '
+            'standard user simply cannot make the same system-wide '
+            'changes that malware running as an administrator could.',
       ),
       LessonSection(
-        heading: 'Share Permissions vs. NTFS',
+        heading: 'Groups: Managing Permissions at Scale',
         body:
-            'When accessing files over a network share, both share '
-            'permissions and NTFS permissions apply — the more restrictive '
-            'of the two wins. A common hardening practice is to set share '
-            'permissions to "Everyone: Full Control" and manage access '
-            'entirely through NTFS permissions, which are more granular.',
+            'Rather than assigning permissions to every individual user '
+            'account one at a time, Windows lets administrators organize '
+            'users into groups and assign permissions to the group as a '
+            'whole. A new employee added to the "Finance" group '
+            'automatically inherits every permission already granted to '
+            'that group, and removing them from the group instantly '
+            'revokes that access — far more manageable at scale than '
+            'tracking individual permission grants across potentially '
+            'thousands of employees.',
       ),
     ],
   ),
 
   // 4 ----------------------------------------------------------------------
   Lesson(
-    title: 'Active Directory Fundamentals',
+    title: 'NTFS Permissions & File System Security',
+    estimatedMinutes: 8,
     sections: [
       LessonSection(
-        heading: 'What Active Directory Is',
-        body:
-            'Active Directory (AD) is Microsoft\'s identity and access '
-            'management service for Windows domains. It centralizes '
-            'authentication, authorization, and policy for all machines '
-            'and users in an organization\'s Windows environment.',
-      ),
-      LessonSection(
-        heading: 'Key AD Concepts',
+        heading: 'The Six Core NTFS Permissions',
         bullets: [
-          'Domain — a logical grouping of users, computers, and resources sharing a common directory',
-          'Domain Controller (DC) — the server running AD, handling authentication and policy',
-          'Organizational Units (OUs) — containers for organizing objects within a domain',
-          'Groups — collections of users or computers for policy and permission assignment',
-          'Forest — one or more domains sharing a schema and trust relationships',
+          'Full Control — read, write, delete, execute, change permissions, and take ownership of the file or folder',
+          'Modify — read, write, delete, and execute, but cannot change permissions or take ownership',
+          'Read & Execute — open and run files, or list a folder\'s contents and traverse into subfolders',
+          'List Folder Contents — see what files and subfolders exist inside a folder',
+          'Read — view a file\'s contents without modifying it',
+          'Write — create new files or modify existing ones within the permitted scope',
         ],
       ),
       LessonSection(
-        heading: 'Why AD Is Such a High-Value Target',
+        heading: 'Allow, Deny, and Which One Wins',
         body:
-            'Compromising a domain controller gives an attacker control '
-            'over the entire environment — every machine, every user, '
-            'every application that trusts the domain. This is why '
-            'protecting the DC tier and privileged AD accounts is one '
-            'of the most critical security priorities in any Windows '
-            'environment.',
+            'NTFS permissions can be explicitly set to either Allow or '
+            'Deny for any given user or group. When both an Allow and a '
+            'Deny entry apply to the same user for the same resource, '
+            'Deny always takes precedence, regardless of which one was '
+            'configured first or which group has broader Allow rights. '
+            'This makes explicit Deny entries a powerful, precise tool '
+            'for carving out exceptions — protecting one particularly '
+            'sensitive folder from a specific group even when that group '
+            'otherwise has broad access to the surrounding directory '
+            'structure.',
+      ),
+      LessonSection(
+        heading: 'Inheritance and Effective Permissions',
+        body:
+            'By default, files and subfolders inherit the permission '
+            'settings of their parent folder, which is what makes it '
+            'practical to manage permissions across deep, complex '
+            'directory structures without configuring every single item '
+            'individually. But because a user\'s actual access is the '
+            'combined result of every group they belong to plus any '
+            'explicit permissions set directly on them, the real, '
+            'effective permission a specific user has on a specific '
+            'resource can become genuinely difficult to predict just by '
+            'looking at the visible settings. Windows provides an '
+            '"Effective Access" tab in the Advanced Security Settings '
+            'dialog specifically to calculate and display this combined '
+            'result for any user you specify.',
+      ),
+      LessonSection(
+        heading: 'Share Permissions vs. NTFS Permissions',
+        body:
+            'When a folder is accessed over the network rather than '
+            'locally, two separate permission systems apply '
+            'simultaneously: the share permissions configured when the '
+            'folder was shared, and the underlying NTFS permissions on '
+            'the folder itself. The more restrictive of the two always '
+            'wins. Because managing two overlapping permission systems '
+            'invites confusion and misconfiguration, a common and widely '
+            'recommended hardening practice is to set share permissions '
+            'to "Everyone: Full Control" and then manage all actual '
+            'access control exclusively through the far more granular '
+            'NTFS permissions underneath.',
       ),
     ],
   ),
 
   // 5 ----------------------------------------------------------------------
   Lesson(
-    title: 'Windows Defender & Endpoint Detection',
+    title: 'Active Directory Fundamentals',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
-        heading: 'Microsoft Defender Antivirus',
+        heading: 'What Active Directory Actually Is',
         body:
-            'Built into Windows 10/11 and Windows Server, Defender '
-            'provides real-time, cloud-assisted malware protection with '
-            'no third-party software required. Its signature database '
-            'is updated multiple times daily and augmented with '
-            'behaviour-based detection.',
+            'Active Directory (AD) is Microsoft\'s identity and access '
+            'management service for Windows-based networks, and it '
+            'serves as the central nervous system for authentication, '
+            'authorization, and policy across every machine and user in '
+            'an organization\'s Windows environment. When an employee '
+            'logs into any company laptop, it\'s AD that verifies their '
+            'identity and determines what they\'re allowed to access.',
       ),
       LessonSection(
-        heading: 'Key Defender Features',
+        heading: 'Key Structural Concepts',
         bullets: [
-          'Real-time protection — scans files as they\'re created, modified, or downloaded',
-          'Cloud-delivered protection — checks suspicious samples against Microsoft\'s threat intelligence',
-          'Tamper protection — prevents attackers from disabling Defender via registry or CLI changes',
-          'Controlled Folder Access — blocks unauthorized processes from modifying protected folders (anti-ransomware)',
-          'Attack Surface Reduction (ASR) rules — blocks specific attack techniques at the OS level',
+          'Domain — a logical grouping of users, computers, and resources that all share a common directory database and security policies',
+          'Domain Controller (DC) — the server actually running AD, responsible for handling authentication requests and enforcing policy across the domain',
+          'Organizational Units (OUs) — containers used to organize users, computers, and groups hierarchically, typically mirroring departmental or geographic structure',
+          'Security Groups — collections of users or computers used for assigning permissions and applying Group Policy efficiently',
+          'Forest — the broadest AD structure, comprising one or more domains that share a common schema and established trust relationships between them',
         ],
       ),
       LessonSection(
-        heading: 'Microsoft Defender for Endpoint (MDE)',
+        heading: 'Why Domain Controllers Are the Ultimate Prize',
         body:
-            'The enterprise extension of Defender adds EDR (Endpoint '
-            'Detection and Response) capability: centralized visibility '
-            'across all endpoints, hunting, automated investigation, '
-            'and response. Alerts from MDE feed directly into a SIEM '
-            'or the Microsoft Sentinel SIEM.',
+            'Compromising a domain controller doesn\'t just compromise '
+            'one server — it effectively hands an attacker control over '
+            'the entire environment, since every machine and user that '
+            'trusts the domain inherits whatever trust decisions the '
+            'compromised DC makes. This single fact drives an enormous '
+            'amount of enterprise security architecture: domain '
+            'controllers typically sit in their own highly restricted '
+            'network tier, privileged AD accounts are protected far more '
+            'aggressively than standard user accounts, and any activity '
+            'touching a domain controller receives disproportionate '
+            'monitoring attention compared to ordinary workstation '
+            'activity.',
+      ),
+      LessonSection(
+        heading: 'Group Policy: AD\'s Enforcement Arm',
+        body:
+            'Active Directory delivers most of its practical security '
+            'value through Group Policy, which lets administrators push '
+            'consistent configuration — password requirements, software '
+            'restrictions, security settings, and much more — out to '
+            'every machine and user in a domain automatically. This '
+            'relationship between AD (providing identity and structure) '
+            'and Group Policy (providing centralized enforcement) is '
+            'explored in more depth in an upcoming lesson.',
       ),
     ],
   ),
 
   // 6 ----------------------------------------------------------------------
   Lesson(
-    title: 'Group Policy & Security Hardening',
+    title: 'Windows Defender & Endpoint Detection',
+    estimatedMinutes: 8,
     sections: [
       LessonSection(
-        heading: 'What Group Policy Does',
+        heading: 'Built-In, Not Bolted On',
         body:
-            'Group Policy Objects (GPOs) apply configuration settings '
-            'to users and computers in an AD domain — from password '
-            'complexity rules to software restrictions to screen lock '
-            'timeouts — without touching each machine individually.',
+            'Microsoft Defender Antivirus ships built directly into '
+            'Windows 10, Windows 11, and Windows Server, providing '
+            'real-time, cloud-assisted malware protection without '
+            'requiring any third-party software purchase or '
+            'installation. Its signature database updates multiple times '
+            'daily, and its detection is significantly augmented by '
+            'behavior-based analysis that can flag genuinely new, '
+            'previously unseen threats based on how they behave rather '
+            'than relying solely on matching a known signature.',
       ),
       LessonSection(
-        heading: 'Essential Security Settings via GPO',
+        heading: 'Key Protective Features',
         bullets: [
-          'Account lockout policy — lock accounts after N failed attempts to block brute force',
-          'Password policy — minimum length, complexity, maximum age',
-          'Audit policy — configure what security events are logged',
-          'Restrict removable media — prevent USB drives from being used as malware delivery',
-          'AppLocker / Software Restriction Policies — allowlist approved executables only',
-          'Disable legacy protocols — NTLMv1, LM hash, SMBv1',
+          'Real-time protection — scans files continuously as they\'re created, modified, or downloaded, rather than only during scheduled scans',
+          'Cloud-delivered protection — checks suspicious, unrecognized files against Microsoft\'s continuously updated threat intelligence in near real time',
+          'Tamper Protection — specifically prevents malware (or an attacker with local access) from disabling Defender itself through registry edits or command-line tools',
+          'Controlled Folder Access — blocks unauthorized applications from modifying files within protected folders, directly countering ransomware\'s core behavior of mass file encryption',
+          'Attack Surface Reduction (ASR) rules — block specific, well-documented attack techniques at the operating system level, such as Office applications spawning child processes',
         ],
       ),
       LessonSection(
-        heading: 'Security Baselines',
+        heading: 'Scaling Up: Microsoft Defender for Endpoint',
         body:
-            'Microsoft publishes free Security Baselines for each Windows '
-            'version — pre-configured GPO templates incorporating '
-            'Microsoft\'s own hardening recommendations. Using a baseline '
-            'as a starting point is far more efficient than building '
-            'hardening settings from scratch.',
+            'In enterprise environments, Defender is frequently paired '
+            'with Microsoft Defender for Endpoint (MDE), which adds full '
+            'EDR — Endpoint Detection and Response — capability. MDE '
+            'gives security teams centralized visibility across every '
+            'managed endpoint simultaneously, automated investigation of '
+            'suspicious activity, and the ability to isolate a '
+            'compromised machine or take other response actions '
+            'remotely. Alerts generated by MDE typically feed directly '
+            'into a SIEM platform, such as Microsoft Sentinel, for '
+            'correlation alongside data from other parts of the '
+            'environment.',
       ),
     ],
   ),
 
   // 7 ----------------------------------------------------------------------
   Lesson(
-    title: 'Windows Firewall',
+    title: 'Group Policy & Security Hardening',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
-        heading: 'Windows Firewall with Advanced Security',
+        heading: 'What Group Policy Objects Actually Do',
         body:
-            'Windows includes a host-based stateful firewall that '
-            'provides inbound and outbound filtering per-application '
-            'and per-port. Unlike a network firewall, it protects the '
-            'individual machine even when on a trusted internal network — '
-            'limiting lateral movement from a compromised machine nearby.',
+            'Group Policy Objects, universally known as GPOs, let '
+            'administrators define a configuration once and apply it '
+            'consistently to every targeted user and computer in a '
+            'domain — from password complexity rules to screen lock '
+            'timeouts to which software is permitted to run — without '
+            'ever needing to touch each individual machine by hand. GPOs '
+            'link to Active Directory\'s Organizational Units, meaning '
+            'different departments or machine types can receive '
+            'entirely different policy sets automatically, based purely '
+            'on which OU they belong to.',
       ),
       LessonSection(
-        heading: 'Network Profiles',
+        heading: 'The Hardening Settings That Matter Most',
         bullets: [
-          'Domain — applied when connected to a corporate domain; typically permissive for management traffic',
-          'Private — applied to trusted home/office networks; balanced',
-          'Public — applied to untrusted networks (hotels, coffee shops); most restrictive',
+          'Account lockout policy — automatically locks an account after a defined number of failed login attempts, directly blunting brute-force password attacks',
+          'Password policy — enforces minimum length, complexity requirements, and maximum password age',
+          'Audit policy — determines precisely which security events actually get logged, which directly determines what a SOC can later investigate',
+          'Removable media restrictions — prevents USB drives from being used as a malware delivery mechanism or data exfiltration path',
+          'AppLocker / Software Restriction Policies — allowlists specifically approved executables, blocking everything else by default rather than trying to blocklist every known-bad program individually',
+          'Disabling legacy protocols — turning off outdated, weak protocols like NTLMv1, LM hash storage, and SMBv1, all of which carry well-documented vulnerabilities',
         ],
       ),
       LessonSection(
-        heading: 'Why Host Firewall Matters Even on Protected Networks',
+        heading: 'Starting From a Baseline Rather Than From Scratch',
         body:
-            'A network firewall protects the perimeter. But once an '
-            'attacker is inside — via phishing, a compromised VPN, or a '
-            'supply chain infection — host-based firewall rules are what '
-            'stop them from moving laterally from machine to machine '
-            'uninhibited.',
+            'Microsoft publishes free Security Baselines for every '
+            'supported Windows version — essentially pre-built GPO '
+            'templates that already encode Microsoft\'s own detailed '
+            'hardening recommendations. Adopting a published baseline as '
+            'a starting point, then adjusting individual settings to fit '
+            'a specific organization\'s actual needs, is dramatically '
+            'more efficient and less error-prone than attempting to '
+            'build a complete hardening configuration entirely from '
+            'first principles.',
       ),
     ],
   ),
 
   // 8 ----------------------------------------------------------------------
   Lesson(
-    title: 'Event Logs, Auditing & Monitoring',
+    title: 'Windows Firewall',
+    estimatedMinutes: 7,
     sections: [
       LessonSection(
-        heading: 'The Three Core Logs',
-        bullets: [
-          'Security log — authentication events, account changes, policy changes, logon/logoff',
-          'System log — driver, service, and OS-level events',
-          'Application log — events generated by installed applications',
-        ],
-      ),
-      LessonSection(
-        heading: 'Critical Security Event IDs',
-        bullets: [
-          '4624 — Successful logon (who logged on, when, how)',
-          '4625 — Failed logon (watch for bursts = brute force)',
-          '4648 — Logon with explicit credentials (pass-the-hash indicator)',
-          '4688 — New process created (command execution)',
-          '4720/4732 — User account created / added to security group',
-          '1102/4719 — Security audit log cleared (attacker covering tracks)',
-        ],
-      ),
-      LessonSection(
-        heading: 'Forwarding Logs to a SIEM',
+        heading: 'A Firewall That Travels With Every Machine',
         body:
-            'Individual machine logs are useful, but in an enterprise, '
-            'logs must be centralized — forwarded via Windows Event '
-            'Forwarding (WEF) or a SIEM agent to a central platform '
-            'where they can be correlated, retained, and searched across '
-            'all machines simultaneously.',
+            'Windows Firewall with Advanced Security is a full-featured, '
+            'host-based, stateful firewall built directly into every '
+            'copy of Windows, capable of filtering both inbound and '
+            'outbound traffic with granular control down to the '
+            'individual application or port. Unlike a network firewall '
+            'sitting at the perimeter, a host firewall travels with the '
+            'device itself — protecting a laptop equally whether it\'s '
+            'sitting inside the corporate office or connected to an '
+            'entirely untrusted network somewhere else in the world.',
+      ),
+      LessonSection(
+        heading: 'Network Profiles: Context-Aware Protection',
+        bullets: [
+          'Domain — automatically applied when the machine is connected to its corporate domain; typically the most permissive profile, allowing necessary management traffic',
+          'Private — used for trusted networks like a home or small office; a balanced middle ground between usability and protection',
+          'Public — automatically applied on untrusted networks such as hotels, airports, or coffee shops; the most restrictive profile by default, specifically designed to protect a device on a network full of unknown, potentially hostile devices',
+        ],
+      ),
+      LessonSection(
+        heading: 'Why a Host Firewall Matters Even Inside a Trusted Network',
+        body:
+            'It\'s tempting to assume that a device sitting safely behind '
+            'a strong network perimeter firewall doesn\'t need its own '
+            'individual protection as well. This assumption breaks down '
+            'the moment any single device inside that perimeter is '
+            'compromised — through phishing, a malicious USB drive, or a '
+            'supply chain infection, for example. At that point, the '
+            'network firewall provides zero additional protection, '
+            'because the attacker is already inside the trusted network. '
+            'Host firewall rules on every individual machine are '
+            'precisely what stops that compromised device from freely '
+            'reaching every other machine sitting on the same internal '
+            'network, directly limiting lateral movement even after the '
+            'perimeter has already been breached.',
       ),
     ],
   ),
 
   // 9 ----------------------------------------------------------------------
   Lesson(
-    title: 'Patch Management & WSUS',
+    title: 'Event Logs, Auditing & Monitoring',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
-        heading: 'Why Unpatched Systems Are the Biggest Risk',
+        heading: 'The Three Core Windows Event Logs',
+        bullets: [
+          'Security — records logon and logoff events, account changes, permission modifications, and access attempts; the log a security investigator turns to first',
+          'System — captures driver, service, and operating-system-level events',
+          'Application — logs events generated by installed software applications rather than the operating system itself',
+        ],
+      ),
+      LessonSection(
+        heading: 'Event IDs Worth Memorizing',
+        bullets: [
+          '4624 — a successful logon, recording who logged in, when, and through what method',
+          '4625 — a failed logon attempt; a sudden burst of these from one source is a classic brute-force signature',
+          '4648 — a logon using explicit credentials, often an indicator of pass-the-hash or lateral movement activity',
+          '4688 — creation of a new process, useful for tracking exactly what commands were executed and when',
+          '4720 / 4732 — a new user account was created, or an account was added to a security group',
+          '1102 / 4719 — the Security audit log itself was cleared; one of the strongest possible signals that an attacker is actively covering their tracks',
+        ],
+      ),
+      LessonSection(
+        heading: 'Why Logs Alone on a Single Machine Aren\'t Enough',
         body:
-            'Most successful attacks exploit known, already-patched '
-            'vulnerabilities. The average time between a CVE being '
-            'published and exploitation in the wild has shrunk to days '
-            'or even hours for high-profile vulnerabilities. Patch '
-            'management is consistently the highest-ROI security activity.',
-      ),
-      LessonSection(
-        heading: 'Windows Update & WSUS',
-        bullets: [
-          'Windows Update — the built-in mechanism delivering patches directly from Microsoft',
-          'WSUS (Windows Server Update Services) — on-premises service for controlling, testing, and approving patches before rolling them out to the fleet',
-          'Microsoft Endpoint Configuration Manager (MECM/SCCM) — enterprise-grade patch orchestration at scale',
-        ],
-      ),
-      LessonSection(
-        heading: 'A Practical Patching Strategy',
-        bullets: [
-          'Critical and high-severity patches: target ≤72 hours, especially for internet-facing systems',
-          'Test in a staging group before deploying broadly where possible',
-          'Have compensating controls (block the vulnerable port/service) for systems that can\'t be immediately patched',
-          'Track compliance — know exactly which machines are missing which patches',
-        ],
+            'Local event logs are genuinely useful — but they share a '
+            'fundamental weakness: an attacker who achieves '
+            'administrator-level access on that same machine can simply '
+            'delete or alter the very logs that would otherwise reveal '
+            'their activity. This is exactly why enterprise environments '
+            'forward logs continuously to a centralized platform using '
+            'Windows Event Forwarding (WEF) or a dedicated SIEM agent. '
+            'Once an event has already left the originating machine and '
+            'landed on a separate, more tightly protected central '
+            'system, a later compromise of the original machine can no '
+            'longer retroactively erase that evidence.',
       ),
     ],
   ),
 
   // 10 ---------------------------------------------------------------------
   Lesson(
-    title: 'BitLocker & Credential Protection',
+    title: 'Patch Management & WSUS',
+    estimatedMinutes: 8,
     sections: [
       LessonSection(
-        heading: 'BitLocker Drive Encryption',
+        heading: 'The Single Highest-ROI Security Activity',
         body:
-            'BitLocker encrypts the entire volume using AES-XTS 128 or '
-            '256 bit. When a laptop is lost or stolen and powered off, '
-            'the data on it is unreadable without the recovery key or '
-            'the user\'s credentials. Works best with a TPM chip which '
-            'seals the encryption key to the hardware, detecting tampering.',
+            'It bears repeating because it\'s repeatedly proven true in '
+            'practice: the overwhelming majority of successful attacks '
+            'don\'t rely on some exotic, cutting-edge technique. They '
+            'exploit known, publicly documented vulnerabilities that '
+            'already have an available patch — one that simply hadn\'t '
+            'been applied yet. Consistent, timely patch management '
+            'remains one of the single highest-return security '
+            'investments any organization can make, precisely because it '
+            'closes off entire categories of attack that would otherwise '
+            'require essentially no skill for an attacker to exploit.',
       ),
       LessonSection(
-        heading: 'Credential Guard',
-        body:
-            'Credential Guard uses virtualization-based security (VBS) '
-            'to isolate stored credentials (NTLM hashes, Kerberos '
-            'tickets) in a protected hypervisor partition. This directly '
-            'mitigates pass-the-hash and pass-the-ticket attacks by '
-            'preventing tools like Mimikatz from reading credentials '
-            'from memory.',
+        heading: 'From Windows Update to Enterprise-Scale Orchestration',
+        bullets: [
+          'Windows Update — the built-in consumer-facing mechanism, delivering patches directly from Microsoft to individual machines',
+          'WSUS (Windows Server Update Services) — an on-premises service that lets an organization centrally review, test, and approve patches before rolling them out fleet-wide, rather than letting every machine pull updates independently and unpredictably',
+          'Microsoft Endpoint Configuration Manager (MECM/SCCM) — enterprise-grade orchestration for patching, software deployment, and compliance reporting across very large, complex fleets',
+        ],
       ),
       LessonSection(
-        heading: 'LAPS: Local Administrator Password Solution',
+        heading: 'A Repeatable Patch Management Workflow',
         body:
-            'By default, many organizations image all machines with '
-            'the same local Administrator password — meaning one '
-            'compromised machine immediately compromises all others. '
-            'LAPS automatically generates and rotates unique local '
-            'admin passwords per machine, stored securely in AD.',
+            'Mature organizations follow a structured, repeating '
+            'process for patching rather than applying updates '
+            'haphazardly as they appear.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.processFlow,
+          steps: ['Identify', 'Test', 'Deploy', 'Verify'],
+          caption:
+              'A disciplined patch management cycle catches problems in '
+              'a staging group before they reach the entire fleet.',
+        ),
+      ),
+      LessonSection(
+        heading: 'Balancing Speed Against Stability',
+        body:
+            'Critical, actively-exploited vulnerabilities — especially '
+            'on systems directly exposed to the internet — should '
+            'generally be patched within days, not weeks. At the same '
+            'time, deploying every patch instantly and blindly across an '
+            'entire production fleet carries real risk of its own: '
+            'occasionally a patch introduces its own bugs or '
+            'compatibility problems. Testing new patches against a small '
+            'staging group before wide deployment, wherever practically '
+            'feasible, catches most such issues before they can affect '
+            'the whole organization. For any system that genuinely '
+            'cannot be patched immediately — often due to compatibility '
+            'constraints with critical legacy software — compensating '
+            'controls, such as blocking the specific vulnerable port or '
+            'service at the network level, provide interim protection '
+            'until a proper patch can finally be applied.',
       ),
     ],
   ),
 
-  // 11 ----------------------------------------------------------------- Quiz
+  // 11 --------------------------------------------------------------------
+  Lesson(
+    title: 'BitLocker & Credential Protection',
+    estimatedMinutes: 8,
+    sections: [
+      LessonSection(
+        heading: 'BitLocker: Encrypting the Entire Drive',
+        body:
+            'BitLocker is Windows\' built-in full-disk encryption '
+            'feature, encrypting an entire volume using strong AES '
+            'encryption (128 or 256 bit, in XTS mode). The practical '
+            'benefit is straightforward and significant: if a laptop '
+            'protected by BitLocker is lost or stolen while powered off '
+            'or locked, the data on it is completely unreadable to '
+            'whoever now physically holds the device, unless they also '
+            'possess the recovery key or the legitimate user\'s '
+            'credentials. BitLocker works best paired with a TPM '
+            '(Trusted Platform Module) chip, which seals the encryption '
+            'key to that specific piece of hardware and can detect '
+            'certain forms of physical tampering with the system.',
+      ),
+      LessonSection(
+        heading: 'Credential Guard: Isolating Secrets From Memory Attacks',
+        body:
+            'Credential Guard uses virtualization-based security (VBS) '
+            'to isolate sensitive stored credentials — NTLM password '
+            'hashes and Kerberos tickets — inside a protected, isolated '
+            'hypervisor partition that ordinary Windows processes, even '
+            'ones running with administrator rights, cannot directly '
+            'access. This directly and specifically counters '
+            'pass-the-hash and pass-the-ticket attacks, since tools like '
+            'Mimikatz that normally extract these credentials straight '
+            'from regular system memory simply have nothing to find '
+            'there anymore.',
+      ),
+      LessonSection(
+        heading: 'LAPS: Ending the "Every Machine Shares the Same Password" Problem',
+        body:
+            'A surprisingly common and dangerous default in many '
+            'organizations: every machine gets imaged with the identical '
+            'local Administrator password, baked directly into the '
+            'standard deployment image. The moment an attacker learns '
+            'that one shared password — from any single compromised '
+            'machine — they immediately have local administrator access '
+            'to every other machine built from the same image. The '
+            'Local Administrator Password Solution (LAPS) solves this '
+            'directly by automatically generating a unique, randomly '
+            'rotated local administrator password for every individual '
+            'machine, storing each one securely in Active Directory '
+            'where only specifically authorized administrators can '
+            'retrieve it when genuinely needed.',
+      ),
+      LessonSection(
+        heading: 'Recognizing the Limits of Any Single Control',
+        body:
+            'None of these three controls is a complete solution on its '
+            'own, and understanding their specific limits matters as '
+            'much as understanding what they protect. BitLocker protects '
+            'data only when the device is powered off or locked — it '
+            'does nothing to stop malware running on an already-unlocked '
+            'system. Credential Guard protects stored credentials in '
+            'memory, but does nothing if a user is directly phished into '
+            'typing their password into a fake login page. LAPS solves '
+            'password reuse across machines but says nothing about '
+            'whether the passwords themselves are strong. This is '
+            'exactly the kind of layered thinking — defense in depth — '
+            'that the Capstone module later in this course builds into a '
+            'complete framework.',
+      ),
+    ],
+  ),
+
+  // 12 --------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
     estimatedMinutes: 15,
@@ -431,12 +635,7 @@ const List<Lesson> windowsSecurityLessons = [
       ),
       QuizQuestion(
         question: 'In NTFS a Deny entry does what when it conflicts with an Allow?',
-        options: [
-          'Allow wins',
-          'Deny wins and always overrides Allow',
-          'They cancel out',
-          'First entry set wins',
-        ],
+        options: ['Allow wins', 'Deny wins and always overrides Allow', 'They cancel out', 'First entry set wins'],
         correctIndex: 1,
         explanation: 'Explicit Deny always overrides Allow in NTFS permissions.',
       ),
@@ -453,12 +652,7 @@ const List<Lesson> windowsSecurityLessons = [
       ),
       QuizQuestion(
         question: 'Which Defender feature specifically addresses ransomware?',
-        options: [
-          'SmartScreen',
-          'Controlled Folder Access',
-          'Tamper Protection',
-          'Network Inspection System',
-        ],
+        options: ['SmartScreen', 'Controlled Folder Access', 'Tamper Protection', 'Network Inspection System'],
         correctIndex: 1,
         explanation: 'Controlled Folder Access blocks unauthorized processes from modifying protected folders.',
       ),
@@ -510,7 +704,7 @@ const List<Lesson> windowsSecurityLessons = [
         question: 'UAC exists to:',
         options: [
           'Speed up application launches',
-          'Require approval before system-level changes run preventing silent malware escalation',
+          'Require approval before system-level changes run, preventing silent malware escalation',
           'Replace the need for antivirus',
           'Log every keypress',
         ],
@@ -519,12 +713,7 @@ const List<Lesson> windowsSecurityLessons = [
       ),
       QuizQuestion(
         question: 'The SAM database stores:',
-        options: [
-          'Encryption keys',
-          'Local account credential hashes',
-          'Group Policy settings',
-          'DNS records',
-        ],
+        options: ['Encryption keys', 'Local account credential hashes', 'Group Policy settings', 'DNS records'],
         correctIndex: 1,
         explanation: 'SAM stores local account password hashes protected by the kernel while Windows is running.',
       ),
@@ -574,14 +763,9 @@ const List<Lesson> windowsSecurityLessons = [
       ),
       QuizQuestion(
         question: 'Windows event log category that shows policy changes and account modifications is:',
-        options: [
-          'Application',
-          'System',
-          'Security',
-          'Setup',
-        ],
+        options: ['Application', 'System', 'Security', 'Setup'],
         correctIndex: 2,
-        explanation: 'The Security log records authentication events account changes and policy modifications.',
+        explanation: 'The Security log records authentication events, account changes, and policy modifications.',
       ),
       QuizQuestion(
         question: 'Pass-the-hash attacks use:',
@@ -629,12 +813,7 @@ const List<Lesson> windowsSecurityLessons = [
       ),
       QuizQuestion(
         question: 'Which event ID indicates the Security audit log was cleared?',
-        options: [
-          '4624',
-          '4688',
-          '1102',
-          '4720',
-        ],
+        options: ['4624', '4688', '1102', '4720'],
         correctIndex: 2,
         explanation: 'Event 1102 (Security log cleared) is a major red flag that an attacker may be covering tracks.',
       ),
@@ -669,7 +848,7 @@ const List<Lesson> windowsSecurityLessons = [
           'Power management',
         ],
         correctIndex: 1,
-        explanation: 'Least privilege on Windows means standard accounts for daily work not administrator accounts.',
+        explanation: 'Least privilege on Windows means standard accounts for daily work, not administrator accounts.',
       ),
       QuizQuestion(
         question: 'Event ID 4688 logs:',
@@ -680,7 +859,7 @@ const List<Lesson> windowsSecurityLessons = [
           'Group Policy updates',
         ],
         correctIndex: 1,
-        explanation: 'Event 4688 logs every new process created enabling detection of suspicious command execution.',
+        explanation: 'Event 4688 logs every new process created, enabling detection of suspicious command execution.',
       ),
       QuizQuestion(
         question: 'AppLocker is used to:',
@@ -693,7 +872,6 @@ const List<Lesson> windowsSecurityLessons = [
         correctIndex: 1,
         explanation: 'AppLocker controls which applications are permitted to run on a system.',
       ),
-
     ],
   ),
 ];
