@@ -5,6 +5,7 @@ const List<Lesson> networkingLessons = [
   // 1 -- AUDIO -------------------------------------------------------------
   Lesson(
     title: 'How the Internet Actually Works',
+    difficulty: LessonDifficulty.beginner,
     isAudio: true,
     estimatedMinutes: 6,
     sections: [
@@ -66,6 +67,7 @@ const List<Lesson> networkingLessons = [
   // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'TCP/IP & the OSI Model',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -97,6 +99,14 @@ const List<Lesson> networkingLessons = [
           'Layer 6 (Presentation) — translating data formats, including encryption and compression',
           'Layer 7 (Application) — the protocols your actual software uses directly: HTTP, DNS, SMTP; this is where most application-layer attacks like SQL injection and phishing happen',
         ],
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.osiLayers,
+          caption:
+              'The OSI stack from bottom to top, with a typical attack '
+              'example at each layer.',
+        ),
       ),
       LessonSection(
         heading: 'Why Security Professionals Think in Layers',
@@ -148,6 +158,7 @@ const List<Lesson> networkingLessons = [
   // 3 ----------------------------------------------------------------------
   Lesson(
     title: 'IPv4 & IPv6 Addressing',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -213,6 +224,7 @@ const List<Lesson> networkingLessons = [
   // 4 ----------------------------------------------------------------------
   Lesson(
     title: 'Subnetting & Network Segmentation',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -280,6 +292,7 @@ const List<Lesson> networkingLessons = [
   // 5 ----------------------------------------------------------------------
   Lesson(
     title: 'Common Ports, Protocols & Services',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -342,6 +355,7 @@ const List<Lesson> networkingLessons = [
   // 6 ----------------------------------------------------------------------
   Lesson(
     title: 'Firewalls, Routers & Network Devices',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -369,6 +383,15 @@ const List<Lesson> networkingLessons = [
             'simultaneously, which is a common and cost-effective way to '
             'implement segmentation without needing separate physical '
             'switches for every zone.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.networkDevices,
+          caption:
+              'A hub blindly broadcasts, a switch forwards intelligently, '
+              'and a firewall inspects and decides — three very different '
+              'jobs often confused with each other.',
+        ),
       ),
       LessonSection(
         heading: 'Firewalls: From Simple Filters to Deep Inspection',
@@ -420,6 +443,7 @@ const List<Lesson> networkingLessons = [
   // 7 ----------------------------------------------------------------------
   Lesson(
     title: 'DNS Architecture & Security',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -504,6 +528,7 @@ const List<Lesson> networkingLessons = [
   // 8 ----------------------------------------------------------------------
   Lesson(
     title: 'VPNs, TLS & Encryption in Transit',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -521,6 +546,15 @@ const List<Lesson> networkingLessons = [
             'the current version, streamlined this handshake '
             'considerably and removed several older, weaker cipher '
             'options that had accumulated over the protocol\'s history.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.tlsHandshake,
+          caption:
+              'The TLS handshake in simplified form — this same exchange '
+              'happens every time you see the padlock icon appear in '
+              'your browser.',
+        ),
       ),
       LessonSection(
         heading: 'What a VPN Actually Provides',
@@ -564,6 +598,7 @@ const List<Lesson> networkingLessons = [
   // 9 ----------------------------------------------------------------------
   Lesson(
     title: 'Wireless Network Security',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -637,6 +672,7 @@ const List<Lesson> networkingLessons = [
   // 10 ---------------------------------------------------------------------
   Lesson(
     title: 'Common Network Attacks & Defenses',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -715,6 +751,7 @@ const List<Lesson> networkingLessons = [
   // 11 ----------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
+    difficulty: LessonDifficulty.expert,
     estimatedMinutes: 15,
     quiz: [
       QuizQuestion(

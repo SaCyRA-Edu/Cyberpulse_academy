@@ -5,6 +5,7 @@ const List<Lesson> windowsSecurityLessons = [
   // 1 -- AUDIO -------------------------------------------------------------
   Lesson(
     title: 'Why Windows Is the World\'s Most Targeted OS',
+    difficulty: LessonDifficulty.beginner,
     isAudio: true,
     estimatedMinutes: 6,
     sections: [
@@ -65,6 +66,7 @@ const List<Lesson> windowsSecurityLessons = [
   // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'Windows Security Architecture',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -120,6 +122,7 @@ const List<Lesson> windowsSecurityLessons = [
   // 3 ----------------------------------------------------------------------
   Lesson(
     title: 'User Accounts, Groups & UAC',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -181,6 +184,7 @@ const List<Lesson> windowsSecurityLessons = [
   // 4 ----------------------------------------------------------------------
   Lesson(
     title: 'NTFS Permissions & File System Security',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -246,6 +250,7 @@ const List<Lesson> windowsSecurityLessons = [
   // 5 ----------------------------------------------------------------------
   Lesson(
     title: 'Active Directory Fundamentals',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -303,6 +308,7 @@ const List<Lesson> windowsSecurityLessons = [
   // 6 ----------------------------------------------------------------------
   Lesson(
     title: 'Windows Defender & Endpoint Detection',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -349,6 +355,7 @@ const List<Lesson> windowsSecurityLessons = [
   // 7 ----------------------------------------------------------------------
   Lesson(
     title: 'Group Policy & Security Hardening',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -395,6 +402,7 @@ const List<Lesson> windowsSecurityLessons = [
   // 8 ----------------------------------------------------------------------
   Lesson(
     title: 'Windows Firewall',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 7,
     sections: [
       LessonSection(
@@ -441,6 +449,7 @@ const List<Lesson> windowsSecurityLessons = [
   // 9 ----------------------------------------------------------------------
   Lesson(
     title: 'Event Logs, Auditing & Monitoring',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -483,6 +492,7 @@ const List<Lesson> windowsSecurityLessons = [
   // 10 ---------------------------------------------------------------------
   Lesson(
     title: 'Patch Management & WSUS',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -548,6 +558,7 @@ const List<Lesson> windowsSecurityLessons = [
   // 11 --------------------------------------------------------------------
   Lesson(
     title: 'BitLocker & Credential Protection',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -620,6 +631,7 @@ const List<Lesson> windowsSecurityLessons = [
   // 12 --------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
+    difficulty: LessonDifficulty.expert,
     estimatedMinutes: 15,
     quiz: [
       QuizQuestion(

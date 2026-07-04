@@ -50,7 +50,7 @@ class _WatermarkPainter extends CustomPainter {
       final offset = (y / rowH).floor().isEven ? 0.0 : colW / 2;
       for (double x = -size.width + offset; x < size.width * 2; x += colW) {
         final tp = TextPainter(
-          text: TextSpan(text: 'CYBERPULSE', style: textStyle),
+          text: TextSpan(text: 'LEARN CYBERSECURITY', style: textStyle),
           textDirection: TextDirection.ltr,
         )..layout();
         tp.paint(canvas, Offset(x, y));

@@ -5,6 +5,7 @@ const List<Lesson> capstoneLessons = [
   // 1 -- AUDIO -------------------------------------------------------------
   Lesson(
     title: 'From Beginner to Security Professional: Your Roadmap',
+    difficulty: LessonDifficulty.beginner,
     isAudio: true,
     estimatedMinutes: 6,
     sections: [
@@ -68,6 +69,7 @@ const List<Lesson> capstoneLessons = [
   // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'Security Architecture: Defense in Depth',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -138,6 +140,7 @@ const List<Lesson> capstoneLessons = [
   // 3 ----------------------------------------------------------------------
   Lesson(
     title: 'Threat Modeling with STRIDE & PASTA',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -212,6 +215,7 @@ const List<Lesson> capstoneLessons = [
   // 4 ----------------------------------------------------------------------
   Lesson(
     title: 'Ethical Hacking Methodology',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -266,6 +270,7 @@ const List<Lesson> capstoneLessons = [
   // 5 ----------------------------------------------------------------------
   Lesson(
     title: 'Digital Forensics & Chain of Custody',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -330,6 +335,7 @@ const List<Lesson> capstoneLessons = [
   // 6 ----------------------------------------------------------------------
   Lesson(
     title: 'Zero Trust Architecture',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -384,6 +390,7 @@ const List<Lesson> capstoneLessons = [
   // 7 ----------------------------------------------------------------------
   Lesson(
     title: 'Cloud Security Architecture',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -441,6 +448,7 @@ const List<Lesson> capstoneLessons = [
   // 8 ----------------------------------------------------------------------
   Lesson(
     title: 'Governance, Risk & Compliance (GRC)',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -494,6 +502,7 @@ const List<Lesson> capstoneLessons = [
   // 9 ----------------------------------------------------------------------
   Lesson(
     title: 'Building a Security Program from Scratch',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -556,6 +565,7 @@ const List<Lesson> capstoneLessons = [
   // 10 -------------------------------------------------------- Assessment
   Lesson(
     title: 'Capstone Assessment',
+    difficulty: LessonDifficulty.expert,
     estimatedMinutes: 15,
     quiz: [
       QuizQuestion(

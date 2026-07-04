@@ -57,7 +57,7 @@ class SplashScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   // App name
                   const Text(
-                    'CyberPulse',
+                    'Learning',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 36,
@@ -66,7 +66,7 @@ class SplashScreen extends StatelessWidget {
                     ),
                   ),
                   const Text(
-                    'ACADEMY',
+                    'CYBERSECURITY',
                     style: TextStyle(
                       color: Color(0xFF90CAF9),
                       fontSize: 16,
@@ -203,7 +203,7 @@ class _SplashPatternPainter extends CustomPainter {
     for (double y = -size.height; y < size.height * 2; y += 60) {
       for (double x = -size.width; x < size.width * 2; x += 140) {
         final tp = TextPainter(
-          text: TextSpan(text: 'CYBERPULSE', style: textStyle),
+          text: TextSpan(text: 'LEARN CYBERSECURITY', style: textStyle),
           textDirection: TextDirection.ltr,
         )..layout();
         tp.paint(canvas, Offset(x, y));

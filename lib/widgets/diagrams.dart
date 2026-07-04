@@ -12,6 +12,9 @@ enum DiagramType {
   riskFormula,
   processFlow,
   killChain,
+  osiLayers,
+  networkDevices,
+  tlsHandshake,
 }
 
 class DiagramSpec {
@@ -46,6 +49,15 @@ class DiagramView extends StatelessWidget {
         break;
       case DiagramType.killChain:
         diagram = const KillChainDiagram();
+        break;
+      case DiagramType.osiLayers:
+        diagram = const OsiLayersDiagram();
+        break;
+      case DiagramType.networkDevices:
+        diagram = const NetworkDevicesDiagram();
+        break;
+      case DiagramType.tlsHandshake:
+        diagram = const TlsHandshakeDiagram();
         break;
       case DiagramType.processFlow:
         diagram = ProcessFlowDiagram(steps: spec.steps ?? const []);
@@ -482,5 +494,232 @@ class KillChainDiagram extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const ProcessFlowDiagram(steps: stages);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// OSI Layers — 7-layer stack, bottom (Physical) to top (Application)
+// ═══════════════════════════════════════════════════════════════════════
+
+class OsiLayersDiagram extends StatelessWidget {
+  const OsiLayersDiagram({super.key});
+
+  // (layer number, name, icon, color, example attack at this layer)
+  static const layers = [
+    (7, 'Application', Icons.language, Color(0xFF6A1B9A), 'SQL injection, phishing'),
+    (6, 'Presentation', Icons.transform, Color(0xFF7B1FA2), 'Encryption downgrade'),
+    (5, 'Session', Icons.link, Color(0xFF8E24AA), 'Session hijacking'),
+    (4, 'Transport', Icons.swap_vert, Color(0xFFAB47BC), 'SYN flood'),
+    (3, 'Network', Icons.public, Color(0xFFBA68C8), 'IP spoofing'),
+    (2, 'Data Link', Icons.cable, Color(0xFFCE93D8), 'ARP spoofing'),
+    (1, 'Physical', Icons.settings_ethernet, Color(0xFFE1BEE7), 'Cable tapping'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        for (final l in layers)
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(vertical: 2),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            decoration: BoxDecoration(
+              color: l.$4,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: const BoxDecoration(
+                    color: Colors.white24,
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '${l.$1}',
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Icon(l.$3, color: Colors.white, size: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l.$2,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                ),
+                Flexible(
+                  child: Text(
+                    l.$5,
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(color: Colors.white70, fontSize: 10),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Network Devices — Hub vs Switch vs Firewall comparison
+// ═══════════════════════════════════════════════════════════════════════
+
+class NetworkDevicesDiagram extends StatelessWidget {
+  const NetworkDevicesDiagram({super.key});
+
+  static const devices = [
+    (
+      'Hub',
+      Icons.hub,
+      Color(0xFF757575),
+      'Broadcasts every packet to all connected devices — no intelligence, no security',
+    ),
+    (
+      'Switch',
+      Icons.lan,
+      Color(0xFF1565C0),
+      'Forwards traffic only to the intended device, based on MAC address',
+    ),
+    (
+      'Firewall',
+      Icons.security,
+      Color(0xFFC62828),
+      'Inspects traffic and allows or blocks it based on defined rules',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      alignment: WrapAlignment.center,
+      children: [
+        for (final d in devices)
+          Container(
+            width: 140,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: d.$3.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: d.$3.withValues(alpha: 0.3)),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(color: d.$3, shape: BoxShape.circle),
+                  child: Icon(d.$2, color: Colors.white, size: 22),
+                ),
+                const SizedBox(height: 8),
+                Text(d.$1,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 14, color: d.$3)),
+                const SizedBox(height: 6),
+                Text(
+                  d.$4,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 11, color: Colors.black87),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// TLS / VPN Handshake — client/server sequence diagram
+// ═══════════════════════════════════════════════════════════════════════
+
+class TlsHandshakeDiagram extends StatelessWidget {
+  const TlsHandshakeDiagram({super.key});
+
+  static const steps = [
+    ('ClientHello', 'right', 'Client proposes TLS version & cipher suites'),
+    ('ServerHello + Certificate', 'left', 'Server picks a cipher suite & sends its certificate'),
+    ('Key Exchange', 'right', 'Client verifies the certificate, negotiates a shared key'),
+    ('Finished — Encrypted Session', 'both', 'Both sides switch to fast symmetric encryption'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _endpoint('Client', Icons.computer, const Color(0xFF1565C0)),
+            _endpoint('Server', Icons.dns, const Color(0xFF2E7D32)),
+          ],
+        ),
+        const SizedBox(height: 4),
+        for (final s in steps) _stepRow(s.$1, s.$2, s.$3),
+      ],
+    );
+  }
+
+  Widget _endpoint(String label, IconData icon, Color color) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          child: Icon(icon, color: Colors.white, size: 20),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: TextStyle(fontWeight: FontWeight.bold, color: color, fontSize: 12)),
+      ],
+    );
+  }
+
+  Widget _stepRow(String label, String direction, String caption) {
+    IconData arrow;
+    switch (direction) {
+      case 'right':
+        arrow = Icons.arrow_forward;
+        break;
+      case 'left':
+        arrow = Icons.arrow_back;
+        break;
+      default:
+        arrow = Icons.sync_alt;
+    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Expanded(child: Divider(thickness: 1)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Icon(arrow, size: 16, color: Colors.grey.shade600),
+              ),
+              const Expanded(child: Divider(thickness: 1)),
+            ],
+          ),
+          Text(label,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          const SizedBox(height: 2),
+          Text(
+            caption,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+          ),
+        ],
+      ),
+    );
   }
 }

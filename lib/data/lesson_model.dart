@@ -7,6 +7,23 @@
 
 import '../widgets/diagrams.dart';
 
+enum LessonDifficulty { beginner, intermediate, advanced, expert }
+
+extension LessonDifficultyLabel on LessonDifficulty {
+  String get label {
+    switch (this) {
+      case LessonDifficulty.beginner:
+        return 'Beginner';
+      case LessonDifficulty.intermediate:
+        return 'Intermediate';
+      case LessonDifficulty.advanced:
+        return 'Advanced';
+      case LessonDifficulty.expert:
+        return 'Expert';
+    }
+  }
+}
+
 class LessonSection {
   final String? heading;
   final String? body;
@@ -35,6 +52,7 @@ class Lesson {
   final List<LessonSection> sections;
   final List<QuizQuestion>? quiz;
   final bool isAudio;
+  final LessonDifficulty difficulty;
 
   /// Estimated minutes to complete this lesson (reading or listening).
   final int estimatedMinutes;
@@ -45,6 +63,7 @@ class Lesson {
     this.quiz,
     this.isAudio = false,
     this.estimatedMinutes = 5,
+    this.difficulty = LessonDifficulty.beginner,
   });
 
   bool get isQuiz => quiz != null;

@@ -5,6 +5,7 @@ const List<Lesson> socOperationsLessons = [
   // 1 -- AUDIO -------------------------------------------------------------
   Lesson(
     title: 'A Day in the Life of a Security Analyst',
+    difficulty: LessonDifficulty.beginner,
     isAudio: true,
     estimatedMinutes: 6,
     sections: [
@@ -66,6 +67,7 @@ const List<Lesson> socOperationsLessons = [
   // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'SOC Models: In-House, MSSP & MDR',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -141,6 +143,7 @@ const List<Lesson> socOperationsLessons = [
   // 3 ----------------------------------------------------------------------
   Lesson(
     title: 'SOC Roles, Tiers & Career Paths',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -225,6 +228,7 @@ const List<Lesson> socOperationsLessons = [
   // 4 ----------------------------------------------------------------------
   Lesson(
     title: 'SIEM Platforms & Log Correlation',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -280,6 +284,7 @@ const List<Lesson> socOperationsLessons = [
   // 5 ----------------------------------------------------------------------
   Lesson(
     title: 'Threat Intelligence & IOC Analysis',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -330,6 +335,7 @@ const List<Lesson> socOperationsLessons = [
   // 6 ----------------------------------------------------------------------
   Lesson(
     title: 'Alert Triage & False Positive Management',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -398,6 +404,7 @@ const List<Lesson> socOperationsLessons = [
   // 7 ----------------------------------------------------------------------
   Lesson(
     title: 'The Incident Response Lifecycle',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -474,6 +481,7 @@ const List<Lesson> socOperationsLessons = [
   // 8 ----------------------------------------------------------------------
   Lesson(
     title: 'MITRE ATT&CK Framework',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -513,6 +521,7 @@ const List<Lesson> socOperationsLessons = [
   // 9 ----------------------------------------------------------------------
   Lesson(
     title: 'The Cyber Kill Chain',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 7,
     sections: [
       LessonSection(
@@ -567,6 +576,7 @@ const List<Lesson> socOperationsLessons = [
   // 10 ---------------------------------------------------------------------
   Lesson(
     title: 'SOAR: Security Orchestration, Automation & Response',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -620,6 +630,7 @@ const List<Lesson> socOperationsLessons = [
   // 11 --------------------------------------------------------------------
   Lesson(
     title: 'SOC Metrics, Documentation & Shift Handoffs',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -666,6 +677,7 @@ const List<Lesson> socOperationsLessons = [
   // 12 --------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
+    difficulty: LessonDifficulty.expert,
     estimatedMinutes: 15,
     quiz: [
       QuizQuestion(

@@ -1,268 +1,147 @@
 import 'package:flutter/material.dart';
 import '../data/levels_data.dart';
+import '../data/lesson_model.dart';
 import '../data/domains_data.dart';
 import '../widgets/watermark.dart';
 import 'lesson_screen.dart';
 import 'level_exam_screen.dart';
 
-const List<String> _tabs = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
-
-class TopicDetailScreen extends StatefulWidget {
+class TopicDetailScreen extends StatelessWidget {
   final TopicEntry entry;
 
   const TopicDetailScreen({super.key, required this.entry});
 
   @override
-  State<TopicDetailScreen> createState() => _TopicDetailScreenState();
-}
-
-class _TopicDetailScreenState extends State<TopicDetailScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: _tabs.length, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final module = entry.module;
+    final lessons = module.lessons;
+    final totalMinutes = lessons.fold<int>(0, (sum, l) => sum + l.estimatedMinutes);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.entry.module.title),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: _tabs.map((t) => Tab(text: t)).toList(),
-          labelColor: Colors.blue,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.blue,
-        ),
+        title: Text(module.title),
       ),
       body: Stack(
         children: [
           const Positioned.fill(child: CyberPulseWatermark()),
-          TabBarView(
-            controller: _tabController,
-            physics: const NeverScrollableScrollPhysics(),
+          ListView(
             children: [
-              _buildBeginnerTab(),
-              _buildUpgradeTab('Intermediate'),
-              _buildUpgradeTab('Advanced'),
-              _buildUpgradeTab('Expert'),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: _DomainRatioCard(primaryDomainIndex: module.primaryDomainIndex),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Card(
+                  color: Colors.blue.withValues(alpha: 0.06),
+                  child: ListTile(
+                    leading: const Icon(Icons.quiz, color: Colors.blue),
+                    title: Text('${entry.level.title} Level Exam'),
+                    subtitle: const Text('Adaptive · Test what you\'ve learned'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => LevelExamScreen(
+                            level: entry.level,
+                            levelIndex: entry.levelIndex,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Lessons',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text('~$totalMinutes min total',
+                        style: const TextStyle(fontSize: 13, color: Colors.grey)),
+                  ],
+                ),
+              ),
+              for (final lesson in lessons)
+                ListTile(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => LessonScreen(
+                          lesson: lesson,
+                          moduleTitle: module.title,
+                        ),
+                      ),
+                    );
+                  },
+                  leading: Icon(
+                    lesson.isAudio
+                        ? Icons.headphones
+                        : lesson.isQuiz
+                            ? Icons.quiz_outlined
+                            : Icons.menu_book,
+                    color: lesson.isAudio ? Colors.blue : null,
+                  ),
+                  title: Text(lesson.title),
+                  subtitle: Row(
+                    children: [
+                      _DifficultyBadge(difficulty: lesson.difficulty),
+                      const SizedBox(width: 8),
+                      if (lesson.isAudio) ...[
+                        const Text('Audio',
+                            style: TextStyle(fontSize: 12, color: Colors.blue)),
+                        const Text(' · ', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      ],
+                      Text('~${lesson.estimatedMinutes} min',
+                          style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                    ],
+                  ),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                ),
+              const SizedBox(height: 20),
             ],
           ),
         ],
       ),
     );
   }
+}
 
-  // -- Beginner Tab (free content) -----------------------------------------
+// ── Per-lesson difficulty badge ─────────────────────────────────────────────
 
-  Widget _buildBeginnerTab() {
-    final module = widget.entry.module;
-    final lessons = module.lessons;
-    final totalMinutes = lessons.fold<int>(0, (sum, l) => sum + l.estimatedMinutes);
+class _DifficultyBadge extends StatelessWidget {
+  final LessonDifficulty difficulty;
 
-    return ListView(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-          child: _DomainRatioCard(primaryDomainIndex: module.primaryDomainIndex),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Card(
-            color: Colors.blue.withValues(alpha: 0.06),
-            child: ListTile(
-              leading: const Icon(Icons.quiz, color: Colors.blue),
-              title: Text('${widget.entry.level.title} Level Exam'),
-              subtitle: const Text('Adaptive · Test what you\'ve learned'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => LevelExamScreen(
-                      level: widget.entry.level,
-                      levelIndex: widget.entry.levelIndex,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Lessons',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              Text('~$totalMinutes min total',
-                  style: const TextStyle(fontSize: 13, color: Colors.grey)),
-            ],
-          ),
-        ),
-        for (final lesson in lessons)
-          ListTile(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => LessonScreen(
-                    lesson: lesson,
-                    moduleTitle: module.title,
-                  ),
-                ),
-              );
-            },
-            leading: Icon(
-              lesson.isAudio
-                  ? Icons.headphones
-                  : lesson.isQuiz
-                      ? Icons.quiz_outlined
-                      : Icons.menu_book,
-              color: lesson.isAudio ? Colors.blue : null,
-            ),
-            title: Text(lesson.title),
-            subtitle: Row(
-              children: [
-                if (lesson.isAudio) ...[
-                  const Text('Audio Course',
-                      style: TextStyle(fontSize: 12, color: Colors.blue)),
-                  const Text(' · ', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                ],
-                Text('~${lesson.estimatedMinutes} min',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
-              ],
-            ),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-          ),
-        const SizedBox(height: 20),
-      ],
-    );
+  const _DifficultyBadge({required this.difficulty});
+
+  Color get _color {
+    switch (difficulty) {
+      case LessonDifficulty.beginner:
+        return Colors.green;
+      case LessonDifficulty.intermediate:
+        return Colors.orange;
+      case LessonDifficulty.advanced:
+        return Colors.deepOrange;
+      case LessonDifficulty.expert:
+        return Colors.purple;
+    }
   }
 
-  // -- Upgrade Tab (paid levels) -------------------------------------------
-
-  Widget _buildUpgradeTab(String levelName) {
-    final features = {
-      'Intermediate': [
-        'In-depth technical lessons',
-        'Hands-on practice scenarios',
-        'Intermediate-level adaptive exam',
-        'Certificate of completion',
-      ],
-      'Advanced': [
-        'Advanced attack & defense techniques',
-        'Real-world case studies',
-        'Advanced adaptive exam',
-        'Certificate of completion',
-      ],
-      'Expert': [
-        'Expert-level capstone content',
-        'Threat modeling & ethical hacking',
-        'Expert adaptive exam',
-        'Professional certificate',
-      ],
-    };
-
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blue.shade700, Colors.blue.shade400],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  const Icon(Icons.workspace_premium, size: 56, color: Colors.white),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Unlock $levelName',
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${widget.entry.module.title} — $levelName Level',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 14, color: Colors.white70),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 28),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text("What you'll get:",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            ),
-            const SizedBox(height: 12),
-            for (final feature in features[levelName]!)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Row(
-                  children: [
-                    const Icon(Icons.check_circle, color: Colors.green, size: 20),
-                    const SizedBox(width: 12),
-                    Text(feature, style: const TextStyle(fontSize: 15)),
-                  ],
-                ),
-              ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: Text('Unlock $levelName'),
-                      content: const Text(
-                        'Payment processing is coming soon. '
-                        'We\'ll notify you as soon as this level '
-                        'is available for purchase.',
-                      ),
-                      actions: [
-                        FilledButton(
-                          onPressed: () => Navigator.pop(ctx),
-                          child: const Text('Got it'),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                child: Text('Get $levelName Access',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Text('Payment integration coming soon',
-                style: TextStyle(fontSize: 12, color: Colors.grey)),
-            const SizedBox(height: 20),
-          ],
-        ),
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      decoration: BoxDecoration(
+        color: _color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        difficulty.label,
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: _color),
       ),
     );
   }

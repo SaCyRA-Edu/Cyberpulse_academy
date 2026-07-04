@@ -5,6 +5,7 @@ const List<Lesson> emailSecurityLessons = [
   // 1 -- AUDIO -------------------------------------------------------------
   Lesson(
     title: 'The Anatomy of a Real Phishing Attack',
+    difficulty: LessonDifficulty.beginner,
     isAudio: true,
     estimatedMinutes: 6,
     sections: [
@@ -65,6 +66,7 @@ const List<Lesson> emailSecurityLessons = [
   // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'How Email Works: SMTP, IMAP & POP3',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -120,6 +122,7 @@ const List<Lesson> emailSecurityLessons = [
   // 3 ----------------------------------------------------------------------
   Lesson(
     title: 'Phishing, Spear Phishing & Whaling',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -173,6 +176,7 @@ const List<Lesson> emailSecurityLessons = [
   // 4 ----------------------------------------------------------------------
   Lesson(
     title: 'Business Email Compromise (BEC)',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -231,6 +235,7 @@ const List<Lesson> emailSecurityLessons = [
   // 5 ----------------------------------------------------------------------
   Lesson(
     title: 'Reading Email Headers',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -285,6 +290,7 @@ const List<Lesson> emailSecurityLessons = [
   // 6 ----------------------------------------------------------------------
   Lesson(
     title: 'Email Authentication: SPF, DKIM & DMARC',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -354,6 +360,7 @@ const List<Lesson> emailSecurityLessons = [
   // 7 ----------------------------------------------------------------------
   Lesson(
     title: 'Safe Link & Attachment Practices',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -401,6 +408,7 @@ const List<Lesson> emailSecurityLessons = [
   // 8 ----------------------------------------------------------------------
   Lesson(
     title: 'Reporting & Responding to Suspicious Email',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -457,6 +465,7 @@ const List<Lesson> emailSecurityLessons = [
   // 9 ----------------------------------------------------------------------
   Lesson(
     title: 'Building an Email-Secure Culture',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -509,6 +518,7 @@ const List<Lesson> emailSecurityLessons = [
   // 10 ----------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
+    difficulty: LessonDifficulty.expert,
     estimatedMinutes: 15,
     quiz: [
       QuizQuestion(

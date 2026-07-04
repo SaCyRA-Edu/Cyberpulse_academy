@@ -5,6 +5,7 @@ const List<Lesson> linuxSecurityLessons = [
   // 1 -- AUDIO -------------------------------------------------------------
   Lesson(
     title: 'Linux: The Invisible OS Running the World',
+    difficulty: LessonDifficulty.beginner,
     isAudio: true,
     estimatedMinutes: 6,
     sections: [
@@ -64,6 +65,7 @@ const List<Lesson> linuxSecurityLessons = [
   // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'Linux Security Architecture',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -115,6 +117,7 @@ const List<Lesson> linuxSecurityLessons = [
   // 3 ----------------------------------------------------------------------
   Lesson(
     title: 'Users, Groups & the Root Account',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -167,6 +170,7 @@ const List<Lesson> linuxSecurityLessons = [
   // 4 ----------------------------------------------------------------------
   Lesson(
     title: 'File Permissions, SUID, SGID & Sticky Bit',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -226,6 +230,7 @@ const List<Lesson> linuxSecurityLessons = [
   // 5 ----------------------------------------------------------------------
   Lesson(
     title: 'sudo Configuration & Privilege Management',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -278,6 +283,7 @@ const List<Lesson> linuxSecurityLessons = [
   // 6 ----------------------------------------------------------------------
   Lesson(
     title: 'SSH Hardening & Key Management',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -331,6 +337,7 @@ const List<Lesson> linuxSecurityLessons = [
   // 7 ----------------------------------------------------------------------
   Lesson(
     title: 'iptables, nftables & ufw',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -389,6 +396,7 @@ const List<Lesson> linuxSecurityLessons = [
   // 8 ----------------------------------------------------------------------
   Lesson(
     title: 'SELinux & AppArmor: Mandatory Access Control',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -452,6 +460,7 @@ const List<Lesson> linuxSecurityLessons = [
   // 9 ----------------------------------------------------------------------
   Lesson(
     title: 'System Logging, journald & Audit Framework',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -498,6 +507,7 @@ const List<Lesson> linuxSecurityLessons = [
   // 10 ---------------------------------------------------------------------
   Lesson(
     title: 'Intrusion Detection: Tripwire & AIDE',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -558,6 +568,7 @@ const List<Lesson> linuxSecurityLessons = [
   // 11 --------------------------------------------------------------------
   Lesson(
     title: 'Patch Management & System Hardening',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -611,6 +622,7 @@ const List<Lesson> linuxSecurityLessons = [
   // 12 --------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
+    difficulty: LessonDifficulty.expert,
     estimatedMinutes: 15,
     quiz: [
       QuizQuestion(

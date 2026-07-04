@@ -12,7 +12,7 @@ class CyberPulseApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'CyberPulse Academy',
+      title: 'Learning Cybersecurity',
       home: const SplashScreen(),
     );
   }

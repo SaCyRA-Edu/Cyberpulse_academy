@@ -64,7 +64,7 @@ class _WatermarkPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final textPainter = TextPainter(
       text: const TextSpan(
-        text: 'CYBERPULSE',
+        text: 'LEARN CYBERSECURITY',
         style: TextStyle(
           fontSize: 22,
           fontWeight: FontWeight.bold,
@@ -136,12 +136,14 @@ class _TopicsScreenState extends State<TopicsScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('About CyberPulse Academy'),
+        title: const Text('About Learning Cybersecurity'),
         content: const Text(
-          'CyberPulse Academy is a vendor-neutral cybersecurity '
-          'curriculum. All core topics are free — pass each level\'s '
-          'exam at 80%+ to advance. Intermediate, Advanced, and Expert '
-          'tabs inside each topic unlock premium depth content.',
+          'Learning Cybersecurity is a vendor-neutral cybersecurity '
+          'curriculum aligned with CompTIA Security+ (SY0-701). Every '
+          'topic contains lessons spanning Beginner through Expert '
+          'difficulty — look for the colored badge on each lesson. '
+          'Pass each level\'s adaptive exam at 80%+ to track your '
+          'progress.',
         ),
         actions: [
           TextButton(
@@ -166,7 +168,7 @@ class _TopicsScreenState extends State<TopicsScreen> {
             const Icon(Icons.shield, color: Colors.white, size: 22),
             const SizedBox(width: 8),
             const Text(
-              'CyberPulse Academy',
+              'Learning Cybersecurity',
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,

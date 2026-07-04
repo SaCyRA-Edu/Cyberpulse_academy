@@ -5,11 +5,12 @@ const List<Lesson> fundamentalsLessons = [
   // 1 -- AUDIO -------------------------------------------------------------
   Lesson(
     title: 'Why Cybersecurity Matters Today',
+    difficulty: LessonDifficulty.beginner,
     isAudio: true,
     estimatedMinutes: 6,
     sections: [
       LessonSection(
-        heading: 'Welcome to CyberPulse Academy',
+        heading: 'Welcome to Learning Cybersecurity',
         body:
             'Welcome. This is an audio lesson — sit back and listen as we '
             'walk through why cybersecurity has become one of the most '
@@ -66,6 +67,7 @@ const List<Lesson> fundamentalsLessons = [
   // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'What is Cybersecurity?',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -151,6 +153,7 @@ const List<Lesson> fundamentalsLessons = [
   // 3 ----------------------------------------------------------------------
   Lesson(
     title: 'The CIA Triad: Confidentiality, Integrity & Availability',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 10,
     sections: [
       LessonSection(
@@ -261,6 +264,7 @@ const List<Lesson> fundamentalsLessons = [
   // 4 ----------------------------------------------------------------------
   Lesson(
     title: 'Threats, Vulnerabilities & Risk',
+    difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -338,6 +342,7 @@ const List<Lesson> fundamentalsLessons = [
   // 5 ----------------------------------------------------------------------
   Lesson(
     title: 'Who Are the Attackers?',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -436,6 +441,7 @@ const List<Lesson> fundamentalsLessons = [
   // 6 ----------------------------------------------------------------------
   Lesson(
     title: 'Authentication & Access Control',
+    difficulty: LessonDifficulty.intermediate,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -538,6 +544,7 @@ const List<Lesson> fundamentalsLessons = [
   // 7 ----------------------------------------------------------------------
   Lesson(
     title: 'Cryptography in Plain English',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -635,6 +642,7 @@ const List<Lesson> fundamentalsLessons = [
   // 8 ----------------------------------------------------------------------
   Lesson(
     title: 'Network Security Overview',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -718,6 +726,7 @@ const List<Lesson> fundamentalsLessons = [
   // 9 ----------------------------------------------------------------------
   Lesson(
     title: 'Risk Management',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 9,
     sections: [
       LessonSection(
@@ -822,6 +831,7 @@ const List<Lesson> fundamentalsLessons = [
   // 10 ---------------------------------------------------------------------
   Lesson(
     title: 'Security Policies & Governance',
+    difficulty: LessonDifficulty.advanced,
     estimatedMinutes: 8,
     sections: [
       LessonSection(
@@ -922,6 +932,7 @@ const List<Lesson> fundamentalsLessons = [
   // 11 ----------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
+    difficulty: LessonDifficulty.expert,
     estimatedMinutes: 15,
     quiz: [
       QuizQuestion(
