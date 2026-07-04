@@ -28,6 +28,11 @@ const Map<String, _ModuleTheme> _moduleThemes = {
     Icons.psychology_alt,
     Icons.record_voice_over,
   ),
+  'Malware': _ModuleTheme(
+    [Color(0xFF212121), Color(0xFF757575)],
+    Icons.coronavirus,
+    Icons.bug_report,
+  ),
   'Email Security': _ModuleTheme(
     [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
     Icons.email,

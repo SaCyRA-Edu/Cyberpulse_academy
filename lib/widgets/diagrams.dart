@@ -20,6 +20,8 @@ enum DiagramType {
   impersonationForms,
   motivationalTriggers,
   otherSocialEngineering,
+  malwareTypes,
+  virusTrojanWormTable,
 }
 
 class DiagramSpec {
@@ -78,6 +80,12 @@ class DiagramView extends StatelessWidget {
         break;
       case DiagramType.otherSocialEngineering:
         diagram = const OtherSocialEngineeringDiagram();
+        break;
+      case DiagramType.malwareTypes:
+        diagram = const MalwareTypesDiagram();
+        break;
+      case DiagramType.virusTrojanWormTable:
+        diagram = const VirusTrojanWormTableDiagram();
         break;
       case DiagramType.processFlow:
         diagram = ProcessFlowDiagram(steps: spec.steps ?? const []);
@@ -995,6 +1003,123 @@ class OtherSocialEngineeringDiagram extends StatelessWidget {
                 Icon(a.$2, size: 14, color: Colors.deepPurple),
                 const SizedBox(width: 6),
                 Text(a.$1, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Malware Types — grid of the major malware categories
+// ═══════════════════════════════════════════════════════════════════════
+
+class MalwareTypesDiagram extends StatelessWidget {
+  const MalwareTypesDiagram({super.key});
+
+  static const types = [
+    ('Virus', Icons.coronavirus, Color(0xFFC62828)),
+    ('Worm', Icons.bug_report, Color(0xFF6A1B9A)),
+    ('Trojan', Icons.card_giftcard, Color(0xFFEF6C00)),
+    ('Ransomware', Icons.lock, Color(0xFF1565C0)),
+    ('Spyware', Icons.visibility, Color(0xFF2E7D32)),
+    ('Rootkit', Icons.vpn_key_off, Color(0xFF37474F)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      alignment: WrapAlignment.center,
+      children: [
+        for (final t in types)
+          Container(
+            width: 100,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            decoration: BoxDecoration(
+              color: t.$3,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                Icon(t.$2, color: Colors.white, size: 24),
+                const SizedBox(height: 6),
+                Text(
+                  t.$1,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Virus vs Trojan vs Worm — side-by-side comparison table
+// ═══════════════════════════════════════════════════════════════════════
+
+class VirusTrojanWormTableDiagram extends StatelessWidget {
+  const VirusTrojanWormTableDiagram({super.key});
+
+  static const rows = [
+    ('Needs a host file?', 'Yes', 'No', 'Yes'),
+    ('Self-replicates?', 'Yes (needs user action)', 'Yes (fully automatic)', 'No'),
+    ('Disguises itself?', 'Sometimes', 'No', 'Yes — always'),
+    ('Spreads across a network alone?', 'No', 'Yes', 'No'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    Widget headerCell(String text, Color color) => Expanded(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            color: color,
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+            ),
+          ),
+        );
+
+    Widget bodyCell(String text, {bool bold = false}) => Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 11, fontWeight: bold ? FontWeight.bold : FontWeight.normal),
+            ),
+          ),
+        );
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            const Expanded(flex: 2, child: SizedBox()),
+            headerCell('Virus', const Color(0xFFC62828)),
+            headerCell('Worm', const Color(0xFF6A1B9A)),
+            headerCell('Trojan', const Color(0xFFEF6C00)),
+          ],
+        ),
+        for (var i = 0; i < rows.length; i++)
+          Container(
+            decoration: BoxDecoration(
+              color: i.isEven ? Colors.grey.shade50 : Colors.white,
+              border: const Border(bottom: BorderSide(color: Color(0xFFEEEEEE))),
+            ),
+            child: Row(
+              children: [
+                Expanded(flex: 2, child: bodyCell(rows[i].$1, bold: true)),
+                bodyCell(rows[i].$2),
+                bodyCell(rows[i].$3),
+                bodyCell(rows[i].$4),
               ],
             ),
           ),

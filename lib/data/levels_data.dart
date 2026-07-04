@@ -5,6 +5,7 @@ import 'domains_data.dart';
 import 'lessons/fundamentals_lessons.dart';
 import 'lessons/threat_actors_lessons.dart';
 import 'lessons/social_engineering_lessons.dart';
+import 'lessons/malware_lessons.dart';
 import 'lessons/email_security_lessons.dart';
 import 'lessons/networking_lessons.dart';
 import 'lessons/windows_security_lessons.dart';
@@ -91,6 +92,13 @@ final List<Level> allLevels = [
         icon: Icons.psychology_alt,
         xpReward: 110,
         lessons: socialEngineeringLessons,
+        primaryDomainIndex: 1, // Threats, Vulnerabilities & Mitigations
+      ),
+      Module(
+        title: 'Malware',
+        icon: Icons.coronavirus,
+        xpReward: 120,
+        lessons: malwareLessons,
         primaryDomainIndex: 1, // Threats, Vulnerabilities & Mitigations
       ),
       Module(
