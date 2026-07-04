@@ -152,6 +152,39 @@ const List<Lesson> networkingLessons = [
             'call is barely noticeable; waiting for it to be '
             're-transmitted, TCP-style, would be far more disruptive.',
       ),
+      LessonSection(
+        heading: 'Encapsulation: How Data Actually Gets Wrapped',
+        body:
+            'As data moves down through the layers on the sending side, '
+            'each layer wraps the data from the layer above it in its '
+            'own header — a process called encapsulation. Your HTTP '
+            'request gets wrapped in a TCP segment (adding port '
+            'numbers and sequencing information), which gets wrapped in '
+            'an IP packet (adding source and destination IP addresses), '
+            'which gets wrapped in an Ethernet frame (adding MAC '
+            'addresses) before it ever touches the physical wire. The '
+            'receiving side reverses this exactly, stripping one header '
+            'at each layer as the data moves back up. Understanding '
+            'encapsulation is what makes packet capture tools like '
+            'Wireshark readable — each layer\'s header sits right there '
+            'in the capture, nested inside the one below it.',
+      ),
+      LessonSection(
+        heading: 'MTU and Fragmentation',
+        body:
+            'Every network link has a Maximum Transmission Unit (MTU) — '
+            'the largest packet size it can carry in one piece, '
+            'typically 1500 bytes on standard Ethernet. If a packet is '
+            'larger than the MTU of a link it needs to cross, it must be '
+            'fragmented into smaller pieces, sent separately, and '
+            'reassembled at the destination. Fragmentation adds overhead '
+            'and, in some network designs, creates a subtle security '
+            'gotcha: fragmented packets can sometimes be used to evade '
+            'inspection by security devices that don\'t properly '
+            'reassemble fragments before applying their rules, which is '
+            'exactly why modern firewalls and IPS devices go out of their '
+            'way to reconstruct fragmented traffic before inspecting it.',
+      ),
     ],
   ),
 
@@ -173,6 +206,69 @@ const List<Lesson> networkingLessons = [
             'an ever-expanding universe of connected devices, which is '
             'exactly why the public IPv4 address space has been '
             'effectively exhausted for years.',
+      ),
+      LessonSection(
+        heading: 'The Original Five IP Address Classes',
+        body:
+            'Before CIDR notation became standard, IPv4 addresses were '
+            'divided into five classes, identified by the value of their '
+            'first octet. Even though classful addressing has been '
+            'obsolete since the 1990s in favor of the classless CIDR '
+            'system you\'ve been learning, the classes still show up '
+            'constantly — in exam questions, in legacy documentation, '
+            'and in the informal way people still describe address '
+            'ranges, so a security professional needs to recognize them '
+            'immediately.',
+        bullets: [
+          'Class A — 1.0.0.0 to 126.255.255.255, default mask /8 (255.0.0.0); reserved for very large networks, each Class A block supports over 16 million hosts',
+          'Class B — 128.0.0.0 to 191.255.255.255, default mask /16 (255.255.0.0); mid-sized networks, each block supports about 65,000 hosts',
+          'Class C — 192.0.0.0 to 223.255.255.255, default mask /24 (255.255.255.0); the class most home and small office networks actually use, each block supports 254 hosts',
+          'Class D — 224.0.0.0 to 239.255.255.255; reserved entirely for multicast traffic, not used for ordinary host addressing at all',
+          'Class E — 240.0.0.0 to 255.255.255.255; reserved for experimental and future use, essentially never seen in production networks',
+        ],
+      ),
+      LessonSection(
+        heading: 'How to Instantly Recognize a Class From Its First Octet',
+        body:
+            'Each class is defined by a specific pattern in the leading '
+            'bits of the first octet, which is why the ranges above fall '
+            'where they do. A first octet from 1–126 is Class A (the '
+            'leading bit is always 0). A first octet from 128–191 is '
+            'Class B (the leading bits are always 10). A first octet '
+            'from 192–223 is Class C (leading bits 110). 127 is '
+            'deliberately skipped entirely — it\'s reserved for loopback '
+            'addresses like 127.0.0.1, the address every device uses to '
+            'refer to itself.',
+      ),
+      LessonSection(
+        heading: 'Why Classful Addressing Was Replaced',
+        body:
+            'The rigid class system wasted enormous amounts of address '
+            'space. An organization with 300 employees needing more than '
+            'a Class C\'s 254 addresses had no choice but to request an '
+            'entire Class B block with room for 65,000 hosts — leaving '
+            'roughly 64,700 addresses permanently unused and unavailable '
+            'to anyone else. CIDR (Classless Inter-Domain Routing), which '
+            'you\'ve already been using throughout this module in the '
+            'form of /24, /26, /30 notation, replaced rigid class '
+            'boundaries with flexible, arbitrary prefix lengths — '
+            'letting an organization request exactly the block size it '
+            'actually needs. This is the direct historical reason CIDR '
+            'and VLSM exist at all: they were built specifically to fix '
+            'the waste built into the original class system.',
+      ),
+      LessonSection(
+        heading: 'Which Private Ranges Map to Which Class',
+        body:
+            'The three private address ranges you\'ll encounter in the '
+            'next section aren\'t arbitrary — one was carved out of each '
+            'of the first three classes specifically so private '
+            'networks of every size would have room: 10.0.0.0/8 comes '
+            'from Class A (matching its huge address capacity), '
+            '172.16.0.0/12 comes from Class B, and 192.168.0.0/16 comes '
+            'from Class C (matching why it\'s the range you see on almost '
+            'every home router, which only ever needs a small number of '
+            'addresses).',
       ),
       LessonSection(
         heading: 'Public vs. Private Address Ranges',
@@ -201,6 +297,22 @@ const List<Lesson> networkingLessons = [
             'forward traffic to them, which incidentally blocks a huge '
             'amount of unsolicited scanning and attack traffic by '
             'default.',
+      ),
+      LessonSection(
+        heading: 'What a Subnet Mask Actually Is, in Binary',
+        body:
+            'A subnet mask like 255.255.255.0 is really just a 32-bit '
+            'pattern of 1s followed by 0s — the 1s mark the network '
+            'portion of an address, the 0s mark the host portion. '
+            '255.255.255.0 in binary is 11111111.11111111.11111111.'
+            '00000000 — 24 ones, which is exactly why it\'s also written '
+            'as /24. To find which network an address belongs to, a '
+            'device performs a bitwise AND between the IP address and '
+            'the subnet mask: every bit position where the mask has a 1, '
+            'keep the address bit; everywhere the mask has a 0, force it '
+            'to 0. This is the actual mechanical operation happening '
+            'every single time any device decides whether a destination '
+            'is on its local network or needs to be routed elsewhere.',
       ),
       LessonSection(
         heading: 'IPv6: Solving the Scarcity Problem Permanently',
@@ -434,6 +546,15 @@ const List<Lesson> networkingLessons = [
             'attacker finding it first.',
       ),
       LessonSection(
+        heading: 'Infrastructure Protocols People Often Forget',
+        bullets: [
+          'DHCP (port 67/68) — automatically assigns IP addresses to devices joining a network; a rogue DHCP server can silently redirect victims to attacker-controlled DNS and gateways',
+          'NTP (port 123) — synchronizes system clocks; accurate time matters enormously for security because log correlation across systems breaks down if clocks drift, and NTP servers have themselves been abused for DDoS amplification',
+          'SNMP (port 161) — used to monitor and manage network devices remotely; older SNMP versions transmit community strings (effectively passwords) in plaintext and should be upgraded to SNMPv3',
+          'LDAP (port 389, or 636 encrypted) — the protocol behind directory services like Active Directory; unencrypted LDAP exposes authentication traffic to anyone capturing packets on the network',
+        ],
+      ),
+      LessonSection(
         heading: 'The Principle of Minimizing Exposed Services',
         body:
             'A useful mental model: every open port that doesn\'t '
@@ -532,6 +653,23 @@ const List<Lesson> networkingLessons = [
             'perfectly tuned, which is why many organizations run new '
             'detection rules in IDS (alert-only) mode before promoting '
             'them to active IPS blocking.',
+      ),
+      LessonSection(
+        heading: 'Proxy Servers and Load Balancers',
+        body:
+            'A forward proxy sits between internal clients and the '
+            'internet, forwarding requests on their behalf — useful for '
+            'content filtering, caching frequently accessed content, and '
+            'hiding internal client IP addresses from external servers. '
+            'A reverse proxy sits in front of internal servers instead, '
+            'accepting requests from the outside world and forwarding '
+            'them to the appropriate backend server, which is exactly '
+            'how a load balancer works: it distributes incoming traffic '
+            'across multiple backend servers, improving both performance '
+            'and availability, since traffic can automatically shift '
+            'away from a server that goes down. Many WAFs and reverse '
+            'proxies are actually the same physical device serving both '
+            'roles simultaneously.',
       ),
     ],
   ),
@@ -1217,6 +1355,29 @@ const List<Lesson> networkingLessons = [
         ],
         correctIndex: 1,
         explanation: 'OSPF is an interior gateway protocol using shortest-path calculation; BGP is an exterior gateway protocol using policy-based route selection between autonomous networks.',
+      ),
+      QuizQuestion(
+        question: 'A device has an IP address starting with 172. Which class does this address belong to?',
+        options: ['Class A', 'Class B', 'Class C', 'Class D'],
+        correctIndex: 1,
+        explanation: 'Class B covers first octets 128-191, so an address starting with 172 is Class B.',
+      ),
+      QuizQuestion(
+        question: 'What is Class D reserved for?',
+        options: ['Home networks', 'Multicast traffic', 'Loopback addresses', 'Experimental use only'],
+        correctIndex: 1,
+        explanation: 'Class D (224.0.0.0-239.255.255.255) is reserved entirely for multicast traffic.',
+      ),
+      QuizQuestion(
+        question: 'Why was classful IP addressing replaced by CIDR?',
+        options: [
+          'Classful addressing was too secure',
+          'Rigid class boundaries wasted enormous amounts of address space; CIDR allows flexible, arbitrary prefix lengths',
+          'Classful addressing did not support IPv6',
+          'CIDR was required for wireless networks',
+        ],
+        correctIndex: 1,
+        explanation: 'An organization needing slightly more than a Class C\'s 254 addresses had to take an entire Class B, wasting tens of thousands of addresses — CIDR fixed this.',
       ),
     ],
   ),
