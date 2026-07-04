@@ -394,6 +394,105 @@ const List<Lesson> windowsSecurityLessons = [
     ],
   ),
 
+  // 5c -------------------------------------------------------------------
+  Lesson(
+    title: 'Windows IAM: Groups, Privileged Accounts & Password Policy',
+    difficulty: LessonDifficulty.advanced,
+    estimatedMinutes: 10,
+    sections: [
+      LessonSection(
+        heading: 'Why Identity and Access Management Deserves Its Own Lesson',
+        body:
+            'Earlier lessons touched on users, groups, and NTFS '
+            'permissions individually, but Windows Identity and Access '
+            'Management as a discipline is really about how all of '
+            'these pieces combine — which accounts exist, which groups '
+            'they belong to, what those groups are actually allowed to '
+            'do, and how strong the credentials protecting all of it '
+            'are required to be. In Active Directory environments, IAM '
+            'mistakes are consistently among the most common root causes '
+            'of a small initial compromise turning into full domain '
+            'takeover.',
+      ),
+      LessonSection(
+        heading: 'Security Groups vs. Distribution Groups',
+        body:
+            'Active Directory has two fundamentally different group '
+            'types that are easy to confuse. Security groups can be '
+            'granted permissions and rights — they\'re the type used '
+            'throughout this course for access control. Distribution '
+            'groups exist purely for email distribution lists and '
+            'cannot be granted any permissions at all, even though both '
+            'types look similar in management tools. A surprisingly '
+            'common misconfiguration is assuming a distribution group '
+            'provides some access control simply because it looks like '
+            'a security group in a list.',
+      ),
+      LessonSection(
+        heading: 'The Built-In Privileged Groups Every Defender Should Know',
+        bullets: [
+          'Domain Admins — full administrative control over the entire domain; membership should be treated as equivalent to owning the domain outright, and kept to an absolute minimum',
+          'Enterprise Admins — full administrative control across every domain in the entire forest; exists only in the forest root domain and is even more sensitive than Domain Admins',
+          'Schema Admins — can modify the Active Directory schema itself, the structure defining what kinds of objects and attributes can even exist; rarely needs standing membership since schema changes are infrequent',
+          'Account Operators — can create, modify, and delete most user and group accounts, but cannot touch Domain Admins; a frequently overlooked path to privilege escalation since it grants broad account management power',
+          'Backup Operators — can back up and restore any file on a domain controller regardless of its actual NTFS permissions, which in practice means they can access literally any file, including highly sensitive ones, through a backup/restore cycle',
+          'Server Operators — can log on locally to domain controllers and manage many of their services, another commonly overlooked path to full domain controller compromise',
+          'Print Operators — can manage printers and load print drivers on domain controllers, historically relevant because print driver loading has been directly exploited for privilege escalation (the PrintNightmare vulnerability being the most prominent recent example)',
+        ],
+      ),
+      LessonSection(
+        heading: 'Why "Overlooked" Groups Matter So Much',
+        body:
+            'Security teams routinely lock down Domain Admins tightly '
+            'while leaving Account Operators, Backup Operators, or '
+            'Server Operators far more loosely controlled, on the '
+            'mistaken assumption that only Domain Admins membership '
+            'really matters. In practice, several of these "lesser" '
+            'groups provide a viable path to full domain compromise '
+            'through account manipulation, file access, or direct '
+            'logon to a domain controller — auditing membership in all '
+            'of these groups, not just Domain Admins, is standard '
+            'practice in a mature Active Directory security review.',
+      ),
+      LessonSection(
+        heading: 'Password Policy in Real Configuration Terms',
+        bullets: [
+          'Minimum password length — modern guidance favors longer minimums (12+ characters) over complex character requirements, since length contributes more to actual crack resistance',
+          'Password history — how many previous passwords are remembered and blocked from immediate reuse',
+          'Maximum password age — how long a password remains valid before a forced change is required; current guidance has shifted away from very frequent forced rotation, which tends to push users toward weaker, more predictable password patterns',
+          'Account lockout threshold and duration — how many failed attempts trigger a lockout, and for how long; this is the direct technical defense against brute-force and password-spraying attacks',
+          'Fine-grained password policies (FGPP) — allow different, stricter password requirements for specific groups (such as Domain Admins) rather than forcing one uniform policy across every account in the domain',
+        ],
+      ),
+      LessonSection(
+        heading: 'A Brief Introduction to Domain Replication',
+        body:
+            'A domain with only one domain controller is a single point '
+            'of failure, which is why production Active Directory '
+            'environments run multiple domain controllers that '
+            'continuously synchronize their data through a multi-master '
+            'replication model — any domain controller can accept a '
+            'change, and that change automatically propagates to every '
+            'other domain controller in the domain. Certain '
+            'domain-critical and forest-critical operations, however, '
+            'can only be performed by one domain controller at a time to '
+            'avoid conflicts; these are called FSMO (Flexible Single '
+            'Master Operations) roles, covering things like the Schema '
+            'Master (the only DC that can modify the schema), the RID '
+            'Master (issues unique identifier pools to other DCs so no '
+            'two objects ever get the same SID), and the PDC Emulator '
+            '(handles time synchronization and password change '
+            'processing across the domain). If the DC holding a FSMO '
+            'role goes down, that specific operation becomes unavailable '
+            'until the role is transferred or seized — a detail that '
+            'matters directly for both availability planning and '
+            'incident response, since attackers who can seize or disrupt '
+            'a FSMO role can cause targeted, difficult-to-diagnose '
+            'outages.',
+      ),
+    ],
+  ),
+
   // 6 ----------------------------------------------------------------------
   Lesson(
     title: 'Windows Defender & Endpoint Detection',
@@ -1109,6 +1208,56 @@ const List<Lesson> windowsSecurityLessons = [
         ],
         correctIndex: 1,
         explanation: 'AMSI exposes script content to antivirus/EDR for inspection immediately before execution, defeating many obfuscation techniques.',
+      ),
+      QuizQuestion(
+        question: 'What is the key difference between a security group and a distribution group in Active Directory?',
+        options: [
+          'Distribution groups can be granted permissions; security groups cannot',
+          'Security groups can be granted permissions and rights; distribution groups exist only for email and cannot be granted any access',
+          'They are functionally identical',
+          'Security groups only exist in the cloud',
+        ],
+        correctIndex: 1,
+        explanation: 'Only security groups can be used for access control; distribution groups are purely for email distribution lists.',
+      ),
+      QuizQuestion(
+        question: 'Which built-in group can back up and restore any file on a domain controller regardless of its NTFS permissions?',
+        options: ['Print Operators', 'Backup Operators', 'Account Operators', 'Schema Admins'],
+        correctIndex: 1,
+        explanation: 'Backup Operators can access any file through a backup/restore cycle, effectively bypassing normal NTFS permission checks.',
+      ),
+      QuizQuestion(
+        question: 'Why do security teams audit membership in groups like Account Operators and Server Operators, not just Domain Admins?',
+        options: [
+          'These groups are purely cosmetic and have no real access',
+          'Several "lesser" groups provide a viable path to full domain compromise through account manipulation or direct DC logon',
+          'Domain Admins membership is irrelevant to security',
+          'These groups are automatically disabled by default',
+        ],
+        correctIndex: 1,
+        explanation: 'Groups like Account Operators and Server Operators are frequently overlooked paths to privilege escalation and domain compromise.',
+      ),
+      QuizQuestion(
+        question: 'What does a Fine-Grained Password Policy (FGPP) allow an organization to do?',
+        options: [
+          'Disable password policies entirely',
+          'Apply different, typically stricter, password requirements to specific groups like Domain Admins rather than one uniform domain-wide policy',
+          'Automatically generate passwords for all users',
+          'Replace passwords with biometric authentication only',
+        ],
+        correctIndex: 1,
+        explanation: 'FGPP lets administrators enforce stricter requirements for privileged groups without changing the policy for every account in the domain.',
+      ),
+      QuizQuestion(
+        question: 'What is a FSMO role in Active Directory?',
+        options: [
+          'A type of security group',
+          'A domain-critical or forest-critical operation that only one domain controller can perform at a time to avoid conflicts',
+          'A password policy setting',
+          'A type of NTFS permission',
+        ],
+        correctIndex: 1,
+        explanation: 'FSMO (Flexible Single Master Operations) roles like Schema Master and RID Master are held by exactly one DC at a time to prevent replication conflicts.',
       ),
     ],
   ),
