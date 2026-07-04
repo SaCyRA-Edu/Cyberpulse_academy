@@ -305,6 +305,95 @@ const List<Lesson> windowsSecurityLessons = [
     ],
   ),
 
+  // 5b -------------------------------------------------------------------
+  Lesson(
+    title: 'Kerberos & Windows Authentication Protocols',
+    difficulty: LessonDifficulty.advanced,
+    estimatedMinutes: 10,
+    sections: [
+      LessonSection(
+        heading: 'Why This Fills a Real Gap',
+        body:
+            'Earlier lessons mentioned pass-the-hash and pass-the-ticket '
+            'attacks without fully explaining the authentication protocol '
+            'those attacks actually target. Kerberos is the default '
+            'authentication protocol in Active Directory environments, '
+            'and understanding how it actually works — not just that it '
+            'exists — is what lets you understand why certain attacks '
+            'against it are possible and how specific defenses close '
+            'those gaps.',
+      ),
+      LessonSection(
+        heading: 'The Three Parties in Every Kerberos Exchange',
+        bullets: [
+          'The client — the user or service requesting access to a resource',
+          'The Key Distribution Center (KDC) — runs on every domain controller, combining an Authentication Server and a Ticket Granting Server',
+          'The resource server — the file share, database, or application the client actually wants to reach',
+        ],
+      ),
+      LessonSection(
+        heading: 'The Ticket Exchange, Step by Step',
+        body:
+            'When a user logs in, their machine sends an AS-REQ '
+            '(Authentication Server Request) to the KDC, proving '
+            'knowledge of the user\'s password without ever sending the '
+            'password itself. The KDC responds with an AS-REP containing '
+            'a Ticket Granting Ticket (TGT) — a time-limited credential '
+            'proving the user already authenticated, valid for roughly '
+            '10 hours by default. From that point on, whenever the user '
+            'wants to access a specific resource, their machine presents '
+            'the TGT to the KDC in a TGS-REQ (Ticket Granting Server '
+            'Request) and receives back a TGS-REP containing a '
+            'service-specific ticket, which is what actually gets '
+            'presented to the resource server to gain access.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.processFlow,
+          steps: ['AS-REQ', 'TGT Issued', 'TGS-REQ', 'Service Ticket', 'Access Granted'],
+          caption:
+              'The Kerberos ticket exchange — notice the password itself '
+              'is never transmitted at any step after the initial login.',
+        ),
+      ),
+      LessonSection(
+        heading: 'Golden Tickets and Silver Tickets',
+        body:
+            'Kerberos tickets are protected by cryptographic signatures, '
+            'but those signatures rely on secret keys stored on the '
+            'domain controller. If an attacker manages to steal the '
+            'KRBTGT account\'s password hash — the key used to sign every '
+            'TGT in the entire domain — they can forge a "Golden '
+            'Ticket": a completely valid-looking TGT for any user, '
+            'including accounts that don\'t even exist, granting access '
+            'that persists even after a compromised account\'s password '
+            'is reset. A "Silver Ticket" is the more limited version, '
+            'forged using a stolen service account password hash rather '
+            'than the KRBTGT hash, granting access to only that specific '
+            'service rather than the entire domain. Both attacks explain '
+            'why the KRBTGT password is rotated twice, at minimum, '
+            'following any suspected domain compromise — rotating it '
+            'only once leaves the previous password\'s hash still valid '
+            'for a window of time.',
+      ),
+      LessonSection(
+        heading: 'Kerberos vs. NTLM',
+        body:
+            'NTLM is Windows\' older, weaker authentication protocol, '
+            'kept around primarily for backward compatibility with '
+            'systems and applications that don\'t support Kerberos. '
+            'Unlike Kerberos\'s ticket-based design, NTLM relies on a '
+            'challenge-response exchange built around the password '
+            'hash itself, which is exactly why NTLM hashes — not '
+            'Kerberos tickets — are the target of classic pass-the-hash '
+            'attacks. Modern hardening guidance consistently recommends '
+            'disabling NTLM wherever possible and monitoring for its '
+            'continued use as a sign that some part of the environment '
+            'still depends on legacy, weaker authentication.',
+      ),
+    ],
+  ),
+
   // 6 ----------------------------------------------------------------------
   Lesson(
     title: 'Windows Defender & Endpoint Detection',
@@ -628,6 +717,93 @@ const List<Lesson> windowsSecurityLessons = [
     ],
   ),
 
+  // 11b -------------------------------------------------------------------
+  Lesson(
+    title: 'PowerShell Security & the Windows Registry',
+    difficulty: LessonDifficulty.expert,
+    estimatedMinutes: 10,
+    sections: [
+      LessonSection(
+        heading: 'The Windows Registry: A Hierarchical Configuration Database',
+        body:
+            'The registry stores essentially all of Windows\' '
+            'configuration — hardware settings, software configuration, '
+            'user preferences, and security policy — organized into a '
+            'hierarchy of keys and values, broadly similar in concept to '
+            'a filesystem of folders and files. Understanding its '
+            'structure matters directly for security because a huge '
+            'number of persistence techniques, privilege escalation '
+            'paths, and malware configuration changes happen entirely '
+            'through registry edits, with no file ever touching disk.',
+      ),
+      LessonSection(
+        heading: 'The Five Root Hives',
+        bullets: [
+          'HKEY_LOCAL_MACHINE (HKLM) — system-wide settings applying to every user on the machine; commonly abbreviated to just "HKLM" in security writeups',
+          'HKEY_CURRENT_USER (HKCU) — settings specific to whichever user is currently logged in',
+          'HKEY_USERS — contains the actual profile data for every user account that has ever logged into the machine, with HKCU simply being a live pointer into the currently logged-in user\'s section',
+          'HKEY_CLASSES_ROOT — file association and COM object registration data',
+          'HKEY_CURRENT_CONFIG — information about the current hardware profile',
+        ],
+      ),
+      LessonSection(
+        heading: 'Why Attackers Love the Registry',
+        body:
+            'A classic and still very common persistence technique adds '
+            'an entry under '
+            'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run — any '
+            'program listed there launches automatically every time the '
+            'machine boots, with no need for a separate scheduled task '
+            'or service. Because registry changes are fast, don\'t '
+            'require writing a new file to disk, and blend in among '
+            'thousands of legitimate entries, they\'re a favorite target '
+            'for both persistence and for disabling security tools — '
+            'some malware directly edits the registry keys controlling '
+            'whether Windows Defender\'s real-time protection is enabled.',
+      ),
+      LessonSection(
+        heading: 'PowerShell Execution Policy: A Speed Bump, Not a Security Boundary',
+        body:
+            'PowerShell\'s execution policy (Restricted, AllSigned, '
+            'RemoteSigned, Unrestricted) controls whether scripts are '
+            'allowed to run at all, and if so, whether they need a '
+            'digital signature. It\'s important to understand this is a '
+            'convenience feature to prevent accidental script execution, '
+            'not a genuine security boundary — it can be trivially '
+            'bypassed by an attacker who already has code execution, '
+            'for instance by piping script contents directly into '
+            'PowerShell rather than executing a script file. Relying on '
+            'execution policy alone as a defense is a common and '
+            'significant misunderstanding.',
+      ),
+      LessonSection(
+        heading: 'The Real PowerShell Defenses',
+        bullets: [
+          'AMSI (Antimalware Scan Interface) — lets antivirus and EDR products inspect PowerShell script content in memory, even content that\'s deliberately obfuscated, right before it executes',
+          'Script Block Logging — records the full, de-obfuscated content of every PowerShell command executed on a system, one of the single highest-value log sources during an investigation involving PowerShell',
+          'Constrained Language Mode — restricts PowerShell to a safe subset of its full functionality, blocking direct access to .NET types and Win32 APIs that a script would otherwise be able to call directly',
+          'Just Enough Administration (JEA) — lets administrators expose only a narrow, specific set of PowerShell commands to a given role, rather than full unrestricted PowerShell access',
+        ],
+      ),
+      LessonSection(
+        heading: 'Why This Matters So Much in Practice',
+        body:
+            'PowerShell is simultaneously one of the most powerful '
+            'legitimate administrative tools on Windows and one of the '
+            'most heavily abused tools by attackers, precisely because '
+            'it\'s installed by default, extremely capable, and can '
+            'execute code entirely from memory without ever writing a '
+            'file to disk for antivirus to scan. Modern detection '
+            'strategy has shifted accordingly — rather than trying to '
+            'block PowerShell outright, which breaks legitimate '
+            'administration, security teams focus heavily on logging '
+            'and inspecting exactly what PowerShell actually executes, '
+            'which is exactly what AMSI and Script Block Logging '
+            'together enable.',
+      ),
+    ],
+  ),
+
   // 12 --------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
@@ -883,6 +1059,56 @@ const List<Lesson> windowsSecurityLessons = [
         ],
         correctIndex: 1,
         explanation: 'AppLocker controls which applications are permitted to run on a system.',
+      ),
+      QuizQuestion(
+        question: 'In Kerberos, what does the Ticket Granting Ticket (TGT) prove?',
+        options: [
+          'The user\'s plaintext password',
+          'That the user already successfully authenticated, without needing to re-send credentials for each subsequent request',
+          'The specific resource server being accessed',
+          'The domain controller\'s IP address',
+        ],
+        correctIndex: 1,
+        explanation: 'The TGT is a time-limited proof of prior authentication, used to request service-specific tickets without re-authenticating.',
+      ),
+      QuizQuestion(
+        question: 'A Golden Ticket attack is possible because an attacker has stolen:',
+        options: [
+          'A single user\'s password',
+          'The KRBTGT account\'s password hash, used to sign every TGT in the domain',
+          'A BitLocker recovery key',
+          'A Windows Defender signature file',
+        ],
+        correctIndex: 1,
+        explanation: 'The KRBTGT hash signs all TGTs domain-wide, so stealing it lets an attacker forge valid tickets for any account.',
+      ),
+      QuizQuestion(
+        question: 'Which registry hive contains settings specific to the currently logged-in user?',
+        options: ['HKEY_LOCAL_MACHINE', 'HKEY_CURRENT_USER', 'HKEY_CLASSES_ROOT', 'HKEY_CURRENT_CONFIG'],
+        correctIndex: 1,
+        explanation: 'HKEY_CURRENT_USER (HKCU) holds settings for whichever user is currently logged in.',
+      ),
+      QuizQuestion(
+        question: 'Why is PowerShell execution policy NOT considered a genuine security boundary?',
+        options: [
+          'It only works on Windows Server',
+          'It can be trivially bypassed by an attacker who already has code execution, such as by piping script content directly into PowerShell',
+          'It requires a paid license to enable',
+          'It disables all PowerShell functionality',
+        ],
+        correctIndex: 1,
+        explanation: 'Execution policy prevents accidental script execution but is easily bypassed by anyone with existing code execution — it is a convenience feature, not a security control.',
+      ),
+      QuizQuestion(
+        question: 'What does AMSI (Antimalware Scan Interface) allow security tools to do?',
+        options: [
+          'Block all PowerShell usage entirely',
+          'Inspect PowerShell script content in memory, even if deliberately obfuscated, right before it executes',
+          'Encrypt PowerShell script files at rest',
+          'Automatically patch PowerShell vulnerabilities',
+        ],
+        correctIndex: 1,
+        explanation: 'AMSI exposes script content to antivirus/EDR for inspection immediately before execution, defeating many obfuscation techniques.',
       ),
     ],
   ),
