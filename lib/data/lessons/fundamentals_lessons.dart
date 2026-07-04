@@ -154,7 +154,7 @@ const List<Lesson> fundamentalsLessons = [
   Lesson(
     title: 'The CIA Triad: Confidentiality, Integrity & Availability',
     difficulty: LessonDifficulty.beginner,
-    estimatedMinutes: 10,
+    estimatedMinutes: 16,
     sections: [
       LessonSection(
         heading: 'The Foundation of Every Security Decision',
@@ -257,6 +257,96 @@ const List<Lesson> fundamentalsLessons = [
             'threatening to publish it for extra leverage). Practicing '
             'this kind of analysis will sharpen your instincts far faster '
             'than memorizing definitions alone.',
+      ),
+      LessonSection(
+        heading: 'Protecting Confidentiality: Practical Controls',
+        bullets: [
+          'Encryption at rest and in transit — the single highest-leverage confidentiality control; even a full data theft yields nothing readable without the key',
+          'Access control lists and role-based permissions — ensuring only people with a genuine need can reach sensitive data in the first place',
+          'Data classification and labeling — so people and systems can consistently recognize what actually needs protecting',
+          'Data masking and tokenization — substituting sensitive values (like credit card numbers) with non-sensitive placeholders in systems that don\'t genuinely need the real data',
+        ],
+      ),
+      LessonSection(
+        heading: 'Protecting Integrity: Practical Controls',
+        bullets: [
+          'Cryptographic hashing — detecting whether a file or message has been altered since it was created',
+          'Digital signatures — proving both who created something and that it hasn\'t changed since',
+          'Version control and change management — tracking exactly what changed, when, and by whom',
+          'Input validation — preventing malformed or malicious data from corrupting a system in the first place',
+        ],
+      ),
+      LessonSection(
+        heading: 'Protecting Availability: What "Good" Actually Looks Like',
+        body:
+            'Unlike confidentiality and integrity, availability is '
+            'usually expressed as a target percentage rather than a '
+            'binary pass/fail — and the honest answer to "should '
+            'availability be 100%?" is no. No system, however well '
+            'engineered, achieves 100% uptime forever; the real '
+            'question is how much downtime is acceptable, and industry '
+            'practice expresses this using "the nines":',
+        bullets: [
+          '99% ("two nines") — about 3.65 days of downtime per year; acceptable for low-criticality internal tools',
+          '99.9% ("three nines") — about 8.76 hours of downtime per year; a common baseline SLA for many business applications',
+          '99.99% ("four nines") — about 52.6 minutes of downtime per year; typical target for critical business systems and major cloud provider SLAs',
+          '99.999% ("five nines") — about 5.26 minutes of downtime per year; reserved for systems where outages carry severe consequences, such as telecom infrastructure or certain financial trading systems',
+        ],
+      ),
+      LessonSection(
+        heading: 'Why Chasing 100% Is the Wrong Goal',
+        body:
+            'Beyond a certain point, each additional "nine" of '
+            'availability costs disproportionately more to achieve — '
+            'going from 99.9% to 99.99% might require geographic '
+            'redundancy, automatic failover, and extensive testing, for '
+            'a difference of only about 8 hours of downtime per year. '
+            'Mature organizations choose an availability target '
+            'deliberately based on actual business impact and cost, '
+            'documented in a Service Level Agreement (SLA), rather than '
+            'reflexively demanding the highest number possible '
+            'regardless of what it would cost to achieve.',
+      ),
+      LessonSection(
+        heading: 'Non-Repudiation: The Property the Triad Doesn\'t Name',
+        body:
+            'Beyond confidentiality, integrity, and availability, '
+            'security professionals rely on a fourth, closely related '
+            'concept: non-repudiation. Non-repudiation means a party '
+            'cannot credibly deny having performed a specific action — '
+            'sent a message, approved a transaction, accessed a system '
+            '— because there\'s verifiable proof tying that action '
+            'specifically to them. Without non-repudiation, "I never '
+            'sent that email" or "I never approved that transfer" would '
+            'be impossible to disprove, which is a serious problem for '
+            'both security and legal accountability.',
+      ),
+      LessonSection(
+        heading: 'How Non-Repudiation Is Actually Achieved',
+        body:
+            'Non-repudiation is built from the same cryptographic tools '
+            'you\'ll study in depth shortly, applied specifically to '
+            'proving authorship. A sender uses their private key to '
+            'create a digital signature over a hash digest of the '
+            'message — the hash ensures even a tiny change to the '
+            'message would produce a completely different signature, '
+            'and the private key ensures only the genuine sender could '
+            'have created that exact signature, since a private key is '
+            'never shared. Anyone can then verify the signature using '
+            'the sender\'s public key, confirming both that the message '
+            'came from that specific sender (authenticity) and that it '
+            'hasn\'t been altered since signing (integrity) — together '
+            'producing accountability that holds up even if the sender '
+            'later tries to deny it.',
+      ),
+      LessonSection(
+        heading: 'Where Non-Repudiation Matters in Practice',
+        bullets: [
+          'Digitally signed contracts and legal documents, where a signature must hold up to later dispute',
+          'Financial transactions, where a bank needs proof a specific customer authorized a specific transfer',
+          'Code signing, where software publishers prove a specific update genuinely came from them and wasn\'t tampered with',
+          'Audit logs tied to authenticated user sessions, supporting accountability for actions taken within a system',
+        ],
       ),
     ],
   ),
@@ -440,24 +530,57 @@ const List<Lesson> fundamentalsLessons = [
 
   // 6 ----------------------------------------------------------------------
   Lesson(
-    title: 'Authentication & Access Control',
+    title: 'Authentication',
     difficulty: LessonDifficulty.intermediate,
-    estimatedMinutes: 9,
+    estimatedMinutes: 12,
     sections: [
       LessonSection(
-        heading: 'Authentication vs. Authorization: Two Different Questions',
+        heading: 'What Authentication Actually Is',
         body:
-            'These two terms get confused constantly, but they answer '
-            'fundamentally different questions. Authentication answers '
-            '"who are you?" — the process of proving identity, typically '
-            'through a password, a physical device, or a biometric '
-            'characteristic. Authorization answers "what are you allowed '
-            'to do?" — the process of determining permissions once '
-            'identity has already been confirmed. Both must work correctly '
-            'for a system to be secure: strong authentication means '
-            'nothing if authorization is misconfigured to grant everyone '
-            'admin access, and fine-grained authorization means nothing if '
-            'authentication can be trivially bypassed.',
+            'Authentication is the process of proving that you are '
+            'genuinely who you claim to be, before a system grants you '
+            'any access at all. It\'s the very first checkpoint in '
+            'almost every secure interaction — before a bank lets you '
+            'view your balance, before a company lets an employee open '
+            'a file, before a website lets you post as yourself rather '
+            'than someone else. Without reliable authentication, every '
+            'other security control built on top of it — permissions, '
+            'audit logs, encryption tied to a specific identity — '
+            'becomes meaningless, because there\'s no trustworthy way to '
+            'know who is actually on the other end of the connection.',
+      ),
+      LessonSection(
+        heading: 'Why Authentication Is Required Everywhere You Look',
+        body:
+            'Authentication exists to solve one specific problem: '
+            'systems and people need a reliable way to distinguish a '
+            'legitimate user from an impostor, an authorized process '
+            'from a malicious one. Without it, there would be no way '
+            'to enforce who can read sensitive data, who can approve a '
+            'transaction, or even whose actions show up in a log. This '
+            'is why authentication shows up at every layer imaginable — '
+            'logging into a laptop, connecting to a corporate VPN, '
+            'accessing a cloud application, calling an API '
+            'programmatically, or even one microservice talking to '
+            'another inside a data center. Anywhere something needs to '
+            'know "who is this, really?" authentication has to happen '
+            'first.',
+      ),
+      LessonSection(
+        heading: 'A Generic Authentication Flow',
+        body:
+            'Regardless of the specific method used, almost every '
+            'authentication exchange follows the same basic shape.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.processFlow,
+          steps: ['Claim Identity', 'Present Credential', 'Verify', 'Grant or Deny'],
+          caption:
+              'This same basic flow underlies a password login, a '
+              'fingerprint scan, and a hardware security key tap — only '
+              'the credential and verification method change.',
+        ),
       ),
       LessonSection(
         heading: 'The Three Authentication Factors',
@@ -476,18 +599,53 @@ const List<Lesson> fundamentalsLessons = [
         ),
       ),
       LessonSection(
-        heading: 'Multi-Factor Authentication (MFA)',
+        heading: 'Strengthening Authentication: MFA in Practice',
         body:
-            'MFA combines two or more of the factors above, so that a '
-            'compromised password alone is no longer sufficient to '
-            'access an account — the attacker would also need the '
-            'physical phone receiving the verification code, or the '
-            'registered fingerprint, neither of which typically travels '
-            'with a stolen password in a data breach. This single control '
-            'is consistently cited by security researchers as one of the '
-            'most effective, low-cost defenses against account takeover, '
-            'stopping the vast majority of credential-based attacks even '
-            'when a password has already been compromised.',
+            'Multi-Factor Authentication combines two or more of the '
+            'factors above, so a compromised password alone is no '
+            'longer sufficient to access an account. In practice, MFA '
+            'shows up through several concrete implementations, each '
+            'with different security and convenience trade-offs.',
+        bullets: [
+          'Software tokens (authenticator apps) — apps like Google Authenticator or Microsoft Authenticator generate a new time-based one-time code every 30 seconds, using a shared secret established when the app was set up; convenient and free, but vulnerable if the phone itself is compromised',
+          'Hardware security keys — small physical devices like a YubiKey or a Titan Security Key that a user physically taps or inserts to approve a login; these use public-key cryptography and are considered the strongest widely available MFA method precisely because the private key never leaves the device and can\'t be phished the way a code can',
+          'SMS-based one-time codes — a numeric code sent by text message; convenient and better than no MFA at all, but the weakest common option, since SIM-swapping attacks can redirect a victim\'s phone number to an attacker\'s device',
+          'Push notifications — a prompt sent to a registered app asking the user to approve or deny a login attempt; convenient, though vulnerable to "MFA fatigue" attacks where an attacker spams approval requests hoping the user eventually taps approve out of frustration',
+          'Biometrics — fingerprint or facial recognition, typically used to unlock a device or a password manager locally rather than being sent anywhere; convenient, but a compromised biometric (unlike a password) can\'t simply be changed afterward',
+        ],
+      ),
+      LessonSection(
+        heading: 'One-Time Passwords (OTPs) in Detail',
+        body:
+            'An OTP is a code valid for only a single use or a short '
+            'time window, which is precisely what makes it resistant to '
+            'reuse even if intercepted. TOTP (Time-based One-Time '
+            'Password) generates a new code every 30 seconds using the '
+            'current time and a shared secret — this is what '
+            'authenticator apps use. HOTP (HMAC-based One-Time Password) '
+            'instead advances based on a counter each time it\'s used, '
+            'rather than the clock, which is common in some hardware '
+            'tokens. Either way, the underlying principle is the same: '
+            'even if an attacker somehow captures one OTP, it becomes '
+            'useless within seconds or after a single use, dramatically '
+            'limiting the damage compared to a static, reusable '
+            'password.',
+      ),
+      LessonSection(
+        heading: 'How These Methods Actually Protect Data',
+        body:
+            'Every strengthening method above works by making it '
+            'progressively harder for an attacker to satisfy the '
+            'authentication check using only stolen information. A '
+            'stolen password alone becomes useless against MFA. A '
+            'phished OTP becomes useless within seconds. A cloned '
+            'fingerprint database becomes useless against a hardware '
+            'key that never transmits anything to clone. The strategic '
+            'goal across all of them is the same: raise the cost and '
+            'complexity of impersonating someone until it becomes '
+            'impractical for the vast majority of real-world attackers, '
+            'even if a single piece of the puzzle — like a password — '
+            'does eventually leak.',
       ),
       LessonSection(
         heading: 'Single Sign-On (SSO)',
@@ -502,41 +660,164 @@ const List<Lesson> fundamentalsLessons = [
             'authentication policies, including MFA, at a single central '
             'point that governs access everywhere.',
       ),
+    ],
+  ),
+
+  // 6b -----------------------------------------------------------------
+  Lesson(
+    title: 'Authorization: RBAC, Rule-Based & Attribute-Based Access',
+    difficulty: LessonDifficulty.intermediate,
+    estimatedMinutes: 10,
+    sections: [
       LessonSection(
-        heading: 'The Principle of Least Privilege',
+        heading: 'What Authorization Actually Is',
         body:
-            'Once identity is authenticated, authorization determines what '
-            'that identity can actually do — and the guiding principle '
-            'here is least privilege: every user, process, and system '
-            'should have only the minimum level of access required to '
-            'perform its function, and nothing more. A marketing employee '
-            'doesn\'t need access to the finance database. A web server '
-            'process doesn\'t need permission to modify system-level '
-            'configuration files. The value of least privilege becomes '
-            'obvious the moment something goes wrong: if an account or '
-            'process is compromised, its restricted permissions directly '
-            'limit how much damage the attacker can actually do with it — '
-            'this concept is often called reducing the "blast radius" of '
-            'a compromise.',
+            'Once authentication confirms who someone is, authorization '
+            'answers the next question: what is this specific, verified '
+            'identity actually allowed to do? Authorization is the '
+            'decision layer that determines access to specific '
+            'resources, actions, and data — and getting it wrong in '
+            'either direction causes real problems: too permissive, and '
+            'a compromised or malicious account can cause far more '
+            'damage than it should; too restrictive, and legitimate '
+            'work grinds to a halt as people constantly hit walls trying '
+            'to do their actual jobs.',
       ),
       LessonSection(
-        heading: 'Putting It Together: A Practical Example',
+        heading: 'Role-Based Access Control (RBAC)',
         body:
-            'Imagine an employee\'s laptop is compromised by malware. If '
-            'that employee logs in with a weak, reused password and no '
-            'MFA, and their account has broad administrative access '
-            'across the company\'s systems "just in case it\'s needed '
-            'someday," the attacker who now controls that laptop has '
-            'effectively been handed the keys to the entire organization. '
-            'Now imagine the same compromise, but the employee uses MFA '
-            '(so the attacker can\'t easily use the credentials elsewhere '
-            'without the physical device) and their account follows least '
-            'privilege (so even with access to that one laptop, the '
-            'attacker can only reach a small, specific set of systems). '
-            'The technical vulnerability was identical in both scenarios '
-            '— the actual business impact was radically different, purely '
-            'because of how authentication and authorization were '
-            'designed.',
+            'RBAC grants permissions based on a user\'s role within an '
+            'organization, rather than assigning permissions to '
+            'individuals one at a time. A "Finance Analyst" role might '
+            'include access to accounting software and financial '
+            'reports; an "IT Support" role might include the ability to '
+            'reset passwords and access helpdesk tools. When someone '
+            'joins, changes roles, or leaves, an administrator changes '
+            'their role assignment once, and every associated permission '
+            'updates automatically — dramatically simpler to manage and '
+            'audit than tracking individual permission grants across '
+            'potentially thousands of employees.',
+      ),
+      LessonSection(
+        heading: 'Rule-Based Access Control',
+        body:
+            'Rule-based access control makes access decisions using '
+            'predefined, often conditional rules that apply system-wide, '
+            'regardless of who a specific user is. A firewall rule '
+            'blocking all traffic outside business hours, or a policy '
+            'denying login attempts from countries where an organization '
+            'has no offices, are both rule-based controls — the rule '
+            'itself, not any individual\'s role or attributes, drives the '
+            'decision. Rule-based control is often layered on top of '
+            'RBAC rather than replacing it, adding conditional logic '
+            'that applies universally.',
+      ),
+      LessonSection(
+        heading: 'Attribute-Based Access Control (ABAC)',
+        body:
+            'ABAC goes further than RBAC by making access decisions '
+            'based on a combination of attributes — characteristics of '
+            'the user, the resource being accessed, and the current '
+            'context — rather than a single fixed role. An ABAC policy '
+            'might grant access only if the user\'s department attribute '
+            'is "Finance," the document\'s classification attribute is '
+            '"Internal" (not "Confidential"), the request originates '
+            'from a company-managed device, and the time is within '
+            'business hours — all evaluated together as a single '
+            'decision. This gives far more precise, context-aware '
+            'control than RBAC alone can provide, at the cost of being '
+            'more complex to design, implement, and audit.',
+      ),
+      LessonSection(
+        heading: 'Comparing the Three Models',
+        bullets: [
+          'RBAC — simplest to manage at scale; best when access genuinely maps cleanly onto organizational roles',
+          'Rule-based — best for applying universal conditions (time, location, network) that should apply regardless of who\'s asking',
+          'ABAC — most precise and context-aware, but the most complex to design and maintain; best suited to environments with highly variable, context-dependent access needs',
+        ],
+      ),
+      LessonSection(
+        heading: 'How Authorization Protects Data and Simplifies Access',
+        body:
+            'Well-designed authorization does two things simultaneously '
+            'that might initially seem to pull in opposite directions: '
+            'it protects sensitive data and maintains integrity by '
+            'ensuring only appropriate identities can reach or modify '
+            'it, while also simplifying legitimate access by grouping '
+            'permissions logically (through roles or attributes) instead '
+            'of requiring constant manual, one-off permission grants. '
+            'The best authorization models make the secure path and the '
+            'convenient path the same path — a properly assigned role or '
+            'attribute set gets people exactly what they need without '
+            'friction, while anyone outside that role or attribute set '
+            'is cleanly and automatically excluded.',
+      ),
+    ],
+  ),
+
+  // 6c -----------------------------------------------------------------
+  Lesson(
+    title: 'Accounting: Audit Trails & User Accountability',
+    difficulty: LessonDifficulty.intermediate,
+    estimatedMinutes: 8,
+    sections: [
+      LessonSection(
+        heading: 'Completing the AAA Model',
+        body:
+            'Authentication and authorization are two-thirds of a '
+            'classic security framework called AAA: Authentication, '
+            'Authorization, and Accounting. Accounting is the '
+            'often-overlooked third pillar — it\'s the ongoing process of '
+            'monitoring and logging what an authenticated, authorized '
+            'identity actually does once access has been granted. '
+            'Without accounting, an organization might correctly verify '
+            'identity and correctly restrict permissions, and still have '
+            'no way to answer "what actually happened here?" after the '
+            'fact.',
+      ),
+      LessonSection(
+        heading: 'What Accounting Actually Captures',
+        bullets: [
+          'Who — the authenticated identity that performed an action',
+          'What — the specific action taken: a file opened, a record modified, a command executed',
+          'When — a precise timestamp, which is exactly why accurate time synchronization across systems matters so much for later analysis',
+          'Where — the originating device, IP address, or system location',
+          'Outcome — whether the action succeeded, failed, or was denied',
+        ],
+      ),
+      LessonSection(
+        heading: 'Why Accounting Matters in Practice',
+        bullets: [
+          'Regulatory compliance — many regulations (HIPAA, PCI-DSS, SOX) explicitly require detailed audit logs proving who accessed what and when',
+          'Forensic analysis — when an incident occurs, accounting logs are frequently the primary evidence used to reconstruct exactly what an attacker (or a well-meaning but mistaken employee) actually did',
+          'Resource optimization — usage logs reveal which systems and features are actually being used, informing decisions about where to invest or cut back',
+          'User accountability — knowing that actions are logged and attributable is itself a deterrent against misuse, and provides a clear record if misuse does occur',
+        ],
+      ),
+      LessonSection(
+        heading: 'Accounting and Non-Repudiation Work Together',
+        body:
+            'Recall non-repudiation from the CIA Triad lesson — the '
+            'property that prevents someone from credibly denying an '
+            'action they actually took. Accounting is what makes '
+            'non-repudiation practically enforceable: a digital '
+            'signature proves a specific person authorized a specific '
+            'transaction, and the accompanying audit log proves exactly '
+            'when and from where that authorization happened, together '
+            'building a record that\'s very difficult to credibly dispute '
+            'after the fact.',
+      ),
+      LessonSection(
+        heading: 'A Practical Reality: Logs Only Help If They\'re Protected',
+        body:
+            'Accounting logs are only as trustworthy as their own '
+            'protection — an attacker with sufficient access can often '
+            'edit or delete the very logs that would reveal their '
+            'activity, which is exactly why centralized, tamper-resistant '
+            'log storage (forwarding logs to a separate system, as '
+            'you\'ll see repeatedly in later modules) is considered a '
+            'core part of accounting done properly, not an optional '
+            'extra.',
       ),
     ],
   ),
@@ -929,11 +1210,181 @@ const List<Lesson> fundamentalsLessons = [
     ],
   ),
 
+  // 10b -------------------------------------------------------------------
+  Lesson(
+    title: 'Security Control Categories & Types',
+    difficulty: LessonDifficulty.advanced,
+    estimatedMinutes: 10,
+    sections: [
+      LessonSection(
+        heading: 'Two Different Ways to Classify Every Control You\'ll Ever Study',
+        body:
+            'Every specific security control you\'ll encounter across '
+            'this entire course — a firewall, a background check, a '
+            'locked server room door, a written policy — can be '
+            'classified two independent ways: by category (broadly, '
+            'what kind of control is it?) and by type (functionally, '
+            'what does it actually do?). Learning both classification '
+            'systems gives you a genuinely useful mental framework for '
+            'analyzing any control you encounter, including ones this '
+            'course hasn\'t specifically covered yet.',
+      ),
+      LessonSection(
+        heading: 'The Four Security Control Categories',
+        bullets: [
+          'Technical — controls implemented through technology itself: firewalls, encryption, antivirus, access control systems',
+          'Managerial — controls implemented through policy, planning, and risk management decisions made by leadership: risk assessments, security policies, security awareness programs',
+          'Operational — controls carried out by people, day to day, following defined procedures: security guards, incident response procedures, user access reviews',
+          'Physical — controls that restrict actual physical access: locked doors, fences, security cameras, badge readers',
+        ],
+      ),
+      LessonSection(
+        heading: 'Why Categories Matter: One Risk, Multiple Layers',
+        body:
+            'A single risk is rarely addressed by only one category of '
+            'control. Protecting a data center against unauthorized '
+            'entry might combine a physical control (a locked door and '
+            'badge reader), a technical control (a camera system logging '
+            'every entry), a managerial control (a policy defining who '
+            'is authorized to enter and why), and an operational control '
+            '(a guard who checks badges and challenges unfamiliar '
+            'faces). This layering across categories is itself a form of '
+            'defense in depth — a concept you\'ll see formalized further '
+            'later in this course.',
+      ),
+      LessonSection(
+        heading: 'The Six Security Control Types',
+        bullets: [
+          'Preventative — stops an incident before it happens: a firewall blocking unauthorized traffic, an Acceptable Use Policy (AUP) setting expectations that discourage risky behavior in the first place',
+          'Deterrent — discourages an attacker from even attempting an action, without necessarily stopping them technically: a visible warning sign, a login banner stating monitoring is in effect',
+          'Detective — identifies that something has already happened: an IDS alerting on suspicious traffic, a security camera recording footage after the fact',
+          'Corrective — reduces the impact and restores normal operation after an incident: restoring a system from backup, applying a patch after a vulnerability is discovered',
+          'Compensating — an alternative control used when the ideal control isn\'t feasible: using additional monitoring on a legacy system that can\'t support modern encryption',
+          'Directive — a control that mandates or directs a specific behavior through policy or instruction, relying on people to comply: a policy requiring all laptops to be encrypted, a mandatory security training requirement',
+        ],
+      ),
+      LessonSection(
+        heading: 'Mapping Real Examples to Type',
+        bullets: [
+          'A firewall blocking inbound traffic on an unused port — Preventative, Technical',
+          'An IDS generating an alert on a suspicious login pattern — Detective, Technical',
+          'A VPN encrypting traffic on an untrusted network — Preventative, Technical',
+          'Antivirus removing a detected piece of malware — Corrective, Technical',
+          'An Acceptable Use Policy (AUP) — Directive, Managerial',
+          'A security guard checking ID badges at the entrance — Preventative, Physical (also Operational, since a person is actively carrying out the check)',
+        ],
+      ),
+      LessonSection(
+        heading: 'Why This Framework Is Genuinely Useful, Not Just Academic',
+        body:
+            'When you\'re asked to improve an organization\'s security '
+            'posture, thinking in terms of category and type helps '
+            'reveal actual gaps rather than just adding more of what\'s '
+            'already there. An organization with plenty of preventative '
+            'technical controls (firewalls, antivirus) but no detective '
+            'controls at all has a serious blind spot — an attacker who '
+            'gets past prevention will operate completely undetected. '
+            'Deliberately mapping existing controls against both the '
+            'four categories and six types quickly surfaces exactly '
+            'these kinds of imbalances.',
+      ),
+    ],
+  ),
+
+  // 10c -------------------------------------------------------------------
+  Lesson(
+    title: 'Zero Trust Fundamentals',
+    difficulty: LessonDifficulty.advanced,
+    estimatedMinutes: 9,
+    sections: [
+      LessonSection(
+        heading: 'Retiring the Idea of a Trusted Perimeter',
+        body:
+            'Traditional network security assumed a clear boundary: '
+            'defend the perimeter tightly, and reasonably trust '
+            'everything already inside it. Zero Trust rejects that '
+            'assumption entirely. It starts from the premise that no '
+            'user, device, or network location — inside or outside a '
+            'traditional perimeter — should be trusted by default. Every '
+            'single request for access must be explicitly verified, '
+            'every time, regardless of where it originates.',
+      ),
+      LessonSection(
+        heading: 'Why the Perimeter Model Stopped Making Sense',
+        body:
+            'Cloud services, remote work, and personal devices accessing '
+            'company resources have made "inside the network" an '
+            'increasingly meaningless boundary. An employee working from '
+            'home, accessing a cloud application from a personal laptop, '
+            'was never genuinely "inside" anything a traditional '
+            'perimeter firewall could actually protect — the entire '
+            'concept of a defensible network edge has quietly '
+            'dissolved for most modern organizations, which is exactly '
+            'the deperimeterized environment Zero Trust was designed to '
+            'secure.',
+      ),
+      LessonSection(
+        heading: 'Adaptive Identity',
+        body:
+            'Rather than granting access based on a static, one-time '
+            'login, Zero Trust systems continuously reassess trust based '
+            'on real-time signal — is this the device the user normally '
+            'uses? Is this the location they normally connect from? Is '
+            'this the time of day they normally work? A login that looks '
+            'perfectly normal at 9 AM from a known device might trigger '
+            'additional verification, or be blocked outright, if it '
+            'suddenly appears at 3 AM from an unrecognized device in a '
+            'different country — the identity itself is treated as '
+            'something whose trustworthiness adapts continuously, not a '
+            'fixed fact established once at login.',
+      ),
+      LessonSection(
+        heading: 'Policy-Driven Access',
+        body:
+            'Instead of broad, static rules like "employees can access '
+            'the internal network," Zero Trust enforces granular, '
+            'explicit policies evaluated for every single request: this '
+            'specific user, on this specific device, in this specific '
+            'context, requesting this specific resource — approved or '
+            'denied based on policy, not on which network segment they '
+            'happen to be connected to.',
+      ),
+      LessonSection(
+        heading: 'The Control Plane and the Data Plane',
+        body:
+            'Zero Trust architecture separates two distinct '
+            'responsibilities. The control plane makes the actual access '
+            'decision — evaluating identity, device health, and policy '
+            'to decide whether a request should be approved. The data '
+            'plane is where the approved traffic actually flows once '
+            'access has been granted. Separating these means every '
+            'access decision passes through consistent, centralized '
+            'policy evaluation before any data plane traffic is ever '
+            'permitted to move, rather than relying on network location '
+            'alone to implicitly grant access.',
+      ),
+      LessonSection(
+        heading: 'How This Connects to What You\'ve Already Learned',
+        body:
+            'Zero Trust isn\'t a completely separate concept — it\'s a '
+            'formal architecture built from principles you\'ve already '
+            'studied in this very module: least privilege (from the '
+            'Authentication and Authorization lessons), strong MFA-based '
+            'authentication, and continuous accounting and monitoring, '
+            'all applied everywhere continuously rather than being '
+            'relaxed once someone is "inside." You\'ll revisit Zero '
+            'Trust in far greater technical depth in the Capstone module, '
+            'once you\'ve built up the networking, identity, and '
+            'operations knowledge that a full Zero Trust implementation '
+            'actually depends on.',
+      ),
+    ],
+  ),
+
   // 11 ----------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
     difficulty: LessonDifficulty.expert,
-    estimatedMinutes: 15,
     quiz: [
       QuizQuestion(
         question: 'Which part of the CIA Triad ensures systems remain '
@@ -1187,6 +1638,106 @@ const List<Lesson> fundamentalsLessons = [
         ],
         correctIndex: 1,
         explanation: 'The risk management cycle is Identify, Assess, Treat, Monitor — and it repeats continuously.',
+      ),
+      QuizQuestion(
+        question: 'What does non-repudiation prevent?',
+        options: [
+          'Unauthorized data access',
+          'A party credibly denying they performed a specific action, such as sending a message or approving a transaction',
+          'Systems becoming unavailable',
+          'Passwords from being guessed',
+        ],
+        correctIndex: 1,
+        explanation: 'Non-repudiation provides verifiable proof tying an action to a specific party, so it cannot be credibly denied.',
+      ),
+      QuizQuestion(
+        question: 'A digital signature achieves non-repudiation by combining which two elements?',
+        options: [
+          'A firewall rule and a VPN',
+          'A hash digest of the message and a signature created with the sender\'s private key',
+          'A username and a password',
+          'An IP address and a MAC address',
+        ],
+        correctIndex: 1,
+        explanation: 'The hash detects tampering; signing with the private key proves only the genuine sender could have produced that signature.',
+      ),
+      QuizQuestion(
+        question: 'What does a 99.99% availability SLA ("four nines") roughly translate to per year?',
+        options: [
+          'About 3.65 days of downtime',
+          'About 8.76 hours of downtime',
+          'About 52.6 minutes of downtime',
+          'Zero downtime',
+        ],
+        correctIndex: 2,
+        explanation: '99.99% availability allows roughly 52.6 minutes of downtime per year — a common target for critical business systems.',
+      ),
+      QuizQuestion(
+        question: 'Why is 100% availability generally not a realistic or sensible target?',
+        options: [
+          'It is technically impossible to measure',
+          'Beyond a certain point, each additional "nine" of availability costs disproportionately more relative to the benefit gained',
+          'Availability does not matter for security',
+          'Most systems already achieve 100% by default',
+        ],
+        correctIndex: 1,
+        explanation: 'Organizations choose a deliberate availability target based on cost and business impact rather than chasing an unrealistic 100%.',
+      ),
+      QuizQuestion(
+        question: 'RBAC (Role-Based Access Control) grants permissions based on:',
+        options: [
+          'A user\'s individual, one-off assigned permissions',
+          'A user\'s role within the organization',
+          'The current time of day only',
+          'The network location of the request only',
+        ],
+        correctIndex: 1,
+        explanation: 'RBAC assigns permissions to roles, and users inherit permissions through their role membership.',
+      ),
+      QuizQuestion(
+        question: 'ABAC (Attribute-Based Access Control) differs from RBAC because it:',
+        options: [
+          'Only considers a user\'s job title',
+          'Evaluates a combination of attributes about the user, resource, and context together, not just a fixed role',
+          'Removes the need for authentication entirely',
+          'Only applies to physical access control',
+        ],
+        correctIndex: 1,
+        explanation: 'ABAC combines multiple attributes (user, resource, context) for more precise, context-aware access decisions than RBAC alone.',
+      ),
+      QuizQuestion(
+        question: 'In the AAA model, what does the "Accounting" component specifically provide?',
+        options: [
+          'Verification of identity',
+          'Determination of permissions',
+          'Monitoring and logging of what an authenticated, authorized identity actually does',
+          'Encryption of stored data',
+        ],
+        correctIndex: 2,
+        explanation: 'Accounting is the ongoing logging of user actions, supporting compliance, forensics, and accountability.',
+      ),
+      QuizQuestion(
+        question: 'A visible warning sign stating that a facility is monitored by security cameras is an example of which control type?',
+        options: ['Preventative', 'Deterrent', 'Corrective', 'Compensating'],
+        correctIndex: 1,
+        explanation: 'A deterrent control discourages an attempt without necessarily stopping it technically.',
+      ),
+      QuizQuestion(
+        question: 'Restoring a system from backup after an incident is an example of which control type?',
+        options: ['Preventative', 'Detective', 'Corrective', 'Directive'],
+        correctIndex: 2,
+        explanation: 'Corrective controls reduce impact and restore normal operation after an incident has occurred.',
+      ),
+      QuizQuestion(
+        question: 'Which of the following best describes the Zero Trust principle of "adaptive identity"?',
+        options: [
+          'Granting access once at login and never re-checking it',
+          'Continuously reassessing trust using real-time signals like device, location, and behavior rather than a single static login check',
+          'Removing the need for authentication after the first login',
+          'Trusting all requests from inside the corporate network by default',
+        ],
+        correctIndex: 1,
+        explanation: 'Zero Trust continuously reevaluates trust based on real-time context rather than treating a single login as permanently sufficient.',
       ),
     ],
   ),
