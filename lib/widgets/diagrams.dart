@@ -23,6 +23,8 @@ enum DiagramType {
   malwareTypes,
   virusTrojanWormTable,
   symmetricAsymmetricTable,
+  idsIpsTable,
+  networkAppliancesTable,
 }
 
 class DiagramSpec {
@@ -90,6 +92,12 @@ class DiagramView extends StatelessWidget {
         break;
       case DiagramType.symmetricAsymmetricTable:
         diagram = const SymmetricAsymmetricTableDiagram();
+        break;
+      case DiagramType.idsIpsTable:
+        diagram = const IdsIpsTableDiagram();
+        break;
+      case DiagramType.networkAppliancesTable:
+        diagram = const NetworkAppliancesTableDiagram();
         break;
       case DiagramType.processFlow:
         diagram = ProcessFlowDiagram(steps: spec.steps ?? const []);
@@ -1192,6 +1200,133 @@ class SymmetricAsymmetricTableDiagram extends StatelessWidget {
                 Expanded(flex: 2, child: bodyCell(rows[i].$1, bold: true)),
                 bodyCell(rows[i].$2),
                 bodyCell(rows[i].$3),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// IDS vs IPS — side-by-side comparison table
+// ═══════════════════════════════════════════════════════════════════════
+
+class IdsIpsTableDiagram extends StatelessWidget {
+  const IdsIpsTableDiagram({super.key});
+
+  static const rows = [
+    ('Position', 'Out-of-band (monitors a copy of traffic)', 'Inline (traffic passes through it)'),
+    ('Action taken', 'Alerts only — no direct blocking', 'Actively blocks malicious traffic'),
+    ('Risk of false positives', 'Lower impact — a false alert is just noise', 'Higher impact — a false block can disrupt legitimate traffic'),
+    ('Typical role', 'Visibility and forensic logging', 'Real-time active prevention'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    Widget headerCell(String text, Color color) => Expanded(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            color: color,
+            child: Text(text,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+          ),
+        );
+
+    Widget bodyCell(String text, {bool bold = false}) => Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+            child: Text(text,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 11, fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
+          ),
+        );
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            const Expanded(flex: 2, child: SizedBox()),
+            headerCell('IDS', const Color(0xFF1565C0)),
+            headerCell('IPS', const Color(0xFFC62828)),
+          ],
+        ),
+        for (var i = 0; i < rows.length; i++)
+          Container(
+            decoration: BoxDecoration(
+              color: i.isEven ? Colors.grey.shade50 : Colors.white,
+              border: const Border(bottom: BorderSide(color: Color(0xFFEEEEEE))),
+            ),
+            child: Row(
+              children: [
+                Expanded(flex: 2, child: bodyCell(rows[i].$1, bold: true)),
+                bodyCell(rows[i].$2),
+                bodyCell(rows[i].$3),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Network Appliances — hardware / software / cloud comparison table
+// ═══════════════════════════════════════════════════════════════════════
+
+class NetworkAppliancesTableDiagram extends StatelessWidget {
+  const NetworkAppliancesTableDiagram({super.key});
+
+  static const rows = [
+    ('Load Balancer', 'F5 BIG-IP', 'NGINX, HAProxy', 'AWS ELB, Azure Load Balancer'),
+    ('Proxy Server', 'Blue Coat appliance', 'Squid, NGINX', 'AWS API Gateway, Azure App Proxy'),
+    ('Jump Server', 'Dedicated hardened host', 'Bastion host software', 'AWS Systems Manager, Entra PIM'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    Widget headerCell(String text) => Expanded(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            color: const Color(0xFF37474F),
+            child: Text(text,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11)),
+          ),
+        );
+
+    Widget bodyCell(String text, {bool bold = false}) => Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+            child: Text(text,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 10, fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
+          ),
+        );
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            const Expanded(flex: 2, child: SizedBox()),
+            headerCell('Hardware'),
+            headerCell('Software'),
+            headerCell('Cloud'),
+          ],
+        ),
+        for (var i = 0; i < rows.length; i++)
+          Container(
+            decoration: BoxDecoration(
+              color: i.isEven ? Colors.grey.shade50 : Colors.white,
+              border: const Border(bottom: BorderSide(color: Color(0xFFEEEEEE))),
+            ),
+            child: Row(
+              children: [
+                Expanded(flex: 2, child: bodyCell(rows[i].$1, bold: true)),
+                bodyCell(rows[i].$2),
+                bodyCell(rows[i].$3),
+                bodyCell(rows[i].$4),
               ],
             ),
           ),

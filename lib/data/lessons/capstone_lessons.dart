@@ -562,6 +562,803 @@ const List<Lesson> capstoneLessons = [
     ],
   ),
 
+  // 9b -----------------------------------------------------------------
+  Lesson(
+    title: 'Security Infrastructure',
+    difficulty: LessonDifficulty.advanced,
+    estimatedMinutes: 11,
+    sections: [
+      LessonSection(
+        heading: 'Applying Enterprise Security Across Domains 3 and 4',
+        body:
+            'This new set of lessons applies the enterprise security '
+            'principles you\'ve already studied — defense in depth, '
+            'least privilege, Zero Trust — specifically to the physical '
+            'and logical infrastructure an organization actually runs '
+            'on. It spans two closely related CompTIA Security+ '
+            'domains: Security Architecture (how infrastructure is '
+            'designed) and Security Operations (how it\'s actually '
+            'run and defended day to day).',
+      ),
+      LessonSection(
+        heading: 'A Real-Time Enterprise Security Architecture',
+        body:
+            'A typical enterprise architecture layers several distinct '
+            'controls between the untrusted internet and sensitive '
+            'internal systems.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.processFlow,
+          steps: ['Internet', 'Perimeter Firewall', 'IDS/IPS', 'DMZ', 'Internal Network'],
+          caption:
+              'Traffic crosses multiple independent inspection points '
+              'before ever reaching sensitive internal systems — '
+              'defense in depth applied directly to network design.',
+        ),
+      ),
+      LessonSection(
+        heading: 'What This Set of Lessons Covers',
+        bullets: [
+          'Ports and Protocols — the addressing layer every other control operates on top of',
+          'Firewalls — from basic packet filtering to modern NGFW, UTM, and cloud-based deployments',
+          'IDS/IPS — detecting and actively blocking malicious traffic',
+          'Network Appliances — load balancers, proxies, jump servers, and sensors',
+          'Port Security — securing the physical and logical network edge',
+          'Securing Network Communications — VPN, TLS, and IPsec protecting data in transit',
+          'SD-WAN and SASE — the modern, cloud-native evolution of enterprise connectivity and security',
+          'Selecting Infrastructure Controls — a risk-based methodology for choosing what to actually deploy',
+        ],
+      ),
+      LessonSection(
+        heading: 'Why This Matters Beyond Individual Components',
+        body:
+            'None of the specific technologies covered in the lessons '
+            'ahead matter in isolation — a firewall without a '
+            'segmentation strategy behind it, or a VPN without an '
+            'understanding of what it does and doesn\'t protect, '
+            'provides far less real security than the same components '
+            'deployed as part of a deliberate, layered architecture. '
+            'This module builds that architectural thinking directly on '
+            'top of the individual technologies.',
+      ),
+    ],
+  ),
+
+  // 9c -----------------------------------------------------------------
+  Lesson(
+    title: 'Ports and Protocols',
+    difficulty: LessonDifficulty.intermediate,
+    estimatedMinutes: 10,
+    sections: [
+      LessonSection(
+        heading: 'A Refresher, With Enterprise Depth Added',
+        body:
+            'The Networking module already introduced ports as the '
+            'numbered doors services listen on. This lesson adds the '
+            'enterprise-level detail needed to actually design and '
+            'audit firewall rules around them.',
+      ),
+      LessonSection(
+        heading: 'Inbound vs. Outbound Traffic',
+        body:
+            'Inbound traffic originates outside a network boundary and '
+            'attempts to enter — a client connecting to your web server. '
+            'Outbound traffic originates inside the boundary and '
+            'attempts to leave — your web server connecting out to a '
+            'software update server. Firewall rules almost always treat '
+            'these directions differently: inbound traffic is typically '
+            'far more restricted by default, since it represents '
+            'someone external initiating contact, while outbound '
+            'traffic often has broader default allowances, though '
+            'increasingly, restricting outbound traffic too (to prevent '
+            'data exfiltration or C2 callbacks) is considered a security '
+            'best practice.',
+      ),
+      LessonSection(
+        heading: 'The Three Port Ranges',
+        bullets: [
+          'Well-known ports (0–1023) — reserved for widely used, standardized services like HTTP (80) and SSH (22); require elevated privileges to bind to on most operating systems',
+          'Registered ports (1024–49151) — assigned to specific applications by IANA on request, but not requiring the same strict standardization as well-known ports',
+          'Dynamic/private ports (49152–65535) — used temporarily by client applications for outbound connections, and by systems like NAT to track individual sessions; never permanently assigned to a specific service',
+        ],
+      ),
+      LessonSection(
+        heading: 'Key Ports Worth Memorizing',
+        bullets: [
+          'HTTP — port 80, unencrypted web traffic',
+          'HTTPS — port 443, encrypted web traffic protected by TLS',
+          'SSH — port 22, encrypted remote administration',
+          'DNS — port 53, domain name resolution (both UDP and TCP)',
+          'SMTP — port 25 (server-to-server) and 587 (client submission), outgoing email',
+          'SQL (Microsoft SQL Server) — port 1433; other databases use their own defaults (MySQL 3306, PostgreSQL 5432)',
+          'RDP — port 3389, Windows Remote Desktop Protocol — one of the most heavily targeted ports when directly exposed to the internet',
+        ],
+      ),
+      LessonSection(
+        heading: 'Applying This to Firewall Rule Design',
+        body:
+            'Effective firewall rules are written with specific ports, '
+            'directions, and source/destination ranges in mind, not '
+            'broad blanket allowances. A rule permitting inbound TCP on '
+            'port 443 from anywhere, to a specific web server, is far '
+            'more defensible and auditable than a rule permitting all '
+            'inbound traffic to that same server — the same deny-by-'
+            'default, explicitly-allow-what\'s-needed principle from the '
+            'Networking module, applied with the specific port knowledge '
+            'from this lesson.',
+      ),
+    ],
+  ),
+
+  // 9d -----------------------------------------------------------------
+  Lesson(
+    title: 'Firewalls',
+    difficulty: LessonDifficulty.advanced,
+    estimatedMinutes: 11,
+    sections: [
+      LessonSection(
+        heading: 'The Full Firewall Family',
+        bullets: [
+          'Packet-filtering firewall — inspects individual packets against simple rules (source, destination, port); no awareness of connection state',
+          'Stateful firewall — tracks the state of active connections, correctly allowing return traffic for legitimately established sessions',
+          'Proxy firewall — intercepts and fully terminates connections on behalf of internal clients, inspecting content before forwarding a brand-new connection to the actual destination',
+          'Kernel proxy firewall — operates at the OS kernel level for maximum performance while retaining proxy-level inspection depth',
+          'Next-Generation Firewall (NGFW) — combines stateful filtering with application-layer inspection, intrusion prevention, and threat intelligence',
+          'Unified Threat Management (UTM) — bundles firewall, antivirus, IPS, and content filtering into one consolidated appliance, typically aimed at smaller organizations wanting one device rather than several',
+          'Web Application Firewall (WAF) — purpose-built to protect HTTP/S traffic specifically from application-layer attacks like SQL injection and XSS',
+        ],
+      ),
+      LessonSection(
+        heading: 'Screened Subnets and Dual-Homed Hosts',
+        body:
+            'A screened subnet (the modern term for what was once called '
+            'a DMZ) places public-facing servers in an isolated network '
+            'segment protected by firewalls on both sides — one facing '
+            'the internet, one facing the internal network. A dual-'
+            'homed host is a single system with two separate network '
+            'interfaces, each connected to a different network segment, '
+            'historically used as a simple gateway between trusted and '
+            'untrusted networks before more sophisticated firewall '
+            'appliances became standard.',
+      ),
+      LessonSection(
+        heading: 'Cloud-Based Firewalls',
+        body:
+            'Rather than a physical appliance, a cloud-based firewall '
+            '(sometimes called Firewall-as-a-Service) runs as a managed '
+            'cloud service, filtering traffic before it ever reaches an '
+            'organization\'s actual cloud workloads or on-premises '
+            'network. This model scales elastically with demand without '
+            'needing to provision physical hardware, and fits naturally '
+            'into cloud-native and hybrid architectures where traffic no '
+            'longer flows through one predictable physical location.',
+      ),
+      LessonSection(
+        heading: 'Which Firewall Type Is Actually Recommended?',
+        body:
+            'For most modern enterprise environments, an NGFW is the '
+            'generally recommended baseline — it provides application-'
+            'layer awareness and integrated threat intelligence that '
+            'basic stateful filtering alone cannot. A WAF should '
+            'specifically supplement an NGFW wherever web applications '
+            'are exposed, since NGFWs are not purpose-built for deep '
+            'HTTP content inspection the way a WAF is. Smaller '
+            'organizations with limited IT staff often find a UTM\'s '
+            'consolidated management genuinely valuable despite its '
+            'trade-offs, since it dramatically reduces the number of '
+            'separate systems that need configuring and maintaining.',
+      ),
+      LessonSection(
+        heading: 'A Real-World Example',
+        body:
+            'An e-commerce company deploys an NGFW at its network '
+            'perimeter to inspect and filter general traffic, adds a WAF '
+            'specifically in front of its public checkout application to '
+            'catch SQL injection attempts targeting its payment form, '
+            'and additionally uses a cloud-based firewall to protect its '
+            'workloads running in a public cloud environment that '
+            'traditional on-premises hardware could never see. Each '
+            'firewall type addresses a distinct part of the '
+            'organization\'s actual attack surface rather than any one '
+            'device trying to cover everything.',
+      ),
+    ],
+  ),
+
+  // 9e -----------------------------------------------------------------
+  Lesson(
+    title: 'IDS and IPS',
+    difficulty: LessonDifficulty.advanced,
+    estimatedMinutes: 10,
+    sections: [
+      LessonSection(
+        heading: 'The Core Difference, in Table Form',
+        body:
+            'IDS (Intrusion Detection System) and IPS (Intrusion '
+            'Prevention System) are often confused, but the distinction '
+            'is straightforward once laid out directly.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(type: DiagramType.idsIpsTable),
+      ),
+      LessonSection(
+        heading: 'Network-Based (NIDS/NIPS)',
+        body:
+            'Monitors traffic across an entire network segment, '
+            'typically deployed at a strategic chokepoint like a network '
+            'tap or a switch\'s mirrored port, giving visibility across '
+            'many devices simultaneously from a single deployment point.',
+      ),
+      LessonSection(
+        heading: 'Host-Based (HIDS/HIPS)',
+        body:
+            'Runs directly on an individual endpoint, monitoring that '
+            'specific system\'s activity — file changes, process '
+            'execution, system calls — with visibility into behavior a '
+            'network-based system positioned outside that host could '
+            'never see, such as what\'s actually happening inside an '
+            'encrypted connection once it\'s been decrypted on the '
+            'endpoint itself.',
+      ),
+      LessonSection(
+        heading: 'Wireless (WIDS/WIPS)',
+        body:
+            'Specifically monitors wireless traffic and the RF spectrum '
+            'for threats unique to Wi-Fi — rogue access points, Evil '
+            'Twin attacks (covered in the Networking module), and '
+            'unauthorized wireless devices attempting to join a network.',
+      ),
+      LessonSection(
+        heading: 'A Real-World Example',
+        body:
+            'A NIPS deployed at the network perimeter detects and '
+            'automatically blocks a known SQL injection pattern targeting '
+            'a public web application before it ever reaches the '
+            'application server. Simultaneously, a HIDS running on that '
+            'same application server notices an unexpected new process '
+            'spawned by the web server software — a pattern consistent '
+            'with successful exploitation — and generates an alert for a '
+            'SOC analyst to investigate immediately, even though the '
+            'NIPS had already blocked the network-level attack pattern '
+            'it recognized. The two systems provide complementary '
+            'visibility: one blocking what it recognizes at the network '
+            'level, the other watching for the consequences on the '
+            'endpoint itself in case something gets through.',
+      ),
+    ],
+  ),
+
+  // 9f -----------------------------------------------------------------
+  Lesson(
+    title: 'Network Appliances',
+    difficulty: LessonDifficulty.advanced,
+    estimatedMinutes: 10,
+    sections: [
+      LessonSection(
+        heading: 'Beyond Firewalls and IDS/IPS',
+        body:
+            'A modern network relies on several other specialized '
+            'appliances, each solving a specific problem — distributing '
+            'load, monitoring traffic, or providing controlled '
+            'administrative access — available as dedicated hardware, '
+            'installable software, or fully managed cloud services.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(type: DiagramType.networkAppliancesTable),
+      ),
+      LessonSection(
+        heading: 'Load Balancers',
+        body:
+            'Distribute incoming traffic across multiple backend '
+            'servers, improving both performance and availability since '
+            'traffic automatically shifts away from any server that '
+            'becomes unavailable. Real-world use: an e-commerce site '
+            'runs ten identical web servers behind a load balancer, '
+            'so a sudden traffic spike during a sale, or the failure of '
+            'any single server, doesn\'t take the site down entirely.',
+      ),
+      LessonSection(
+        heading: 'Proxy Servers',
+        body:
+            'As covered in the Networking module, forward proxies sit '
+            'between internal clients and the internet (content '
+            'filtering, caching), while reverse proxies sit in front of '
+            'internal servers (load balancing, hiding internal server '
+            'details from the outside world). Real-world use: a company '
+            'uses a forward proxy to enforce content filtering policy '
+            'and cache frequently accessed external resources, reducing '
+            'both risk and bandwidth costs.',
+      ),
+      LessonSection(
+        heading: 'Sensors',
+        body:
+            'Dedicated devices or software agents specifically deployed '
+            'to passively monitor traffic and feed data to a SIEM or '
+            'IDS/IPS platform, without themselves making active blocking '
+            'decisions. Real-world use: network sensors placed at every '
+            'major network segment boundary feed traffic metadata '
+            'continuously into a central SIEM, providing the visibility '
+            'the SOC actually depends on for correlation and detection.',
+      ),
+      LessonSection(
+        heading: 'Jump Servers',
+        body:
+            'A jump server (or bastion host) is a hardened, tightly '
+            'monitored intermediary system that administrators must '
+            'connect through before reaching more sensitive internal '
+            'systems — rather than connecting directly from their own '
+            'workstation to a production database server, for example, '
+            'they connect first to the jump server, which then connects '
+            'onward. Real-world use: all administrative access to '
+            'production database servers is required to route through a '
+            'jump server, which logs every session in full for later '
+            'audit and centralizes exactly where sensitive administrative '
+            'credentials are ever actually used.',
+      ),
+      LessonSection(
+        heading: 'The Shared Advantage: Centralized Control Points',
+        body:
+            'Every appliance in this lesson shares a common strategic '
+            'value beyond its specific function: each one creates a '
+            'centralized point where traffic, access, or monitoring can '
+            'be controlled and audited, rather than that responsibility '
+            'being scattered unpredictably across every individual '
+            'server or client throughout the network.',
+      ),
+    ],
+  ),
+
+  // 9g -----------------------------------------------------------------
+  Lesson(
+    title: 'Port Security',
+    difficulty: LessonDifficulty.advanced,
+    estimatedMinutes: 10,
+    sections: [
+      LessonSection(
+        heading: 'Why Physical and Logical Ports Need Their Own Security',
+        body:
+            'Every switch port and network jack is a potential entry '
+            'point — plugging an unauthorized device into an open port '
+            'in an empty conference room could grant network access as '
+            'easily as any remote attack. Port security specifically '
+            'addresses this physical and logical access layer.',
+      ),
+      LessonSection(
+        heading: 'Advantages of Port Security',
+        bullets: [
+          'Prevents unauthorized devices from simply plugging in and gaining network access',
+          'Limits MAC flooding attacks, where an attacker overwhelms a switch\'s MAC address table to force it into broadcasting all traffic to every port, defeating normal switch traffic isolation',
+          'Provides an audit trail of exactly which device, identified by MAC address, connected to which physical port and when',
+        ],
+      ),
+      LessonSection(
+        heading: 'Disadvantages and Trade-offs',
+        bullets: [
+          'Adds real administrative overhead — legitimate new devices need to be explicitly authorized rather than simply plugging in and working immediately',
+          'Can disrupt legitimate business operations if misconfigured, such as blocking a legitimate replacement device with a new MAC address',
+          'MAC addresses can be spoofed by a sufficiently determined attacker, so port security alone is not a complete access control solution',
+        ],
+      ),
+      LessonSection(
+        heading: 'Sticky MAC Learning',
+        body:
+            'Rather than manually configuring every permitted MAC '
+            'address on every port individually, sticky MAC learning '
+            'lets a switch port automatically learn and lock onto the '
+            'first MAC address it sees, then refuse any other device '
+            'attempting to connect through that same port afterward — '
+            'combining ease of initial setup with genuine ongoing '
+            'restriction.',
+      ),
+      LessonSection(
+        heading: '802.1X: Authentication at the Network Edge',
+        body:
+            'Port security based purely on MAC addresses is limited '
+            'since MAC addresses can be spoofed. 802.1X goes further, '
+            'requiring genuine authentication before a device is granted '
+            'any network access at all, using the Extensible '
+            'Authentication Protocol (EAP) to carry the actual '
+            'credential exchange between the connecting device (the '
+            'supplicant) and a switch or access point (the authenticator).',
+      ),
+      LessonSection(
+        heading: 'RADIUS and TACACS+',
+        body:
+            'The switch or access point doesn\'t verify credentials '
+            'itself — it forwards the authentication request to a '
+            'centralized server. RADIUS is the most widely used protocol '
+            'for this, both for network access (802.1X) and VPN '
+            'authentication. TACACS+ is a similar but more granular '
+            'alternative, more commonly used specifically for '
+            'authenticating administrative access to network devices '
+            'themselves (like router and switch command-line access), '
+            'since it separates authentication, authorization, and '
+            'accounting more distinctly than RADIUS does.',
+      ),
+      LessonSection(
+        heading: 'How This Helps in Practice',
+        body:
+            'Combining sticky MAC learning with 802.1X authentication '
+            'means a device must both connect to a port already learned '
+            'or explicitly authorized, and successfully authenticate a '
+            'real user or device credential through a centralized RADIUS '
+            'server, before any meaningful network access is granted at '
+            'all — directly applying the least-privilege and Zero Trust '
+            'principles from earlier in this course to the physical '
+            'network edge itself.',
+      ),
+    ],
+  ),
+
+  // 9h -----------------------------------------------------------------
+  Lesson(
+    title: 'Securing Network Communications',
+    difficulty: LessonDifficulty.advanced,
+    estimatedMinutes: 11,
+    sections: [
+      LessonSection(
+        heading: 'Protecting Data as It Crosses Untrusted Networks',
+        body:
+            'Once data leaves a trusted, controlled network, it '
+            'needs protection independent of whatever network it '
+            'happens to be crossing. VPNs, TLS, and IPsec are the three '
+            'primary tools for this, each solving overlapping but '
+            'distinct parts of the problem.',
+      ),
+      LessonSection(
+        heading: 'Site-to-Site, Client-to-Site, and Clientless VPNs',
+        bullets: [
+          'Site-to-site VPN — connects two entire networks together permanently, such as a company\'s headquarters and a branch office, so devices on both sides communicate as if on one shared network',
+          'Client-to-site VPN — connects an individual remote device to a corporate network, requiring VPN client software installed on that device; the most common model for remote employees',
+          'Clientless VPN — provides secure access to specific web-based applications through an ordinary browser, without requiring any dedicated VPN client software to be installed at all, at the cost of typically supporting only browser-accessible resources rather than full network access',
+        ],
+      ),
+      LessonSection(
+        heading: 'TLS and DTLS',
+        body:
+            'TLS, covered in depth in the Networking module, secures '
+            'connection-oriented (TCP-based) traffic. DTLS (Datagram '
+            'TLS) provides the equivalent protection for connectionless '
+            'UDP-based traffic — used by some VPN implementations and '
+            'real-time applications like voice and video where TCP\'s '
+            'overhead would be counterproductive.',
+      ),
+      LessonSection(
+        heading: 'IPsec Modes: Transport and Tunnel',
+        bullets: [
+          'Transport mode — encrypts only the payload of each IP packet, leaving the original header intact; typically used for direct end-to-end communication between two specific hosts',
+          'Tunnel mode — encrypts the entire original IP packet, including its header, then wraps it in a completely new packet; the standard mode for site-to-site VPNs, since it fully protects the original routing information as well as the payload',
+        ],
+      ),
+      LessonSection(
+        heading: 'AH and ESP',
+        bullets: [
+          'AH (Authentication Header) — provides authentication and integrity for a packet, but no confidentiality (no actual encryption of the payload)',
+          'ESP (Encapsulating Security Payload) — provides confidentiality (encryption) along with authentication and integrity; the far more commonly used option in practice, since most real deployments need actual encryption, not just authentication',
+        ],
+      ),
+      LessonSection(
+        heading: 'A Real-World Example',
+        body:
+            'A company connects its headquarters to a branch office '
+            'using a site-to-site IPsec VPN in tunnel mode with ESP, '
+            'fully encrypting all traffic between locations across the '
+            'public internet. Remote employees working from home '
+            'connect individually using client-to-site VPN software '
+            'that establishes a TLS-based tunnel to the same corporate '
+            'network. A contractor who only needs access to one specific '
+            'internal web application, and shouldn\'t have broader '
+            'network access at all, is instead given a clientless VPN '
+            'link that provides exactly that one application through '
+            'their browser and nothing more — three different '
+            'connectivity needs, each matched to the VPN model that '
+            'actually fits it.',
+      ),
+    ],
+  ),
+
+  // 9i -----------------------------------------------------------------
+  Lesson(
+    title: 'SD-WAN and SASE',
+    difficulty: LessonDifficulty.expert,
+    estimatedMinutes: 10,
+    sections: [
+      LessonSection(
+        heading: 'SD-WAN: Software-Defined Wide Area Networking',
+        body:
+            'Traditional WAN connections between office locations relied '
+            'on dedicated, expensive private circuits configured largely '
+            'by hand. SD-WAN instead uses software-defined, centrally '
+            'managed control over multiple types of network transport '
+            'simultaneously — broadband internet, LTE/5G, and traditional '
+            'private circuits — intelligently routing traffic across '
+            'whichever available path best fits each application\'s '
+            'actual needs in real time.',
+      ),
+      LessonSection(
+        heading: 'SASE: Secure Access Service Edge',
+        body:
+            'SASE combines SD-WAN\'s networking capabilities with a full '
+            'suite of integrated security services — including a cloud-'
+            'delivered firewall, secure web gateway, CASB, and Zero '
+            'Trust network access — all delivered as one unified, '
+            'cloud-native platform rather than a collection of separate '
+            'point products each requiring their own management.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.processFlow,
+          steps: ['Distributed Users', 'SASE Cloud Edge', 'Policy Enforcement', 'Secure App Access'],
+          caption:
+              'Rather than routing all traffic back through a central '
+              'data center, SASE enforces consistent policy at cloud '
+              'points of presence close to wherever users actually are.',
+        ),
+      ),
+      LessonSection(
+        heading: 'Why This Model Emerged',
+        body:
+            'As covered in the Zero Trust lesson earlier in this module, '
+            'the traditional model of routing all traffic back through '
+            'a central corporate data center for inspection made '
+            'increasingly little sense once users, applications, and '
+            'data all became distributed across the cloud and remote '
+            'locations. SASE brings security enforcement to wherever '
+            'users and applications actually are, rather than forcing '
+            'traffic to make an inefficient, latency-adding detour '
+            'through a legacy central location purely for a security '
+            'check.',
+      ),
+      LessonSection(
+        heading: 'A Real-World Use Case',
+        body:
+            'A company with offices across a dozen countries, a fully '
+            'remote workforce, and applications split between two '
+            'different cloud providers replaces its aging system of '
+            'individual site-to-site VPNs and a single central firewall '
+            'with a SASE platform. Every user, whether in an office or '
+            'working remotely, connects to the nearest SASE cloud edge '
+            'location, which enforces identical Zero Trust security '
+            'policy regardless of location before granting access to '
+            'any application — with dramatically simplified management '
+            'compared to maintaining dozens of separate VPN tunnels and '
+            'firewall configurations across every location individually.',
+      ),
+    ],
+  ),
+
+  // 9j -----------------------------------------------------------------
+  Lesson(
+    title: 'Selecting Infrastructure Controls',
+    difficulty: LessonDifficulty.expert,
+    estimatedMinutes: 9,
+    sections: [
+      LessonSection(
+        heading: 'A Risk-Based Methodology, Not a Shopping List',
+        body:
+            'With so many infrastructure technologies covered across '
+            'this set of lessons, the practical challenge shifts from '
+            '"what exists" to "what should we actually deploy, and in '
+            'what order?" The right approach starts from the risk '
+            'management process covered in the Fundamentals module: '
+            'identify actual vulnerabilities and realistic threats '
+            'specific to your environment, then select controls that '
+            'directly address the highest-priority gaps, rather than '
+            'deploying every available technology regardless of actual '
+            'need.',
+      ),
+      LessonSection(
+        heading: 'Guiding Principles Revisited',
+        bullets: [
+          'Least privilege — every control should grant the minimum access genuinely required, whether that\'s a firewall rule, a jump server policy, or 802.1X network access',
+          'Defense in depth — no single infrastructure control should be treated as sufficient alone; layer complementary controls (firewall + IDS/IPS + segmentation) so any one failure is caught by another',
+          'Lifecycle management — every control needs ongoing patching, configuration review, and eventual replacement as it ages or as better options emerge, not a one-time deployment treated as permanently finished',
+          'Open design — security should not depend on attackers remaining unaware of how a system works (security through obscurity); a well-designed control remains effective even if its general design is publicly known, relying instead on properly protected keys, credentials, and configuration',
+        ],
+      ),
+      LessonSection(
+        heading: 'Leaning on Established Frameworks',
+        body:
+            'Rather than developing a control selection methodology '
+            'entirely from scratch, mature organizations lean on '
+            'established, vendor-neutral frameworks already introduced '
+            'in the GRC lesson earlier in this module — the NIST '
+            'Cybersecurity Framework and ISO/IEC 27001 both provide '
+            'structured guidance for exactly this kind of risk-based '
+            'control selection, helping ensure a control decision made '
+            'in one part of the organization stays consistent with the '
+            'broader security program rather than being made in '
+            'isolation.',
+      ),
+      LessonSection(
+        heading: 'Putting It All Together',
+        body:
+            'A practical infrastructure control selection process asks, '
+            'for every candidate control: what specific risk does this '
+            'address, does it follow least privilege and fit into the '
+            'existing defense-in-depth architecture, who will own its '
+            'ongoing lifecycle, and does it rely on any hidden or '
+            'obscure implementation detail that would make it fragile '
+            'once understood by an attacker? Answering these '
+            'consistently, across every infrastructure decision, is what '
+            'turns the individual technologies covered in this set of '
+            'lessons — firewalls, IDS/IPS, VPNs, SASE — into an '
+            'actual coherent architecture rather than an unconnected '
+            'collection of point products.',
+      ),
+    ],
+  ),
+
+  // 9k --------------------------------------------------------- Quiz
+  Lesson(
+    title: 'Security Infrastructure Practice Quiz',
+    difficulty: LessonDifficulty.expert,
+    estimatedMinutes: 15,
+    quiz: [
+      QuizQuestion(
+        question: 'Which port range includes HTTP (80) and SSH (22)?',
+        options: ['Well-known ports (0-1023)', 'Registered ports (1024-49151)', 'Dynamic ports (49152-65535)', 'None of these'],
+        correctIndex: 0,
+        explanation: 'Well-known ports (0-1023) are reserved for widely standardized services like HTTP and SSH.',
+      ),
+      QuizQuestion(
+        question: 'Dynamic/private ports are primarily used for:',
+        options: [
+          'Permanently assigned enterprise services',
+          'Temporary client-side connections and NAT session tracking',
+          'DNS resolution only',
+          'Root-level system services',
+        ],
+        correctIndex: 1,
+        explanation: 'Dynamic ports are used temporarily by client applications and NAT, never permanently assigned to a specific service.',
+      ),
+      QuizQuestion(
+        question: 'A stateful firewall differs from a basic packet-filtering firewall because it:',
+        options: [
+          'Cannot inspect any traffic',
+          'Tracks the state of active connections, correctly allowing return traffic for established sessions',
+          'Only works with UDP traffic',
+          'Requires no configuration at all',
+        ],
+        correctIndex: 1,
+        explanation: 'Stateful firewalls track connection state; packet filters only look at individual packets in isolation.',
+      ),
+      QuizQuestion(
+        question: 'Which firewall type is purpose-built to protect HTTP/S traffic from SQL injection and XSS?',
+        options: ['UTM', 'WAF', 'Proxy firewall', 'Kernel proxy firewall'],
+        correctIndex: 1,
+        explanation: 'A Web Application Firewall (WAF) is specifically designed to inspect and protect HTTP/S application-layer traffic.',
+      ),
+      QuizQuestion(
+        question: 'What is a key advantage of a cloud-based firewall over a traditional physical appliance?',
+        options: [
+          'It requires no configuration',
+          'It scales elastically with demand and fits cloud-native architectures without provisioning hardware',
+          'It cannot be bypassed under any circumstances',
+          'It is always free to use',
+        ],
+        correctIndex: 1,
+        explanation: 'Cloud-based firewalls scale on demand and fit naturally into cloud and hybrid environments.',
+      ),
+      QuizQuestion(
+        question: 'The key difference between IDS and IPS is that IPS:',
+        options: [
+          'Only works on wireless networks',
+          'Sits inline with traffic and actively blocks threats, while IDS only monitors and alerts',
+          'Cannot generate any alerts',
+          'Is always more accurate than IDS',
+        ],
+        correctIndex: 1,
+        explanation: 'IPS is inline and can actively block traffic; IDS is out-of-band and only alerts.',
+      ),
+      QuizQuestion(
+        question: 'A HIDS has visibility that a NIDS positioned outside a host typically lacks because:',
+        options: [
+          'HIDS is always faster',
+          'HIDS runs directly on the endpoint and can see file changes, process execution, and decrypted activity on that specific host',
+          'NIDS cannot process any traffic at all',
+          'HIDS does not require any configuration',
+        ],
+        correctIndex: 1,
+        explanation: 'Host-based systems see endpoint-level activity, including content after decryption, that network-based systems positioned outside cannot observe.',
+      ),
+      QuizQuestion(
+        question: 'What is the primary purpose of a jump server?',
+        options: [
+          'To provide public internet access to employees',
+          'To act as a hardened, monitored intermediary that administrators must connect through before reaching sensitive internal systems',
+          'To replace the need for a firewall',
+          'To distribute load across web servers',
+        ],
+        correctIndex: 1,
+        explanation: 'Jump servers centralize and log administrative access to sensitive systems rather than allowing direct connections.',
+      ),
+      QuizQuestion(
+        question: 'Sticky MAC learning on a switch port:',
+        options: [
+          'Requires no configuration and blocks all devices permanently',
+          'Automatically learns and locks onto the first MAC address seen, refusing other devices afterward',
+          'Encrypts all traffic through that port',
+          'Only applies to wireless access points',
+        ],
+        correctIndex: 1,
+        explanation: 'Sticky MAC learning combines easy setup with genuine restriction by locking a port to the first learned MAC address.',
+      ),
+      QuizQuestion(
+        question: 'In 802.1X authentication, what role does RADIUS typically play?',
+        options: [
+          'It physically connects the network cable',
+          'It is the centralized server that verifies credentials on behalf of the switch or access point (the authenticator)',
+          'It replaces the need for EAP entirely',
+          'It only works with wireless networks',
+        ],
+        correctIndex: 1,
+        explanation: 'RADIUS centrally verifies credentials so the switch/AP itself does not need to store or check them directly.',
+      ),
+      QuizQuestion(
+        question: 'Which VPN model is best suited for a contractor who only needs access to one specific internal web application?',
+        options: ['Site-to-site VPN', 'Client-to-site VPN', 'Clientless VPN', 'IPsec transport mode'],
+        correctIndex: 2,
+        explanation: 'Clientless VPN provides browser-based access to specific applications without granting broader network access.',
+      ),
+      QuizQuestion(
+        question: 'IPsec tunnel mode differs from transport mode because tunnel mode:',
+        options: [
+          'Provides no encryption at all',
+          'Encrypts the entire original IP packet including its header, wrapping it in a new packet',
+          'Only works with TCP traffic',
+          'Cannot be used for site-to-site VPNs',
+        ],
+        correctIndex: 1,
+        explanation: 'Tunnel mode protects the entire original packet including header information, making it standard for site-to-site VPNs.',
+      ),
+      QuizQuestion(
+        question: 'What is the key difference between AH and ESP in IPsec?',
+        options: [
+          'AH provides encryption; ESP does not',
+          'ESP provides confidentiality (encryption) plus authentication and integrity; AH provides authentication and integrity only, no encryption',
+          'They are functionally identical',
+          'AH only works with IPv6',
+        ],
+        correctIndex: 1,
+        explanation: 'ESP is far more commonly used since most deployments need actual encryption, which AH alone does not provide.',
+      ),
+      QuizQuestion(
+        question: 'SASE combines SD-WAN networking capabilities with:',
+        options: [
+          'Nothing additional — SASE and SD-WAN are identical',
+          'A full suite of integrated cloud-delivered security services like firewall, secure web gateway, and Zero Trust network access',
+          'Only physical hardware appliances',
+          'A single antivirus product',
+        ],
+        correctIndex: 1,
+        explanation: 'SASE unifies SD-WAN networking with integrated security services delivered from the cloud.',
+      ),
+      QuizQuestion(
+        question: 'Why did the SASE model emerge as an alternative to routing all traffic through a central data center?',
+        options: [
+          'Central data centers are always more secure',
+          'Users, applications, and data became distributed across cloud and remote locations, making central routing inefficient and latency-adding',
+          'SASE is required by law in most countries',
+          'Central data centers cannot run firewalls',
+        ],
+        correctIndex: 1,
+        explanation: 'SASE brings security enforcement close to distributed users and applications rather than forcing an inefficient detour.',
+      ),
+      QuizQuestion(
+        question: 'The "open design" principle in infrastructure control selection means:',
+        options: [
+          'Security should depend on attackers never learning how a system works',
+          'A well-designed control remains effective even if its general design is publicly known, relying on protected keys and credentials rather than secrecy of design',
+          'All source code must be open source',
+          'Firewalls should never have any configuration',
+        ],
+        correctIndex: 1,
+        explanation: 'Open design rejects security through obscurity — genuine security should not depend on attackers staying unaware of how something works.',
+      ),
+    ],
+  ),
   // 10 -------------------------------------------------------- Assessment
   Lesson(
     title: 'Capstone Assessment',
