@@ -15,6 +15,8 @@ enum DiagramType {
   osiLayers,
   networkDevices,
   tlsHandshake,
+  threatActorSpectrum,
+  attackVectors,
 }
 
 class DiagramSpec {
@@ -58,6 +60,12 @@ class DiagramView extends StatelessWidget {
         break;
       case DiagramType.tlsHandshake:
         diagram = const TlsHandshakeDiagram();
+        break;
+      case DiagramType.threatActorSpectrum:
+        diagram = const ThreatActorSpectrumDiagram();
+        break;
+      case DiagramType.attackVectors:
+        diagram = const AttackVectorsDiagram();
         break;
       case DiagramType.processFlow:
         diagram = ProcessFlowDiagram(steps: spec.steps ?? const []);
@@ -720,6 +728,122 @@ class TlsHandshakeDiagram extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Threat Actor Spectrum — sophistication gradient from low to high
+// ═══════════════════════════════════════════════════════════════════════
+
+class ThreatActorSpectrumDiagram extends StatelessWidget {
+  const ThreatActorSpectrumDiagram({super.key});
+
+  static const actors = [
+    ('Unskilled Attacker', Color(0xFF66BB6A)),
+    ('Hacktivist', Color(0xFFAED581)),
+    ('Insider', Color(0xFFFFD54F)),
+    ('Organized Crime', Color(0xFFFF8A65)),
+    ('Nation-State', Color(0xFFE57373)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          height: 14,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            gradient: LinearGradient(
+              colors: actors.map((a) => a.$2).toList(),
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: const [
+            Text('Lower sophistication\n& resources',
+                style: TextStyle(fontSize: 10, color: Colors.grey)),
+            Text('Higher sophistication\n& resources',
+                textAlign: TextAlign.right,
+                style: TextStyle(fontSize: 10, color: Colors.grey)),
+          ],
+        ),
+        const SizedBox(height: 14),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.center,
+          children: [
+            for (final a in actors)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: a.$2.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: a.$2),
+                ),
+                child: Text(
+                  a.$1,
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: a.$2),
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Attack Vectors — 6 common vectors used to reach a target
+// ═══════════════════════════════════════════════════════════════════════
+
+class AttackVectorsDiagram extends StatelessWidget {
+  const AttackVectorsDiagram({super.key});
+
+  static const vectors = [
+    ('Messages', Icons.sms, Color(0xFF1565C0)),
+    ('Images', Icons.image, Color(0xFF6A1B9A)),
+    ('Files', Icons.insert_drive_file, Color(0xFFC62828)),
+    ('Voice Calls', Icons.phone, Color(0xFF2E7D32)),
+    ('Removable Devices', Icons.usb, Color(0xFFEF6C00)),
+    ('Unsecured Networks', Icons.wifi_off, Color(0xFF37474F)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      alignment: WrapAlignment.center,
+      children: [
+        for (final v in vectors)
+          Container(
+            width: 100,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: v.$3.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: v.$3.withValues(alpha: 0.3)),
+            ),
+            child: Column(
+              children: [
+                Icon(v.$2, color: v.$3, size: 22),
+                const SizedBox(height: 6),
+                Text(
+                  v.$1,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: v.$3),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

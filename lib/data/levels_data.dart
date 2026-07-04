@@ -3,6 +3,7 @@ import 'lesson_model.dart';
 import 'exam_model.dart';
 import 'domains_data.dart';
 import 'lessons/fundamentals_lessons.dart';
+import 'lessons/threat_actors_lessons.dart';
 import 'lessons/email_security_lessons.dart';
 import 'lessons/networking_lessons.dart';
 import 'lessons/windows_security_lessons.dart';
@@ -76,6 +77,13 @@ final List<Level> allLevels = [
         xpReward: 100,
         lessons: fundamentalsLessons,
         primaryDomainIndex: 0, // General Security Concepts
+      ),
+      Module(
+        title: 'Threat Actors',
+        icon: Icons.person_search,
+        xpReward: 110,
+        lessons: threatActorsLessons,
+        primaryDomainIndex: 1, // Threats, Vulnerabilities & Mitigations
       ),
       Module(
         title: 'Email Security',

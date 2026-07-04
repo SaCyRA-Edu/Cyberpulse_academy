@@ -18,6 +18,11 @@ const Map<String, _ModuleTheme> _moduleThemes = {
     Icons.security,
     Icons.shield,
   ),
+  'Threat Actors': _ModuleTheme(
+    [Color(0xFFB71C1C), Color(0xFFEF5350)],
+    Icons.person_search,
+    Icons.gps_fixed,
+  ),
   'Email Security': _ModuleTheme(
     [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
     Icons.email,
