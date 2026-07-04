@@ -708,6 +708,45 @@ const List<Lesson> networkingLessons = [
         ),
       ),
       LessonSection(
+        heading: 'The DNS Record Types You Need to Know',
+        body:
+            'DNS doesn\'t just store one type of information — a domain\'s '
+            'DNS configuration is really a small database of different '
+            'record types, each answering a different question. '
+            'Security professionals routinely inspect these records '
+            'directly (using tools like dig or nslookup) both to '
+            'understand how a domain is configured and to spot '
+            'suspicious changes.',
+        bullets: [
+          'A — maps a domain name to an IPv4 address; the most fundamental record type, this is what most "DNS lookups" are actually asking for',
+          'AAAA — the IPv6 equivalent of an A record, mapping a domain name to a 128-bit IPv6 address',
+          'CNAME (Canonical Name) — points one domain name to another domain name rather than directly to an IP address; commonly used so a subdomain like www.example.com can simply alias to example.com',
+          'MX (Mail Exchange) — specifies which mail servers are responsible for accepting email on behalf of a domain, along with a priority value used when multiple mail servers exist',
+          'TXT — holds arbitrary text data; this is the record type that actually carries SPF policies, DKIM public keys, and domain verification codes for services like Google Workspace',
+          'NS (Name Server) — identifies which authoritative name servers are responsible for a domain, forming the backbone of the DNS delegation hierarchy',
+          'SOA (Start of Authority) — contains administrative information about a zone: the primary name server, the domain administrator\'s contact, and timing values controlling how often secondary servers refresh their data',
+          'PTR (Pointer) — performs reverse DNS lookup, mapping an IP address back to a domain name; mail servers commonly check PTR records to help filter spam, since legitimate mail servers are expected to have one configured',
+          'SRV (Service) — specifies the hostname and port for a specific service, commonly used by protocols like SIP and by Microsoft services locating domain controllers',
+          'CAA (Certification Authority Authorization) — explicitly states which Certificate Authorities are allowed to issue TLS certificates for a domain, helping prevent an unauthorized CA from issuing a fraudulent certificate',
+        ],
+      ),
+      LessonSection(
+        heading: 'Reading a Real DNS Lookup',
+        body:
+            'Running "dig example.com MX" returns the mail exchange '
+            'records for that domain along with their priority values — '
+            'lower priority numbers are tried first. Running "dig '
+            'example.com TXT" reveals the SPF record you studied in the '
+            'Email Security module, visible as plain text starting with '
+            '"v=spf1". Learning to read these records directly, rather '
+            'than only through a GUI tool, is what lets you quickly '
+            'verify whether a domain\'s email authentication is actually '
+            'configured correctly, or investigate whether a suspicious '
+            'domain has recently changed its mail servers or '
+            'nameservers — both common indicators worth checking during '
+            'an investigation.',
+      ),
+      LessonSection(
         heading: 'DNS Cache Poisoning',
         body:
             'Because DNS responses are cached to improve performance, an '
@@ -1378,6 +1417,29 @@ const List<Lesson> networkingLessons = [
         ],
         correctIndex: 1,
         explanation: 'An organization needing slightly more than a Class C\'s 254 addresses had to take an entire Class B, wasting tens of thousands of addresses — CIDR fixed this.',
+      ),
+      QuizQuestion(
+        question: 'Which DNS record type maps a domain name directly to an IPv4 address?',
+        options: ['CNAME', 'MX', 'A', 'TXT'],
+        correctIndex: 2,
+        explanation: 'The A record is the fundamental record type mapping a domain name to an IPv4 address.',
+      ),
+      QuizQuestion(
+        question: 'Which DNS record type actually carries an SPF policy?',
+        options: ['MX', 'TXT', 'NS', 'SOA'],
+        correctIndex: 1,
+        explanation: 'SPF policies (along with DKIM keys and domain verification codes) are published as TXT records.',
+      ),
+      QuizQuestion(
+        question: 'A CAA record is used to:',
+        options: [
+          'Map an IP address back to a domain name',
+          'Specify which Certificate Authorities are allowed to issue TLS certificates for a domain',
+          'List the mail servers for a domain',
+          'Point one domain name to another domain name',
+        ],
+        correctIndex: 1,
+        explanation: 'CAA records restrict which CAs can legitimately issue certificates for a domain, helping prevent fraudulent certificate issuance.',
       ),
     ],
   ),
