@@ -416,6 +416,7 @@ const List<Lesson> windowsSecurityLessons = [
   // 11 ----------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
+    estimatedMinutes: 15,
     quiz: [
       QuizQuestion(
         question: 'What do Windows integrity levels prevent?',

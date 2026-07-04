@@ -35,6 +35,15 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  # Text-to-speech audio narration for lessons.
+  flutter_tts: ^4.2.0
+
+  # Persisted progress, notes, and exam scores.
+  shared_preferences: ^2.3.3
+
+  # Opens the device email client for the lesson feedback button.
+  url_launcher: ^6.3.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

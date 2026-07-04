@@ -386,6 +386,7 @@ const List<Lesson> linuxSecurityLessons = [
 
   Lesson(
     title: 'Practice Quiz',
+    estimatedMinutes: 15,
     quiz: [
       QuizQuestion(
         question: 'What does the SUID bit on an executable do?',

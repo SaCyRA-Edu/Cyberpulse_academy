@@ -1,4 +1,5 @@
 import '../lesson_model.dart';
+import '../../widgets/diagrams.dart';
 
 const List<Lesson> socOperationsLessons = [
   // 1 -- AUDIO -------------------------------------------------------------
@@ -315,6 +316,14 @@ const List<Lesson> socOperationsLessons = [
         ],
       ),
       LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.killChain,
+          caption:
+              'The seven stages of the Cyber Kill Chain — disrupting any '
+              'single stage can stop the entire attack.',
+        ),
+      ),
+      LessonSection(
         heading: 'Limitations',
         body:
             'The Kill Chain was designed around external network-based '
@@ -395,6 +404,7 @@ const List<Lesson> socOperationsLessons = [
 
   Lesson(
     title: 'Practice Quiz',
+    estimatedMinutes: 15,
     quiz: [
       QuizQuestion(
         question: 'What distinguishes MDR from a traditional MSSP?',

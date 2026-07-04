@@ -1,4 +1,5 @@
 import '../lesson_model.dart';
+import '../../widgets/diagrams.dart';
 
 const List<Lesson> capstoneLessons = [
   // 1 -- AUDIO -------------------------------------------------------------
@@ -86,6 +87,14 @@ const List<Lesson> capstoneLessons = [
           'Data — encryption at rest, DLP, data classification',
           'Detection — SIEM, SOC, threat hunting, incident response',
         ],
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.defenseInDepth,
+          caption:
+              'Each layer assumes the one before it may fail — a breach '
+              'has to get through all of them to succeed.',
+        ),
       ),
       LessonSection(
         heading: 'Why Mature Organizations Think This Way',
@@ -355,6 +364,7 @@ const List<Lesson> capstoneLessons = [
 
   Lesson(
     title: 'Capstone Assessment',
+    estimatedMinutes: 15,
     quiz: [
       QuizQuestion(
         question: 'A web server compromised by an attacker cannot read /etc/passwd even running as root. What control is responsible?',

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'lesson_model.dart';
 import 'exam_model.dart';
+import 'domains_data.dart';
 import 'lessons/fundamentals_lessons.dart';
 import 'lessons/email_security_lessons.dart';
 import 'lessons/networking_lessons.dart';
@@ -19,12 +20,19 @@ class Module {
   final int xpReward;
   final List<Lesson> lessons;
 
+  /// Index into [securityPlusDomains] — the CompTIA Security+ domain this
+  /// module primarily reinforces.
+  final int primaryDomainIndex;
+
   const Module({
     required this.title,
     required this.icon,
     required this.xpReward,
     required this.lessons,
+    required this.primaryDomainIndex,
   });
+
+  SecurityDomain get primaryDomain => securityPlusDomains[primaryDomainIndex];
 
   int get lessonCount => lessons.length;
 }
@@ -67,12 +75,14 @@ final List<Level> allLevels = [
         icon: Icons.security,
         xpReward: 100,
         lessons: fundamentalsLessons,
+        primaryDomainIndex: 0, // General Security Concepts
       ),
       Module(
         title: 'Email Security',
         icon: Icons.email,
         xpReward: 100,
         lessons: emailSecurityLessons,
+        primaryDomainIndex: 1, // Threats, Vulnerabilities & Mitigations
       ),
     ],
     examBank: beginnerExamBank,
@@ -87,12 +97,14 @@ final List<Level> allLevels = [
         icon: Icons.router,
         xpReward: 130,
         lessons: networkingLessons,
+        primaryDomainIndex: 2, // Security Architecture
       ),
       Module(
         title: 'Windows Security',
         icon: Icons.desktop_windows,
         xpReward: 130,
         lessons: windowsSecurityLessons,
+        primaryDomainIndex: 2, // Security Architecture
       ),
     ],
     examBank: intermediateExamBank,
@@ -107,12 +119,14 @@ final List<Level> allLevels = [
         icon: Icons.terminal,
         xpReward: 160,
         lessons: linuxSecurityLessons,
+        primaryDomainIndex: 3, // Security Operations
       ),
       Module(
         title: 'SOC Operations',
         icon: Icons.visibility,
         xpReward: 160,
         lessons: socOperationsLessons,
+        primaryDomainIndex: 3, // Security Operations
       ),
     ],
     examBank: advancedExamBank,
@@ -130,6 +144,7 @@ final List<Level> allLevels = [
         icon: Icons.workspace_premium,
         xpReward: 250,
         lessons: capstoneLessons,
+        primaryDomainIndex: 4, // Security Program Management & Oversight
       ),
     ],
     examBank: expertExamBank,

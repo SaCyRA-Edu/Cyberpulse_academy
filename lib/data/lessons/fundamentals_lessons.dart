@@ -1,10 +1,12 @@
 import '../lesson_model.dart';
+import '../../widgets/diagrams.dart';
 
 const List<Lesson> fundamentalsLessons = [
   // 1 -- AUDIO -------------------------------------------------------------
   Lesson(
     title: 'Why Cybersecurity Matters Today',
     isAudio: true,
+    estimatedMinutes: 6,
     sections: [
       LessonSection(
         heading: 'Welcome to CyberPulse Academy',
@@ -64,35 +66,84 @@ const List<Lesson> fundamentalsLessons = [
   // 2 ----------------------------------------------------------------------
   Lesson(
     title: 'What is Cybersecurity?',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
         heading: 'A Working Definition',
         body:
             'Cybersecurity is the practice of protecting computers, '
             'networks, applications, and data from unauthorized access, '
-            'attacks, and damage. It combines technology, processes, and '
-            'people — all three matter equally.',
+            'attacks, and damage. That single sentence hides a lot of '
+            'complexity, so let\'s unpack it piece by piece. "Protecting" '
+            'implies an ongoing, active effort — not a one-time setup. '
+            '"Unauthorized access" covers everyone from a curious '
+            'ex-employee to a nation-state intelligence agency. And '
+            '"damage" isn\'t limited to stolen data — it includes downtime, '
+            'reputational harm, legal liability, and in some cases, '
+            'physical safety when the systems in question control '
+            'machinery, vehicles, or medical devices.',
       ),
       LessonSection(
-        heading: 'The Core Security Domains',
+        heading: 'Three Pillars: Technology, Process, People',
+        body:
+            'A common mistake — especially among people new to the field '
+            '— is to think of cybersecurity as purely a technology '
+            'problem: buy the right firewall, install the right antivirus, '
+            'and you\'re covered. In reality, effective security rests on '
+            'three equally important pillars working together.',
         bullets: [
-          'Network Security — protecting the pathways data travels through',
-          'Application Security — building software that resists abuse',
-          'Endpoint Security — securing laptops, phones, and servers',
-          'Identity & Access Management — controlling who can do what',
-          'Cloud Security — protecting data and services hosted off-premises',
-          'Security Operations — detecting and responding to incidents',
-          'Governance, Risk & Compliance — aligning security with business and legal requirements',
+          'Technology — the tools: firewalls, encryption, endpoint protection, monitoring systems',
+          'Process — the documented, repeatable steps people follow: how to onboard a new employee securely, how to respond to an incident, how to review access permissions',
+          'People — awareness, training, and judgment: recognizing a phishing email, following the process even when it\'s inconvenient, reporting something that looks wrong',
         ],
       ),
       LessonSection(
-        heading: 'Defense Requires All Three Pillars',
+        heading: 'Why All Three Must Work Together',
         body:
-            'Technology controls like firewalls and encryption can only '
-            'do so much. Processes — the documented steps people follow '
-            '— fill the gaps between tools. And people, through awareness '
-            'and training, remain both the most exploited weakness and the '
-            'most powerful last line of defense.',
+            'Consider what happens when just one pillar is weak. An '
+            'organization can have world-class technology — the latest '
+            'firewalls, cutting-edge threat detection — and still be '
+            'breached because an employee was tricked into handing over '
+            'their password. Conversely, a well-trained, security-conscious '
+            'workforce can still be compromised if the underlying '
+            'technology has an unpatched, well-known vulnerability that '
+            'nobody bothered to fix. Security is only as strong as its '
+            'weakest pillar, which is why mature security programs invest '
+            'in all three simultaneously rather than over-indexing on '
+            'whichever one is easiest to buy or measure.',
+      ),
+      LessonSection(
+        heading: 'The Core Security Domains',
+        body:
+            'Cybersecurity isn\'t one discipline — it\'s a collection of '
+            'specialized areas that overlap and depend on each other. As '
+            'you progress through this course, you\'ll notice that every '
+            'module maps to one or more of these domains:',
+        bullets: [
+          'Network Security — protecting the pathways data travels through, from your home Wi-Fi to a company\'s global backbone',
+          'Application Security — building and testing software so it resists abuse, from web apps to mobile apps to APIs',
+          'Endpoint Security — securing the actual devices people use: laptops, phones, servers, and increasingly, IoT devices',
+          'Identity & Access Management — controlling who can do what, and proving people are who they claim to be',
+          'Cloud Security — protecting data and services hosted on infrastructure you don\'t physically control',
+          'Security Operations — the ongoing work of detecting, investigating, and responding to threats in real time',
+          'Governance, Risk & Compliance — aligning security decisions with business priorities, legal obligations, and acceptable risk levels',
+        ],
+      ),
+      LessonSection(
+        heading: 'A Field That Never Stands Still',
+        body:
+            'One of the defining characteristics of cybersecurity as a '
+            'profession is that it never reaches a finished state. New '
+            'technologies create new attack surfaces — cloud computing, '
+            'mobile devices, AI systems, and IoT have each introduced '
+            'entirely new categories of risk that didn\'t exist a decade '
+            'earlier. At the same time, attackers continuously adapt their '
+            'techniques in response to new defenses. This dynamic is often '
+            'described as an arms race, and it\'s precisely why the '
+            'foundational concepts you\'ll learn in this course — the CIA '
+            'Triad, risk management, defense in depth — matter more than '
+            'memorizing today\'s specific tools. Concepts endure. Products '
+            'change constantly.',
       ),
     ],
   ),
@@ -100,57 +151,109 @@ const List<Lesson> fundamentalsLessons = [
   // 3 ----------------------------------------------------------------------
   Lesson(
     title: 'The CIA Triad: Confidentiality, Integrity & Availability',
+    estimatedMinutes: 10,
     sections: [
       LessonSection(
         heading: 'The Foundation of Every Security Decision',
         body:
-            'Almost every security control ever designed exists to protect '
-            'one or more of three properties. Together they form the CIA '
-            'Triad — the lens through which professionals analyze risk.',
+            'If you remember only one framework from this entire course, '
+            'make it this one. Almost every security control ever '
+            'designed — every firewall rule, every encryption scheme, '
+            'every backup policy — exists to protect one or more of three '
+            'properties. Together they form the CIA Triad, and it\'s the '
+            'lens through which security professionals analyze virtually '
+            'every situation they encounter.',
       ),
       LessonSection(
-        heading: 'Confidentiality',
+        diagram: DiagramSpec(
+          type: DiagramType.ciaTriad,
+          caption:
+              'The CIA Triad: every security control maps to protecting '
+              'one or more of these three properties.',
+        ),
+      ),
+      LessonSection(
+        heading: 'Confidentiality: Keeping Secrets Secret',
         body:
-            'Only authorized parties can access sensitive information. '
-            'A confidentiality failure means data reaches someone it '
-            'shouldn\'t — through a breach, an insecure email, or '
-            'overly broad access permissions.',
+            'Confidentiality means that only authorized people or systems '
+            'can access specific information. Think about a hospital\'s '
+            'patient records — a nurse treating that patient needs access, '
+            'but a hospital employee in an unrelated department should '
+            'not. When confidentiality fails, sensitive information ends '
+            'up in the hands of someone who was never meant to see it — '
+            'whether that\'s a curious insider, a hacker who breached a '
+            'database, or simply a misconfigured cloud storage bucket left '
+            'open to the public internet.',
         bullets: [
-          'Controls: encryption, access control lists, need-to-know policies',
-          'Failure example: a cloud storage bucket left publicly readable',
+          'Typical controls: encryption (both at rest and in transit), access control lists, need-to-know policies, data classification',
+          'Real-world failure example: a cloud storage bucket accidentally left with public read access, exposing millions of customer records to anyone who finds the link',
         ],
       ),
       LessonSection(
-        heading: 'Integrity',
+        heading: 'Integrity: Trusting That Data Hasn\'t Changed',
         body:
-            'Data is accurate and hasn\'t been altered without '
-            'authorization. An integrity failure means information was '
-            'modified — by an attacker, a buggy system, or an accident — '
-            'without anyone knowing.',
+            'Integrity means that data is accurate and has not been '
+            'altered without authorization — whether by a malicious '
+            'attacker, a software bug, or simple human error. Integrity is '
+            'what lets you trust that the balance shown in your bank '
+            'account actually reflects your transactions, or that the '
+            'software you downloaded is the exact same file the vendor '
+            'published, not a tampered copy carrying malware.',
         bullets: [
-          'Controls: cryptographic hashing, digital signatures, audit logs',
-          'Failure example: malware silently changing a financial transaction',
+          'Typical controls: cryptographic hashing, digital signatures, version control systems, detailed audit logs',
+          'Real-world failure example: an attacker gains access to a company\'s payment system and quietly modifies the destination account number on outgoing wire transfers',
         ],
       ),
       LessonSection(
-        heading: 'Availability',
+        heading: 'Availability: Being There When Needed',
         body:
-            'Systems and data are accessible to authorized users when '
-            'needed. An availability failure means legitimate users are '
-            'blocked — whether by a DDoS attack, hardware failure, or '
-            'ransomware.',
+            'Availability means that systems and data are accessible to '
+            'authorized users whenever they are needed. This is often the '
+            'least glamorous of the three properties, but it can also be '
+            'the most immediately damaging when it fails — imagine an '
+            'e-commerce site that goes down during its biggest sales event '
+            'of the year, or a hospital\'s electronic health record system '
+            'becoming unreachable in the middle of a medical emergency.',
         bullets: [
-          'Controls: redundancy, load balancing, backups, DDoS mitigation',
-          'Failure example: hospital records system taken offline during a shift',
+          'Typical controls: redundant infrastructure, load balancing, regular backups, DDoS mitigation services',
+          'Real-world failure example: a ransomware attack encrypts every file on a hospital\'s network, forcing staff back onto pen and paper for patient records',
         ],
       ),
       LessonSection(
-        heading: 'Trade-offs Are Unavoidable',
+        heading: 'The Triad Involves Constant Trade-offs',
         body:
-            'Making data highly available often increases its exposure. '
-            'Locking it down tightly can hurt usability. Good security '
-            'design balances all three properties based on the actual '
-            'sensitivity and criticality of the system.',
+            'In an ideal world you\'d maximize all three properties '
+            'simultaneously, but in practice, security design is full of '
+            'trade-offs between them. Locking data down with extremely '
+            'strict access controls can protect confidentiality but hurt '
+            'availability if legitimate users are constantly blocked or '
+            'slowed down. Making a system highly redundant and always-on '
+            'to maximize availability can create more potential entry '
+            'points for an attacker, increasing confidentiality risk. '
+            'There is no universal "correct" balance — the right trade-off '
+            'depends entirely on what the specific system and data '
+            'actually need. A public marketing website prioritizes '
+            'availability above all else. A database of unreleased '
+            'financial results prioritizes confidentiality far more '
+            'heavily. Learning to recognize which property matters most '
+            'in a given context is a skill that separates junior '
+            'practitioners from experienced ones.',
+      ),
+      LessonSection(
+        heading: 'Using the Triad to Analyze Any Security Story',
+        body:
+            'A useful habit to build starting today: whenever you read '
+            'about a security incident in the news, ask yourself which '
+            'part (or parts) of the CIA Triad actually failed. Was data '
+            'stolen (confidentiality)? Was it altered (integrity)? Was a '
+            'service knocked offline (availability)? Sometimes an '
+            'incident involves more than one — a ransomware attack, for '
+            'example, typically threatens both availability (files are '
+            'encrypted and inaccessible) and confidentiality (many '
+            'ransomware groups also steal data before encrypting it, '
+            'threatening to publish it for extra leverage). Practicing '
+            'this kind of analysis will sharpen your instincts far faster '
+            'than memorizing definitions alone.',
       ),
     ],
   ),
@@ -158,33 +261,75 @@ const List<Lesson> fundamentalsLessons = [
   // 4 ----------------------------------------------------------------------
   Lesson(
     title: 'Threats, Vulnerabilities & Risk',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
-        heading: 'Three Distinct Concepts',
+        heading: 'Three Distinct Concepts People Often Confuse',
+        body:
+            'These three words get used loosely in everyday conversation, '
+            'but in security they have precise, distinct meanings that '
+            'matter enormously for how you think about defense.',
         bullets: [
-          'Threat — anything that could cause harm: an attacker, a flood, a disgruntled employee',
-          'Vulnerability — a weakness a threat could exploit: unpatched software, weak password, open port',
-          'Risk — the combination of likelihood and impact: how likely is the threat to exploit this vulnerability, and how bad would it be?',
+          'Threat — anything that could cause harm: an attacker, a natural disaster, a disgruntled employee, even an accidental misconfiguration',
+          'Vulnerability — a weakness that a threat could exploit: unpatched software, a weak password, an open port that shouldn\'t be exposed',
+          'Risk — the combination of likelihood and impact: how probable is it that a specific threat will exploit a specific vulnerability, and how bad would the consequences be if it did?',
         ],
+      ),
+      LessonSection(
+        heading: 'Why the Distinction Matters',
+        body:
+            'Here\'s a concrete way to see why separating these concepts '
+            'is useful. Imagine a server running outdated software with a '
+            'known, publicly documented vulnerability (the vulnerability). '
+            'If that server sits on an isolated internal network with no '
+            'internet access and no valuable data, the risk might be '
+            'fairly low even though the vulnerability is severe — there\'s '
+            'no realistic threat actor who can reach it. Now imagine the '
+            'exact same vulnerability on a server directly exposed to the '
+            'internet, processing customer payment data. Same '
+            'vulnerability, dramatically higher risk, because the threat '
+            'landscape and potential impact are completely different. '
+            'Security teams that understand this distinction can '
+            'prioritize their limited time and budget far more '
+            'effectively than teams that just chase every vulnerability '
+            'with equal urgency.',
       ),
       LessonSection(
         heading: 'The Attack Surface',
         body:
-            'The attack surface is everything exposed to potential '
-            'attackers — open ports, public-facing applications, employee '
-            'email addresses, physical entry points. Reducing the attack '
-            'surface means removing or restricting things that don\'t '
-            'need to be exposed.',
+            'A closely related concept is the attack surface — the '
+            'complete set of points where an unauthorized user could '
+            'potentially try to enter a system or extract data. This '
+            'includes obvious things like open network ports and '
+            'public-facing web applications, but also less obvious things '
+            'like employee email addresses (a target for phishing), '
+            'physical entry points to a building, and even the metadata '
+            'exposed in job postings that reveal what software a company '
+            'uses internally. Reducing the attack surface — removing '
+            'anything exposed that doesn\'t strictly need to be — is one '
+            'of the most cost-effective defensive strategies available, '
+            'because it eliminates entire categories of risk rather than '
+            'trying to defend every possible entry point equally.',
       ),
       LessonSection(
-        heading: 'Common Threat Categories',
+        heading: 'Common Threat Categories to Recognize',
         bullets: [
-          'Malware — ransomware, spyware, trojans, worms',
-          'Social engineering — phishing, vishing, pretexting',
-          'Insider threats — malicious or negligent employees/contractors',
-          'Supply chain attacks — compromising a trusted vendor to reach their customers',
-          'Zero-day exploits — attacks on vulnerabilities unknown to the vendor',
-          'Denial of Service — overwhelming systems to deny legitimate access',
+          'Malware — a broad category including ransomware (encrypts data for extortion), spyware (covertly monitors activity), trojans (disguised as legitimate software), and worms (self-replicating across networks)',
+          'Social engineering — manipulating people rather than exploiting technical flaws: phishing (email), vishing (voice calls), pretexting (fabricated scenarios to extract information)',
+          'Insider threats — harm caused by employees or contractors, whether malicious (a departing employee stealing data) or negligent (an employee accidentally emailing sensitive files to the wrong recipient)',
+          'Supply chain attacks — compromising a trusted vendor or software provider as an indirect path to reach that vendor\'s customers',
+          'Zero-day exploits — attacks that target a vulnerability unknown to the software vendor, meaning no patch exists yet at the time of the attack',
+          'Denial of Service — deliberately overwhelming a system with traffic or requests to make it unavailable to legitimate users',
+        ],
+      ),
+      LessonSection(
+        heading: 'Common Vulnerability Categories',
+        bullets: [
+          'Unpatched or outdated software running known, publicly documented flaws',
+          'Weak, default, or reused passwords across multiple accounts',
+          'Misconfigured systems — an open port that should be closed, a cloud storage setting left at its permissive default',
+          'Lack of security awareness among employees, making social engineering far more effective',
+          'Missing encryption on sensitive data, whether stored or transmitted',
         ],
       ),
     ],
@@ -193,32 +338,97 @@ const List<Lesson> fundamentalsLessons = [
   // 5 ----------------------------------------------------------------------
   Lesson(
     title: 'Who Are the Attackers?',
+    estimatedMinutes: 8,
     sections: [
       LessonSection(
         heading: 'Understanding Threat Actors',
         body:
-            'Not all attackers are alike. Understanding who is likely to '
-            'target you — and why — helps you prioritize where to spend '
-            'your defensive effort.',
+            'Not all attackers are alike, and understanding who is likely '
+            'to target a particular organization — and why — helps '
+            'security teams prioritize where to focus their limited '
+            'defensive resources. A small local bakery and a national '
+            'power grid operator face very different realistic threats, '
+            'even though both technically "could" be targeted by anyone.',
       ),
       LessonSection(
-        heading: 'Threat Actor Types',
-        bullets: [
-          'Script kiddies — low-skill, use pre-built tools, largely opportunistic',
-          'Hacktivists — ideologically motivated, targeting organizations they oppose',
-          'Organized crime — financially motivated, well-resourced, often running ransomware or fraud operations',
-          'Nation-state actors — highly skilled, strategic long-term objectives, significant resources',
-          'Insiders — employees or contractors misusing legitimate access, either maliciously or negligently',
-          'Industrial spies — targeting intellectual property for competitive or national advantage',
-        ],
-      ),
-      LessonSection(
-        heading: 'Motivations Shape Methods',
+        heading: 'Script Kiddies',
         body:
-            'A nation-state adversary targeting infrastructure behaves '
-            'very differently from a ransomware gang targeting a hospital. '
-            'Your defenses should reflect the realistic threats you face — '
-            'which means understanding your own value as a target.',
+            'This somewhat dismissive term describes low-skill attackers '
+            'who use pre-built tools and scripts created by others, '
+            'without a deep technical understanding of how those tools '
+            'actually work. They\'re largely opportunistic, scanning the '
+            'internet broadly for any system with an obvious, easily '
+            'exploitable weakness rather than targeting anyone '
+            'specifically. Don\'t underestimate them, though — even '
+            'unsophisticated automated scanning can find and exploit real '
+            'vulnerabilities if basic hygiene like patching is neglected.',
+      ),
+      LessonSection(
+        heading: 'Hacktivists',
+        body:
+            'Hacktivists are motivated by political or social causes '
+            'rather than financial gain. They typically target '
+            'organizations they view as opposed to their cause — '
+            'governments, corporations involved in controversial '
+            'industries, or institutions accused of unethical practices. '
+            'Their goal is often disruption and public embarrassment '
+            'rather than financial theft: defacing a website, leaking '
+            'internal communications, or knocking a service offline to '
+            'make a statement.',
+      ),
+      LessonSection(
+        heading: 'Organized Crime',
+        body:
+            'Financially motivated and often surprisingly well-resourced, '
+            'organized cybercrime groups run operations that mirror '
+            'legitimate businesses — complete with specialized roles, '
+            'customer support for ransomware victims, and even '
+            '"ransomware-as-a-service" offerings that let less technical '
+            'criminals rent access to sophisticated tools in exchange for '
+            'a cut of the proceeds. These groups are responsible for the '
+            'majority of ransomware attacks, business email compromise '
+            'scams, and large-scale data theft for resale on underground '
+            'markets.',
+      ),
+      LessonSection(
+        heading: 'Nation-State Actors',
+        body:
+            'Generally the most highly skilled and best-resourced threat '
+            'actors, nation-state groups pursue long-term strategic '
+            'objectives on behalf of a government — espionage, '
+            'intellectual property theft, disruption of critical '
+            'infrastructure, or positioning for potential future conflict. '
+            'They\'re often willing to spend months or years patiently '
+            'working toward a single objective, and they have access to '
+            'zero-day vulnerabilities and custom tools that most other '
+            'threat actors simply cannot obtain.',
+      ),
+      LessonSection(
+        heading: 'Insiders',
+        body:
+            'Employees, contractors, or business partners who misuse '
+            'legitimate access they were already granted. Insider threats '
+            'can be malicious (a departing employee deliberately stealing '
+            'customer data before resigning) or entirely unintentional (an '
+            'employee falling for a phishing email, or accidentally '
+            'misconfiguring a system). Because insiders already have '
+            'authorized access, their activity often blends in with normal '
+            'usage patterns, making insider threats notoriously difficult '
+            'to detect compared to external attacks.',
+      ),
+      LessonSection(
+        heading: 'Why This Taxonomy Matters in Practice',
+        body:
+            'When you understand the realistic threat actors relevant to '
+            'a specific organization, you can make smarter, more targeted '
+            'defensive investments rather than treating every possible '
+            'threat with equal urgency. A hospital should think hard about '
+            'ransomware groups (organized crime) and insider risks around '
+            'patient data. A defense contractor needs to seriously '
+            'consider nation-state espionage. A controversial company in '
+            'the public eye should factor in hacktivism. This kind of '
+            'threat-informed thinking is a core part of the risk '
+            'management process you\'ll explore later in this module.',
       ),
     ],
   ),
@@ -226,38 +436,101 @@ const List<Lesson> fundamentalsLessons = [
   // 6 ----------------------------------------------------------------------
   Lesson(
     title: 'Authentication & Access Control',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
-        heading: 'Authentication vs. Authorization',
-        bullets: [
-          'Authentication — proving identity: "Who are you?"',
-          'Authorization — defining permissions: "What are you allowed to do?"',
-          'Both must work correctly — authentication alone doesn\'t prevent an authorized user from doing something they shouldn\'t, and authorization alone means nothing if identity isn\'t verified first',
-        ],
+        heading: 'Authentication vs. Authorization: Two Different Questions',
+        body:
+            'These two terms get confused constantly, but they answer '
+            'fundamentally different questions. Authentication answers '
+            '"who are you?" — the process of proving identity, typically '
+            'through a password, a physical device, or a biometric '
+            'characteristic. Authorization answers "what are you allowed '
+            'to do?" — the process of determining permissions once '
+            'identity has already been confirmed. Both must work correctly '
+            'for a system to be secure: strong authentication means '
+            'nothing if authorization is misconfigured to grant everyone '
+            'admin access, and fine-grained authorization means nothing if '
+            'authentication can be trivially bypassed.',
       ),
       LessonSection(
-        heading: 'Authentication Factors',
-        bullets: [
-          'Something you know — password, PIN',
-          'Something you have — phone, hardware token, smart card',
-          'Something you are — fingerprint, face, iris',
-        ],
+        heading: 'The Three Authentication Factors',
+        body:
+            'Every authentication method in existence falls into one of '
+            'three categories, often called "factors." Strong '
+            'authentication combines more than one.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.authFactors,
+          caption:
+              'The three authentication factors — combining two or more '
+              'of these is what makes Multi-Factor Authentication (MFA) '
+              'so effective.',
+        ),
       ),
       LessonSection(
         heading: 'Multi-Factor Authentication (MFA)',
         body:
-            'MFA combines two or more factors. A stolen password is no '
-            'longer enough — an attacker also needs the second factor. '
-            'This single control stops the vast majority of account '
-            'takeover attacks.',
+            'MFA combines two or more of the factors above, so that a '
+            'compromised password alone is no longer sufficient to '
+            'access an account — the attacker would also need the '
+            'physical phone receiving the verification code, or the '
+            'registered fingerprint, neither of which typically travels '
+            'with a stolen password in a data breach. This single control '
+            'is consistently cited by security researchers as one of the '
+            'most effective, low-cost defenses against account takeover, '
+            'stopping the vast majority of credential-based attacks even '
+            'when a password has already been compromised.',
+      ),
+      LessonSection(
+        heading: 'Single Sign-On (SSO)',
+        body:
+            'SSO allows a user to authenticate once and then access '
+            'multiple connected applications without needing to log in '
+            'separately to each one. Beyond the obvious convenience '
+            'benefit, SSO also improves security by centralizing '
+            'authentication — instead of managing dozens of separate '
+            'passwords across different systems (many of which end up '
+            'weak or reused), an organization can enforce strong '
+            'authentication policies, including MFA, at a single central '
+            'point that governs access everywhere.',
       ),
       LessonSection(
         heading: 'The Principle of Least Privilege',
         body:
-            'Every user, process, and system should have only the minimum '
-            'access needed to do its job — nothing more. Limiting access '
-            'limits the blast radius when any single account or component '
-            'is compromised.',
+            'Once identity is authenticated, authorization determines what '
+            'that identity can actually do — and the guiding principle '
+            'here is least privilege: every user, process, and system '
+            'should have only the minimum level of access required to '
+            'perform its function, and nothing more. A marketing employee '
+            'doesn\'t need access to the finance database. A web server '
+            'process doesn\'t need permission to modify system-level '
+            'configuration files. The value of least privilege becomes '
+            'obvious the moment something goes wrong: if an account or '
+            'process is compromised, its restricted permissions directly '
+            'limit how much damage the attacker can actually do with it — '
+            'this concept is often called reducing the "blast radius" of '
+            'a compromise.',
+      ),
+      LessonSection(
+        heading: 'Putting It Together: A Practical Example',
+        body:
+            'Imagine an employee\'s laptop is compromised by malware. If '
+            'that employee logs in with a weak, reused password and no '
+            'MFA, and their account has broad administrative access '
+            'across the company\'s systems "just in case it\'s needed '
+            'someday," the attacker who now controls that laptop has '
+            'effectively been handed the keys to the entire organization. '
+            'Now imagine the same compromise, but the employee uses MFA '
+            '(so the attacker can\'t easily use the credentials elsewhere '
+            'without the physical device) and their account follows least '
+            'privilege (so even with access to that one laptop, the '
+            'attacker can only reach a small, specific set of systems). '
+            'The technical vulnerability was identical in both scenarios '
+            '— the actual business impact was radically different, purely '
+            'because of how authentication and authorization were '
+            'designed.',
       ),
     ],
   ),
@@ -265,37 +538,95 @@ const List<Lesson> fundamentalsLessons = [
   // 7 ----------------------------------------------------------------------
   Lesson(
     title: 'Cryptography in Plain English',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
-        heading: 'What Cryptography Does',
+        heading: 'What Cryptography Actually Does',
         body:
-            'Cryptography converts readable data (plaintext) into an '
-            'unreadable form (ciphertext) so only authorized parties '
-            'can read it. It also provides tools for verifying integrity '
-            'and authenticating identity.',
+            'Cryptography transforms readable data, called plaintext, '
+            'into an unreadable form, called ciphertext, so that only '
+            'someone possessing the correct key can convert it back. '
+            'Beyond simple secrecy, modern cryptography also provides '
+            'tools for verifying that data hasn\'t been tampered with '
+            'and for confirming that a message genuinely came from the '
+            'party it claims to be from. It\'s difficult to overstate how '
+            'foundational cryptography is to the modern internet — '
+            'without it, online banking, e-commerce, and private '
+            'messaging as we know them simply wouldn\'t be possible.',
       ),
       LessonSection(
-        heading: 'Symmetric vs. Asymmetric Encryption',
-        bullets: [
-          'Symmetric — one shared key encrypts and decrypts. Fast, but both parties must securely exchange that key.',
-          'Asymmetric — two mathematically linked keys: a public key (share freely) and a private key (never share). Solves the key-exchange problem. Used in HTTPS, SSH, digital signatures.',
-        ],
-      ),
-      LessonSection(
-        heading: 'Hashing',
+        heading: 'Symmetric Encryption: One Shared Key',
         body:
-            'Hashing converts data into a fixed-length fingerprint. '
-            'Unlike encryption, it\'s one-way — you can\'t reverse it. '
-            'Used to verify file integrity and to store passwords without '
-            'keeping the plaintext.',
+            'In symmetric encryption, the exact same key is used to both '
+            'encrypt and decrypt the data. It\'s fast and computationally '
+            'efficient, which is why it\'s used for encrypting large '
+            'volumes of data. The catch is the key exchange problem: both '
+            'parties need to somehow obtain the same secret key before '
+            'they can communicate securely, and if that key is '
+            'intercepted during the exchange, the entire scheme is '
+            'compromised. This is a bit like sharing a single physical '
+            'key to a locked box — great once both people have a copy, '
+            'but risky to hand off in the first place.',
       ),
       LessonSection(
-        heading: 'Where You See This Every Day',
+        heading: 'Asymmetric Encryption: Solving the Key Exchange Problem',
+        body:
+            'Asymmetric encryption uses two mathematically linked keys: '
+            'a public key, which can be shared openly with anyone, and a '
+            'private key, which must never be shared and stays with its '
+            'owner. Data encrypted with someone\'s public key can only be '
+            'decrypted with the matching private key. This elegantly '
+            'solves the key exchange problem — you can publish your '
+            'public key anywhere, and anyone can use it to send you '
+            'something only you can read, without ever needing a secure '
+            'channel to exchange a shared secret first. The trade-off is '
+            'that asymmetric encryption is significantly slower than '
+            'symmetric encryption, which is why real systems like HTTPS '
+            'actually use both together: asymmetric encryption to '
+            'securely exchange a temporary symmetric key, then symmetric '
+            'encryption for the speed needed to handle the actual session '
+            'data.',
+      ),
+      LessonSection(
+        heading: 'Hashing: One-Way Fingerprints',
+        body:
+            'Hashing is fundamentally different from encryption because '
+            'it\'s one-way — there\'s no key that reverses a hash back '
+            'into the original data. A hashing algorithm takes an input '
+            'of any size and produces a fixed-length output, called a '
+            'hash or digest, that acts like a unique fingerprint for that '
+            'exact input. Change even a single character of the input and '
+            'the resulting hash changes completely and unpredictably. '
+            'This property makes hashing perfect for two very different '
+            'use cases: verifying that a file hasn\'t been altered '
+            '(compare hashes before and after) and storing passwords '
+            'securely (the system stores only the hash, never the actual '
+            'password, so even if the database leaks, attackers don\'t '
+            'get the plaintext passwords directly).',
+      ),
+      LessonSection(
+        heading: 'Digital Signatures and Certificates',
+        body:
+            'A digital signature uses asymmetric cryptography to prove '
+            'that a specific message genuinely came from a specific '
+            'sender and wasn\'t altered in transit — the sender signs the '
+            'message with their private key, and anyone can verify that '
+            'signature using the sender\'s public key. A digital '
+            'certificate takes this a step further by binding a public '
+            'key to a verified identity, typically issued by a trusted '
+            'third party called a Certificate Authority. This is exactly '
+            'what happens when your browser shows a padlock icon next to '
+            'a website address — it has verified a certificate proving '
+            'that the public key being used really does belong to the '
+            'website you think you\'re visiting, not an impostor.',
+      ),
+      LessonSection(
+        heading: 'Where This Shows Up in Everyday Life',
         bullets: [
-          'HTTPS — encrypts traffic between browser and website',
-          'Password storage — sites store hashes, not your actual password',
-          'Code signing — verifying downloaded software wasn\'t tampered with',
-          'Email signing — proving a message genuinely came from the claimed sender',
+          'HTTPS — combines asymmetric and symmetric encryption to protect virtually all modern web traffic',
+          'Password storage — responsible systems store hashes of passwords, never the plaintext',
+          'Software updates — publishers digitally sign updates so your device can verify they haven\'t been tampered with before installing',
+          'End-to-end encrypted messaging — apps like Signal use asymmetric encryption so that only the intended recipient\'s device holds the private key needed to read a message',
         ],
       ),
     ],
@@ -304,32 +635,81 @@ const List<Lesson> fundamentalsLessons = [
   // 8 ----------------------------------------------------------------------
   Lesson(
     title: 'Network Security Overview',
+    estimatedMinutes: 8,
     sections: [
       LessonSection(
-        heading: 'Why Networks Are Such a Big Target',
+        heading: 'Why Networks Are Such a High-Value Target',
         body:
-            'Networks carry everything — credentials, financial data, '
-            'private communications, intellectual property. Compromising '
-            'a network gives an attacker visibility into and movement '
-            'across everything connected to it.',
+            'Networks are the connective tissue carrying almost '
+            'everything of value in an organization — credentials, '
+            'financial transactions, private communications, and '
+            'intellectual property all travel across network links at '
+            'some point. Compromising a network doesn\'t just expose one '
+            'system; it can give an attacker visibility into, and the '
+            'ability to move between, every device connected to that '
+            'network. This is exactly why network security sits at the '
+            'core of almost every defense-in-depth strategy.',
       ),
       LessonSection(
-        heading: 'Key Network Security Concepts',
-        bullets: [
-          'Segmentation — dividing networks so a breach in one area doesn\'t expose everything',
-          'Firewalls — enforcing rules about what traffic is permitted to flow where',
-          'Intrusion Detection/Prevention — monitoring for and blocking suspicious traffic',
-          'Encryption in transit — ensuring data can\'t be read if intercepted (TLS/HTTPS/VPN)',
-          'Network monitoring — logging traffic patterns to detect anomalies',
-        ],
+        heading: 'Segmentation: Not Everything Belongs on One Network',
+        body:
+            'Segmentation means dividing a network into smaller, isolated '
+            'zones rather than treating everything as one flat, '
+            'interconnected space. If every device on a network can '
+            'freely reach every other device, a single compromised '
+            'laptop can potentially become a stepping stone to reach the '
+            'company\'s most sensitive database. Segmentation limits this '
+            '"lateral movement" by putting sensitive systems — finance '
+            'servers, customer databases, industrial control systems — on '
+            'separate segments with tightly controlled traffic rules '
+            'between them, so a breach in one area doesn\'t automatically '
+            'cascade into a breach of everything.',
       ),
       LessonSection(
-        heading: 'Common Network Attacks',
+        heading: 'Firewalls: Enforcing the Rules',
+        body:
+            'A firewall inspects network traffic and makes allow-or-deny '
+            'decisions based on a defined set of rules — for example, '
+            '"allow inbound traffic on port 443 (HTTPS) but block '
+            'everything else." Firewalls exist at multiple levels: '
+            'network firewalls protect entire segments, while host-based '
+            'firewalls protect individual devices even from other devices '
+            'on the same trusted network, adding a valuable layer of '
+            'protection against lateral movement from an already-'
+            'compromised machine nearby.',
+      ),
+      LessonSection(
+        heading: 'Intrusion Detection & Prevention',
+        body:
+            'Beyond simple allow/deny rules, more advanced systems '
+            'actively analyze traffic patterns for signs of malicious '
+            'activity. An Intrusion Detection System (IDS) monitors '
+            'traffic and generates alerts when it spots something '
+            'suspicious, but takes no direct action — a human or '
+            'automated system must respond. An Intrusion Prevention '
+            'System (IPS) goes further, sitting inline with the traffic '
+            'flow and automatically blocking anything it identifies as '
+            'malicious in real time, before it reaches its destination.',
+      ),
+      LessonSection(
+        heading: 'Encryption in Transit',
+        body:
+            'Even with strong perimeter defenses, data traveling across '
+            'a network can still be intercepted by anyone positioned '
+            'along its path — a compromised router, a malicious actor on '
+            'the same Wi-Fi network, or an internet service provider '
+            'itself. Encrypting data in transit (via HTTPS, VPNs, or '
+            'encrypted internal protocols) ensures that even if traffic '
+            'is captured, it appears as meaningless ciphertext to anyone '
+            'without the decryption key.',
+      ),
+      LessonSection(
+        heading: 'Common Network Attacks to Recognize',
         bullets: [
-          'Man-in-the-middle — intercepting communications between two parties',
-          'Packet sniffing — capturing unencrypted traffic',
-          'DNS spoofing — redirecting users to malicious sites via fake DNS responses',
-          'DDoS — flooding systems to deny legitimate access',
+          'Man-in-the-middle — an attacker secretly intercepts and potentially alters communication between two parties who believe they\'re talking directly to each other',
+          'Packet sniffing — capturing traffic as it crosses a network; devastating on unencrypted connections, largely harmless against properly encrypted ones',
+          'DNS spoofing — feeding a device a false IP address to silently redirect it toward a malicious destination',
+          'Distributed Denial of Service (DDoS) — flooding a target with overwhelming traffic from many sources simultaneously to knock it offline',
         ],
       ),
     ],
@@ -338,32 +718,103 @@ const List<Lesson> fundamentalsLessons = [
   // 9 ----------------------------------------------------------------------
   Lesson(
     title: 'Risk Management',
+    estimatedMinutes: 9,
     sections: [
       LessonSection(
         heading: 'The Core Formula',
         body:
-            'Risk = Likelihood × Impact. A highly likely threat with '
-            'minimal impact may be a lower priority than a less likely '
-            'threat that could be catastrophic. Risk management is about '
-            'allocating limited resources where they matter most.',
+            'At its heart, risk in a security context is generally '
+            'understood as a function of two variables: how likely a '
+            'given threat is to actually exploit a given vulnerability, '
+            'and how severe the consequences would be if it did. Security '
+            'professionals often express this conceptually as Likelihood '
+            '× Impact = Risk. This isn\'t a precise mathematical formula '
+            'you plug numbers into — it\'s a mental model for comparing '
+            'and prioritizing many different risks against each other, '
+            'since no organization has unlimited resources to address '
+            'everything with equal urgency.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.riskFormula,
+          caption:
+              'Risk is a function of how likely a threat is to occur and '
+              'how severe the impact would be if it did.',
+        ),
       ),
       LessonSection(
         heading: 'The Risk Management Process',
+        body:
+            'Rather than reacting to threats one at a time as they '
+            'appear, mature organizations follow a structured, repeating '
+            'process for managing risk systematically.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.processFlow,
+          steps: ['Identify', 'Assess', 'Treat', 'Monitor'],
+          caption: 'The risk management process repeats continuously — '
+              'risks change as the business and technology environment '
+              'evolves.',
+        ),
+      ),
+      LessonSection(
+        heading: 'Identify',
+        body:
+            'The process begins with a thorough inventory: what assets '
+            'does the organization actually have (data, systems, '
+            'infrastructure, intellectual property), and what could '
+            'realistically threaten each of them? You cannot protect what '
+            'you don\'t know exists, which is why asset inventory is '
+            'consistently ranked as one of the most foundational — and '
+            'most frequently neglected — security practices.',
+      ),
+      LessonSection(
+        heading: 'Assess',
+        body:
+            'Once risks are identified, each one is evaluated for both '
+            'likelihood and potential impact. This is often done using a '
+            'simple qualitative scale (low, medium, high) for '
+            'organizations just getting started, or more sophisticated '
+            'quantitative models that attempt to estimate risk in actual '
+            'financial terms for mature programs with the data to support '
+            'that level of precision.',
+      ),
+      LessonSection(
+        heading: 'Treat',
+        body:
+            'For each identified and assessed risk, the organization '
+            'chooses how to respond. There are exactly four possible '
+            'strategies, and understanding all four (not just "fix it") '
+            'is a hallmark of mature risk thinking.',
         bullets: [
-          'Identify — what assets exist and what could threaten them',
-          'Assess — how likely is each threat, and how severe is the impact',
-          'Treat — decide how to respond (avoid, mitigate, transfer, or accept)',
-          'Monitor — risks change as technology and business evolve; reassess regularly',
+          'Avoid — eliminate the activity or system that creates the risk entirely',
+          'Mitigate — implement controls that reduce the likelihood or impact, without eliminating the underlying activity',
+          'Transfer — shift the financial consequence of the risk to a third party, most commonly through cyber insurance',
+          'Accept — make a conscious, documented decision to take on the risk as-is, typically because the cost of addressing it exceeds the potential loss, or the risk is already low enough to tolerate',
         ],
       ),
       LessonSection(
-        heading: 'Four Risk Treatment Strategies',
-        bullets: [
-          'Avoid — eliminate the activity that creates the risk',
-          'Mitigate — implement controls to reduce likelihood or impact',
-          'Transfer — shift financial exposure to a third party (e.g. cyber insurance)',
-          'Accept — consciously take on the risk because it\'s low enough or too costly to address',
-        ],
+        heading: 'Monitor',
+        body:
+            'Risk is never a one-time assessment. New vulnerabilities '
+            'emerge, business priorities shift, new technologies get '
+            'adopted, and the threat landscape evolves constantly. The '
+            'monitoring step ensures the entire process repeats on a '
+            'regular cadence rather than becoming a stale document that '
+            'no longer reflects reality.',
+      ),
+      LessonSection(
+        heading: 'Why Organizations Formalize This Process',
+        body:
+            'No organization, regardless of size or budget, can '
+            'eliminate all risk or defend against every conceivable '
+            'threat with equal intensity. A formal risk management '
+            'process gives security teams and leadership a shared, '
+            'defensible framework for prioritizing limited time, budget, '
+            'and attention toward the risks that genuinely matter most to '
+            'that specific organization — rather than chasing whichever '
+            'threat happened to make headlines most recently.',
       ),
     ],
   ),
@@ -371,34 +822,99 @@ const List<Lesson> fundamentalsLessons = [
   // 10 ---------------------------------------------------------------------
   Lesson(
     title: 'Security Policies & Governance',
+    estimatedMinutes: 8,
     sections: [
       LessonSection(
         heading: 'Why Written Policies Matter',
         body:
-            'Technology controls without policy are incomplete — they '
-            'don\'t tell employees what\'s expected, don\'t establish '
-            'accountability, and don\'t satisfy auditors. Policies turn '
-            'security intent into enforceable, auditable rules.',
+            'Technology controls without corresponding policy are '
+            'incomplete. A firewall doesn\'t tell an employee whether '
+            'they\'re allowed to install personal software on a company '
+            'laptop. Encryption doesn\'t establish who is accountable when '
+            'a data breach occurs. Written security policies exist '
+            'precisely to fill this gap — they translate an '
+            'organization\'s security intentions into clear, enforceable, '
+            'and auditable rules that everyone is expected to follow, and '
+            'they create the accountability structure needed when '
+            'something eventually does go wrong.',
       ),
       LessonSection(
         heading: 'Essential Policy Types',
         bullets: [
-          'Acceptable Use Policy (AUP) — what employees may and may not do with company systems',
-          'Password Policy — complexity, rotation, and storage requirements',
-          'Incident Response Policy — steps to follow when a security event occurs',
-          'Data Classification Policy — how to label and handle data by sensitivity',
-          'Change Management Policy — ensuring system changes are reviewed and authorized before deployment',
-          'BYOD Policy — rules for personal devices accessing company resources',
+          'Acceptable Use Policy (AUP) — defines what employees may and may not do with company systems, networks, and devices',
+          'Password Policy — sets minimum requirements for creating, storing, and rotating passwords',
+          'Incident Response Policy — establishes the steps to follow the moment a security event is suspected or confirmed',
+          'Data Classification Policy — defines how to label and handle data based on its sensitivity (public, internal, confidential, restricted)',
+          'Change Management Policy — ensures system and infrastructure changes go through review and authorization before deployment',
+          'Bring Your Own Device (BYOD) Policy — sets rules for personal devices that access company resources',
         ],
       ),
       LessonSection(
-        heading: 'Governance Frameworks',
+        heading: 'The Policy Lifecycle',
         body:
-            'Rather than building a security program from scratch, most '
-            'organizations adopt a framework — NIST CSF, ISO 27001, CIS '
-            'Controls — that maps what a mature program looks like. These '
-            'are vendor-neutral and platform-agnostic, which is why this '
-            'course is built around concepts, not products.',
+            'Policies aren\'t documents you write once and file away. '
+            'Healthy security governance treats policy as a living '
+            'process that repeats over time as the organization, its '
+            'technology, and the threat landscape all evolve.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.processFlow,
+          steps: ['Develop', 'Communicate', 'Enforce', 'Review'],
+          caption: 'A healthy policy lifecycle repeats continuously — a '
+              'policy that\'s never reviewed quickly becomes outdated and '
+              'ignored.',
+        ),
+      ),
+      LessonSection(
+        heading: 'Develop and Communicate',
+        body:
+            'A policy is only effective if the people expected to follow '
+            'it actually know it exists and understand what it requires '
+            'of them. Simply publishing a document to an internal wiki '
+            'that nobody reads accomplishes very little — effective '
+            'organizations actively communicate policy changes through '
+            'training, onboarding, and regular reminders, and use clear, '
+            'accessible language rather than dense legal jargon.',
+      ),
+      LessonSection(
+        heading: 'Enforce Consistently',
+        body:
+            'A policy that\'s enforced inconsistently — strictly applied '
+            'to some employees but quietly overlooked for others, '
+            'especially senior staff — undermines the entire governance '
+            'structure and signals to everyone that the rules are '
+            'optional. Consistent enforcement, paired with clear '
+            'consequences for violations, is what gives a policy real '
+            'weight rather than existing as words on paper.',
+      ),
+      LessonSection(
+        heading: 'Review and Adapt',
+        body:
+            'Technology changes, regulations change, and the '
+            'organization\'s own risk profile changes as it grows or '
+            'shifts its business model. A policy written five years ago '
+            'may no longer reflect current best practice, current tools, '
+            'or current legal requirements. Periodic review — typically '
+            'annually, or immediately following a significant incident '
+            'or major change — keeps policy relevant rather than becoming '
+            'an outdated relic that everyone quietly ignores.',
+      ),
+      LessonSection(
+        heading: 'Governance Frameworks: Standing on the Shoulders of Others',
+        body:
+            'Rather than building an entire security program and policy '
+            'set completely from scratch, most organizations adopt an '
+            'established governance framework as a starting point — '
+            'widely used examples include the NIST Cybersecurity '
+            'Framework, ISO/IEC 27001, and the CIS Controls. These '
+            'frameworks are deliberately vendor-neutral and platform-'
+            'agnostic, describing what a mature security program should '
+            'cover conceptually without dictating specific products. '
+            'This is precisely why this course is structured around '
+            'durable concepts rather than any single vendor\'s tools — '
+            'the frameworks that guide real security programs are built '
+            'the same way.',
       ),
     ],
   ),
@@ -406,103 +922,79 @@ const List<Lesson> fundamentalsLessons = [
   // 11 ----------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
+    estimatedMinutes: 15,
     quiz: [
       QuizQuestion(
-        question: 'Which part of the CIA Triad ensures systems are accessible when needed?',
-        options: [
-          'Confidentiality',
-          'Integrity',
-          'Availability',
-          'Authentication',
-        ],
+        question: 'Which part of the CIA Triad ensures systems remain '
+            'accessible to authorized users when needed?',
+        options: ['Confidentiality', 'Integrity', 'Availability', 'Authentication'],
         correctIndex: 2,
-        explanation: 'Availability means authorized users can reach systems and data when they need them.',
+        explanation: 'Availability means authorized users can access systems and data when they need them.',
       ),
       QuizQuestion(
         question: 'What is the difference between a threat and a vulnerability?',
         options: [
           'They mean the same thing',
-          'A threat is a weakness; a vulnerability causes harm',
+          'A threat is a weakness; a vulnerability is a source of harm',
           'A threat is a potential source of harm; a vulnerability is a weakness that could be exploited',
           'Vulnerabilities only apply to hardware',
         ],
         correctIndex: 2,
-        explanation: 'Threat = potential danger. Vulnerability = the exploitable gap.',
+        explanation: 'Threat = potential danger. Vulnerability = the gap that threat could exploit.',
       ),
       QuizQuestion(
         question: 'Which authentication factor is a hardware token?',
-        options: [
-          'Something you know',
-          'Something you have',
-          'Something you are',
-          'Something you feel',
-        ],
+        options: ['Something you know', 'Something you have', 'Something you are', 'Something you feel'],
         correctIndex: 1,
         explanation: 'A hardware token is a physical device — something you have.',
       ),
       QuizQuestion(
-        question: 'Why is hashing preferred over encryption for storing passwords?',
+        question: 'Why is hashing used for storing passwords instead of encryption?',
         options: [
-          'Hashing is faster',
-          'Hashing is reversible for easy recovery',
-          'Hashing is one-way so a leaked hash does not directly reveal the password',
-          'Encryption does not work on short strings',
+          'Hashing is faster than encryption',
+          'Hashing is reversible, so passwords can be recovered',
+          'Hashing is one-way, so even if the stored hash leaks, the original password isn\'t directly recoverable',
+          'Encryption doesn\'t work on passwords',
         ],
         correctIndex: 2,
-        explanation: 'One-way hashing means a leaked database does not hand attackers plaintext passwords.',
+        explanation: 'One-way hashing means a leaked database doesn\'t hand attackers plaintext passwords directly.',
       ),
       QuizQuestion(
-        question: 'A company buys cyber insurance for a low-probability risk. Which treatment is this?',
-        options: [
-          'Avoid',
-          'Mitigate',
-          'Transfer',
-          'Accept',
-        ],
+        question: 'A company buys cyber insurance instead of building '
+            'extra controls for a low-probability risk. Which strategy is this?',
+        options: ['Avoid', 'Mitigate', 'Transfer', 'Accept'],
         correctIndex: 2,
         explanation: 'Shifting financial exposure to an insurer is risk transfer.',
       ),
       QuizQuestion(
-        question: 'Which threat actor type is typically best-funded and strategically motivated?',
-        options: [
-          'Script kiddies',
-          'Hacktivists',
-          'Nation-state actors',
-          'Insiders',
-        ],
+        question: 'Which threat actor type is typically the most well-funded '
+            'and strategically motivated?',
+        options: ['Script kiddies', 'Hacktivists', 'Nation-state actors', 'Insiders'],
         correctIndex: 2,
         explanation: 'Nation-state actors have the greatest resources and long-term strategic goals.',
       ),
       QuizQuestion(
         question: 'What does the Principle of Least Privilege mean?',
         options: [
-          'All users get admin rights for convenience',
-          'Users get only the minimum access required to do their job',
+          'All users should have administrator rights for efficiency',
+          'Users and processes should have only the minimum access required to do their job',
           'Privileged accounts should never be used',
-          'Passwords must be 8+ characters',
+          'Passwords should be at least 8 characters long',
         ],
         correctIndex: 1,
         explanation: 'Least privilege limits access to minimize the impact of a compromised account.',
       ),
       QuizQuestion(
-        question: 'Which governance framework is vendor-neutral and covers Identify, Protect, Detect, Respond, Recover?',
-        options: [
-          'BitLocker',
-          'NIST Cybersecurity Framework',
-          'WPA3',
-          'SMTP',
-        ],
+        question: 'Which of the following is a governance framework used to '
+            'structure an organization\'s security program?',
+        options: ['BitLocker', 'NIST Cybersecurity Framework', 'WPA3', 'SMTP'],
         correctIndex: 1,
-        explanation: 'The NIST CSF is a widely used vendor-neutral framework for organizing a security program.',
+        explanation: 'The NIST CSF is a widely used, vendor-neutral framework for organizing a security program.',
       ),
       QuizQuestion(
-        question: 'An attacker modifies a bank transfer amount without either party knowing. Which CIA property failed?',
-        options: [
-          'Confidentiality',
-          'Integrity',
-          'Availability',
-          'Authentication',
-        ],
+        question: 'An attacker modifies a bank transfer amount without either '
+            'party knowing. Which CIA property failed?',
+        options: ['Confidentiality', 'Integrity', 'Availability', 'Authentication'],
         correctIndex: 1,
         explanation: 'Unauthorized modification of data is an Integrity failure.',
       ),
@@ -519,12 +1011,7 @@ const List<Lesson> fundamentalsLessons = [
       ),
       QuizQuestion(
         question: 'MFA requires at least how many authentication factors?',
-        options: [
-          'One',
-          'Two',
-          'Three',
-          'Four',
-        ],
+        options: ['One', 'Two', 'Three', 'Four'],
         correctIndex: 1,
         explanation: 'MFA combines two or more factors for stronger authentication.',
       ),
@@ -551,7 +1038,8 @@ const List<Lesson> fundamentalsLessons = [
         explanation: 'Asymmetric encryption uses a public key to encrypt and a private key to decrypt.',
       ),
       QuizQuestion(
-        question: 'What type of policy defines what employees may and may not do with company systems?',
+        question: 'What type of policy defines what employees may and may not do '
+            'with company systems?',
         options: [
           'Incident Response Policy',
           'Data Classification Policy',
@@ -573,13 +1061,9 @@ const List<Lesson> fundamentalsLessons = [
         explanation: 'Ransomware encrypts victim data and extorts payment for the decryption key.',
       ),
       QuizQuestion(
-        question: 'Which risk treatment strategy eliminates the activity that creates the risk?',
-        options: [
-          'Accept',
-          'Mitigate',
-          'Transfer',
-          'Avoid',
-        ],
+        question: 'Which risk treatment strategy eliminates the activity that '
+            'creates the risk?',
+        options: ['Accept', 'Mitigate', 'Transfer', 'Avoid'],
         correctIndex: 3,
         explanation: 'Risk avoidance eliminates the risky activity entirely.',
       ),
@@ -682,7 +1166,17 @@ const List<Lesson> fundamentalsLessons = [
         correctIndex: 1,
         explanation: 'A purpose-specific service account with minimal permissions is least privilege in practice.',
       ),
-
+      QuizQuestion(
+        question: 'What are the four steps of the risk management process, in order?',
+        options: [
+          'Assess, Identify, Monitor, Treat',
+          'Identify, Assess, Treat, Monitor',
+          'Treat, Identify, Monitor, Assess',
+          'Monitor, Treat, Identify, Assess',
+        ],
+        correctIndex: 1,
+        explanation: 'The risk management cycle is Identify, Assess, Treat, Monitor — and it repeats continuously.',
+      ),
     ],
   ),
 ];

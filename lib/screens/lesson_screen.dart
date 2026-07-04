@@ -1,14 +1,24 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../data/lesson_model.dart';
+import '../services/notes_service.dart';
+import '../widgets/watermark.dart';
+import '../widgets/diagrams.dart';
 
 const int _quizLength = 20;
+const String _feedbackEmail = 'sacyra@gmail.com';
 
 class LessonScreen extends StatefulWidget {
   final Lesson lesson;
+  final String moduleTitle;
 
-  const LessonScreen({super.key, required this.lesson});
+  const LessonScreen({
+    super.key,
+    required this.lesson,
+    required this.moduleTitle,
+  });
 
   @override
   State<LessonScreen> createState() => _LessonScreenState();
@@ -24,6 +34,11 @@ class _LessonScreenState extends State<LessonScreen> {
   final FlutterTts _tts = FlutterTts();
   bool _isSpeaking = false;
 
+  // Notes state.
+  final TextEditingController _notesController = TextEditingController();
+  bool _notesExpanded = false;
+  bool _notesLoaded = false;
+
   @override
   void initState() {
     super.initState();
@@ -36,6 +51,11 @@ class _LessonScreenState extends State<LessonScreen> {
     }
     _selectedAnswers = List.filled(_activeQuiz.length, -1);
 
+    _setUpTts();
+    _loadNote();
+  }
+
+  Future<void> _setUpTts() async {
     _tts.setCompletionHandler(() {
       if (mounted) setState(() => _isSpeaking = false);
     });
@@ -45,23 +65,60 @@ class _LessonScreenState extends State<LessonScreen> {
     _tts.setErrorHandler((msg) {
       if (mounted) setState(() => _isSpeaking = false);
     });
+
+    // Indian English voice, tuned for a warmer, more natural delivery.
+    // Actual voice quality depends on the TTS engine installed on the
+    // user's device/browser — Android and Chrome typically ship at least
+    // one en-IN voice, but availability varies.
+    try {
+      await _tts.setLanguage('en-IN');
+    } catch (_) {
+      // Fall back silently if en-IN isn't available on this platform.
+    }
+    await _tts.setPitch(1.0);
+    await _tts.setSpeechRate(0.46); // slightly slower reads more naturally
+    await _tts.setVolume(1.0);
+
+    try {
+      final voices = await _tts.getVoices;
+      if (voices is List) {
+        final match = voices.cast<dynamic>().firstWhere(
+              (v) => (v['locale'] ?? '').toString().toLowerCase().contains('en-in'),
+              orElse: () => null,
+            );
+        if (match != null) {
+          await _tts.setVoice({
+            'name': match['name'].toString(),
+            'locale': match['locale'].toString(),
+          });
+        }
+      }
+    } catch (_) {
+      // Voice selection is best-effort; default en-IN locale still applies.
+    }
+  }
+
+  Future<void> _loadNote() async {
+    final note =
+        await NotesService.getNote(widget.moduleTitle, widget.lesson.title);
+    if (mounted) {
+      _notesController.text = note;
+      setState(() => _notesLoaded = true);
+    }
   }
 
   @override
   void dispose() {
     _tts.stop();
+    _notesController.dispose();
     super.dispose();
   }
 
   String _lessonNarrationText(Lesson lesson) {
     final buffer = StringBuffer();
     for (final section in lesson.sections) {
-      if (section.heading != null) {
-        buffer.writeln(section.heading);
-      }
-      if (section.body != null) {
-        buffer.writeln(section.body);
-      }
+      if (section.heading != null) buffer.writeln(section.heading);
+      if (section.body != null) buffer.writeln(section.body);
       if (section.bullets != null) {
         for (final bullet in section.bullets!) {
           buffer.writeln(bullet);
@@ -91,6 +148,28 @@ class _LessonScreenState extends State<LessonScreen> {
 
   bool get _allAnswered => !_selectedAnswers.contains(-1);
 
+  Future<void> _sendFeedback() async {
+    final subject =
+        Uri.encodeComponent('CyberPulse Feedback: ${widget.lesson.title}');
+    final body = Uri.encodeComponent(
+      'Module: ${widget.moduleTitle}\nLesson: ${widget.lesson.title}\n\n'
+      'Your feedback:\n',
+    );
+    final uri = Uri.parse('mailto:$_feedbackEmail?subject=$subject&body=$body');
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Could not open an email app. Send feedback directly to $_feedbackEmail',
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final lesson = widget.lesson;
@@ -106,12 +185,35 @@ class _LessonScreenState extends State<LessonScreen> {
               onPressed: _toggleNarration,
             ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(30),
+          child: Container(
+            color: Colors.black12,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            width: double.infinity,
+            child: Row(
+              children: [
+                const Icon(Icons.timer_outlined, size: 14),
+                const SizedBox(width: 4),
+                Text(
+                  '~${lesson.estimatedMinutes} min',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
-      body: lesson.isQuiz
-          ? _buildQuiz(_activeQuiz)
-          : lesson.isAudio
-              ? _buildAudioLesson(lesson)
-              : _buildReadingContent(lesson),
+      body: Stack(
+        children: [
+          const Positioned.fill(child: CyberPulseWatermark()),
+          lesson.isQuiz
+              ? _buildQuiz(_activeQuiz)
+              : lesson.isAudio
+                  ? _buildAudioLesson(lesson)
+                  : _buildReadingContent(lesson),
+        ],
+      ),
     );
   }
 
@@ -121,7 +223,6 @@ class _LessonScreenState extends State<LessonScreen> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // Audio player panel
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
@@ -140,73 +241,43 @@ class _LessonScreenState extends State<LessonScreen> {
                   lesson.title,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                      fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  'Audio Course',
-                  style: TextStyle(fontSize: 13, color: Colors.white70),
-                ),
+                const Text('Audio Course',
+                    style: TextStyle(fontSize: 13, color: Colors.white70)),
                 const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.blue.shade800,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 28, vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      icon: Icon(
-                        _isSpeaking ? Icons.stop_rounded : Icons.play_arrow_rounded,
-                        size: 28,
-                      ),
-                      label: Text(
-                        _isSpeaking ? 'Stop' : 'Play',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onPressed: _toggleNarration,
-                    ),
-                  ],
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.blue.shade800,
+                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  ),
+                  icon: Icon(_isSpeaking ? Icons.stop_rounded : Icons.play_arrow_rounded, size: 28),
+                  label: Text(_isSpeaking ? 'Stop' : 'Play',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  onPressed: _toggleNarration,
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  _isSpeaking
-                      ? 'Now playing — follow along below'
-                      : 'Tap Play to listen to this lesson',
+                  _isSpeaking ? 'Now playing — follow along below' : 'Tap Play to listen to this lesson',
                   style: const TextStyle(fontSize: 13, color: Colors.white70),
                 ),
               ],
             ),
           ),
-
-          // Transcript
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Transcript',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                  ),
-                ),
+                const Text('Transcript',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey)),
                 const Divider(height: 20),
-                for (final section in lesson.sections)
-                  _buildSection(section),
+                for (final section in lesson.sections) _buildSection(section),
+                _buildNotesSection(),
+                _buildFeedbackSection(),
               ],
             ),
           ),
@@ -224,12 +295,20 @@ class _LessonScreenState extends State<LessonScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           for (final section in lesson.sections) _buildSection(section),
+          _buildNotesSection(),
+          _buildFeedbackSection(),
         ],
       ),
     );
   }
 
   Widget _buildSection(LessonSection section) {
+    if (section.diagram != null) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: DiagramView(spec: section.diagram!),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.only(bottom: 25),
       child: Column(
@@ -240,19 +319,13 @@ class _LessonScreenState extends State<LessonScreen> {
               padding: const EdgeInsets.only(bottom: 10),
               child: Text(
                 section.heading!,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
             ),
           if (section.body != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: Text(
-                section.body!,
-                style: const TextStyle(fontSize: 18, height: 1.4),
-              ),
+              child: Text(section.body!, style: const TextStyle(fontSize: 18, height: 1.4)),
             ),
           if (section.bullets != null)
             Column(
@@ -261,13 +334,115 @@ class _LessonScreenState extends State<LessonScreen> {
                 for (final bullet in section.bullets!)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 6),
-                    child: Text(
-                      '•  $bullet',
-                      style: const TextStyle(fontSize: 18, height: 1.4),
-                    ),
+                    child: Text('•  $bullet', style: const TextStyle(fontSize: 18, height: 1.4)),
                   ),
               ],
             ),
+        ],
+      ),
+    );
+  }
+
+  // -- Notes ------------------------------------------------------------------
+
+  Widget _buildNotesSection() {
+    return Container(
+      margin: const EdgeInsets.only(top: 10, bottom: 16),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.amber.shade200),
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.amber.withValues(alpha: 0.05),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () => setState(() => _notesExpanded = !_notesExpanded),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                children: [
+                  const Icon(Icons.edit_note, color: Colors.orange),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    child: Text('My Notes',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  ),
+                  Icon(_notesExpanded ? Icons.expand_less : Icons.expand_more),
+                ],
+              ),
+            ),
+          ),
+          if (_notesExpanded)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+              child: _notesLoaded
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        TextField(
+                          controller: _notesController,
+                          maxLines: 5,
+                          decoration: InputDecoration(
+                            hintText: 'Write your own notes about this lesson...',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton.icon(
+                            icon: const Icon(Icons.save, size: 18),
+                            label: const Text('Save Note'),
+                            onPressed: () async {
+                              await NotesService.saveNote(
+                                widget.moduleTitle,
+                                widget.lesson.title,
+                                _notesController.text,
+                              );
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Note saved'), duration: Duration(seconds: 1)),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    )
+                  : const Center(child: CircularProgressIndicator()),
+            ),
+        ],
+      ),
+    );
+  }
+
+  // -- Feedback -----------------------------------------------------------
+
+  Widget _buildFeedbackSection() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 30),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.feedback_outlined, color: Colors.grey),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Text(
+              'Spotted an issue or have a suggestion for this lesson?',
+              style: TextStyle(fontSize: 13),
+            ),
+          ),
+          TextButton(
+            onPressed: _sendFeedback,
+            child: const Text('Send Feedback'),
+          ),
         ],
       ),
     );
@@ -294,12 +469,10 @@ class _LessonScreenState extends State<LessonScreen> {
             child: ElevatedButton(
               onPressed: _submitted
                   ? () => setState(() {
-                        final shuffled =
-                            List<QuizQuestion>.from(widget.lesson.quiz!)
-                              ..shuffle(Random());
+                        final shuffled = List<QuizQuestion>.from(widget.lesson.quiz!)
+                          ..shuffle(Random());
                         _activeQuiz = shuffled.take(_quizLength).toList();
-                        _selectedAnswers =
-                            List.filled(_activeQuiz.length, -1);
+                        _selectedAnswers = List.filled(_activeQuiz.length, -1);
                         _submitted = false;
                       })
                   : (_allAnswered ? () => setState(() => _submitted = true) : null),
@@ -307,6 +480,7 @@ class _LessonScreenState extends State<LessonScreen> {
             ),
           ),
           const SizedBox(height: 30),
+          _buildFeedbackSection(),
         ],
       ),
     );
@@ -325,16 +499,11 @@ class _LessonScreenState extends State<LessonScreen> {
       decoration: BoxDecoration(
         color: passed ? Colors.green.withValues(alpha: 0.1) : Colors.orange.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: passed ? Colors.green : Colors.orange,
-        ),
+        border: Border.all(color: passed ? Colors.green : Colors.orange),
       ),
       child: Row(
         children: [
-          Icon(
-            passed ? Icons.emoji_events : Icons.refresh,
-            color: passed ? Colors.green : Colors.orange,
-          ),
+          Icon(passed ? Icons.emoji_events : Icons.refresh, color: passed ? Colors.green : Colors.orange),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -360,10 +529,8 @@ class _LessonScreenState extends State<LessonScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '${index + 1}. ${q.question}',
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-          ),
+          Text('${index + 1}. ${q.question}',
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           for (var optIndex = 0; optIndex < q.options.length; optIndex++)
             _buildOption(index, q, optIndex, selected),
@@ -371,11 +538,7 @@ class _LessonScreenState extends State<LessonScreen> {
             const SizedBox(height: 8),
             Text(
               q.explanation,
-              style: TextStyle(
-                fontSize: 14,
-                fontStyle: FontStyle.italic,
-                color: Colors.grey.shade700,
-              ),
+              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.grey.shade700),
             ),
           ],
         ],
@@ -395,10 +558,7 @@ class _LessonScreenState extends State<LessonScreen> {
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 3),
-      decoration: BoxDecoration(
-        color: tileColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: tileColor, borderRadius: BorderRadius.circular(8)),
       child: RadioListTile<int>(
         contentPadding: EdgeInsets.zero,
         dense: true,

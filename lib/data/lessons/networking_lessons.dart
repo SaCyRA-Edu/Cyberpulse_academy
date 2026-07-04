@@ -392,6 +392,7 @@ const List<Lesson> networkingLessons = [
   // 10 ----------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
+    estimatedMinutes: 15,
     quiz: [
       QuizQuestion(
         question: 'What is the purpose of network segmentation?',

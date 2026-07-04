@@ -15,8 +15,9 @@ void main() {
     await tester.pumpWidget(const CyberPulseApp());
 
     // The splash screen should show the app name and the entry button.
-    expect(find.text('CyberPulse Academy'), findsOneWidget);
-    expect(find.text('Continue as Guest'), findsOneWidget);
+    expect(find.text('CyberPulse'), findsOneWidget);
+    expect(find.text('ACADEMY'), findsOneWidget);
+    expect(find.text('Start Learning'), findsOneWidget);
     expect(find.byIcon(Icons.shield), findsOneWidget);
   });
 }
