@@ -289,6 +289,102 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
+  // 4b --------------------------------------------------------------------
+  Lesson(
+    title: 'Subnetting in Practice: CIDR Math & VLSM',
+    difficulty: LessonDifficulty.advanced,
+    estimatedMinutes: 10,
+    sections: [
+      LessonSection(
+        heading: 'Why This Lesson Exists',
+        body:
+            'The earlier subnetting lesson explained the concept and why '
+            'it matters for security. This lesson goes further: real '
+            'worked calculations, the kind you need to actually design a '
+            'subnet plan rather than just talk about one in the abstract. '
+            'If you\'re aiming for a security or network role where you '
+            'might be asked to justify a subnet layout, this is the '
+            'level of fluency that\'s expected.',
+      ),
+      LessonSection(
+        heading: 'Reading a CIDR Block Correctly',
+        body:
+            'A network written as 192.168.10.0/24 has two parts: the '
+            'network address (192.168.10.0) and the prefix length (/24), '
+            'which tells you how many of the 32 total bits are fixed as '
+            'the network portion. The remaining bits belong to the host '
+            'portion. A /24 fixes the first 24 bits, leaving 8 bits for '
+            'hosts — 2^8 = 256 total addresses, of which 254 are usable '
+            '(the first address identifies the network itself, and the '
+            'last is the broadcast address).',
+      ),
+      LessonSection(
+        heading: 'Worked Example 1: Splitting a /24 Into Four Subnets',
+        body:
+            'Suppose you\'re given 192.168.10.0/24 and told to split it '
+            'into 4 equal subnets for four departments. Four subnets '
+            'require borrowing 2 bits from the host portion (2^2 = 4), '
+            'moving the prefix from /24 to /26. Each resulting subnet '
+            'has 2^6 = 64 addresses, with 62 usable per subnet:',
+        bullets: [
+          'Subnet 1: 192.168.10.0/26 — usable range 192.168.10.1 to .62, broadcast .63',
+          'Subnet 2: 192.168.10.64/26 — usable range 192.168.10.65 to .126, broadcast .127',
+          'Subnet 3: 192.168.10.128/26 — usable range 192.168.10.129 to .190, broadcast .191',
+          'Subnet 4: 192.168.10.192/26 — usable range 192.168.10.193 to .254, broadcast .255',
+        ],
+      ),
+      LessonSection(
+        heading: 'VLSM: Why Equal Subnets Are Often Wasteful',
+        body:
+            'Splitting into four equal /26 subnets works cleanly on '
+            'paper, but real departments rarely need identical numbers '
+            'of addresses. A finance team of 5 people doesn\'t need the '
+            'same 62-address subnet as an engineering team of 100. '
+            'Variable Length Subnet Masking (VLSM) solves this by '
+            'allowing different prefix lengths within the same overall '
+            'block, sized to what each segment actually needs — '
+            'conserving address space that would otherwise sit unused.',
+      ),
+      LessonSection(
+        heading: 'Worked Example 2: VLSM Sizing',
+        body:
+            'Using the same 192.168.10.0/24 block, suppose you need: '
+            'Engineering (100 hosts), Sales (50 hosts), Finance (10 '
+            'hosts), and a point-to-point router link (2 hosts).',
+        bullets: [
+          'Engineering needs 100+2 addresses → /25 (126 usable) → 192.168.10.0/25',
+          'Sales needs 50+2 addresses → /26 (62 usable) → 192.168.10.128/26',
+          'Finance needs 10+2 addresses → /28 (14 usable) → 192.168.10.192/28',
+          'The router link needs exactly 2 addresses → /30 (2 usable) → 192.168.10.208/30',
+        ],
+      ),
+      LessonSection(
+        heading: 'The Formula to Memorize',
+        body:
+            'For any subnet, usable hosts = 2^(32 − prefix) − 2. Work '
+            'backward from a required host count by finding the '
+            'smallest prefix where that formula meets or exceeds your '
+            'requirement, then add 2 for the network and broadcast '
+            'addresses you always lose. This single formula is what '
+            'every subnet sizing decision in both example above actually '
+            'reduces to.',
+      ),
+      LessonSection(
+        heading: 'Why This Matters for Security Design, Concretely',
+        body:
+            'Precise subnet sizing isn\'t just tidy address management — '
+            'it directly shapes how tightly you can scope firewall rules. '
+            'A firewall rule written as "allow 192.168.10.192/28 to reach '
+            'the finance database" is dramatically more restrictive and '
+            'auditable than a rule written against an oversized /24 that '
+            'happens to also contain unrelated departments. The more '
+            'precisely a subnet boundary matches an actual trust '
+            'boundary, the more your network architecture and your '
+            'security policy say the same thing.',
+      ),
+    ],
+  ),
+
   // 5 ----------------------------------------------------------------------
   Lesson(
     title: 'Common Ports, Protocols & Services',
@@ -748,6 +844,95 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
+  // 10b -------------------------------------------------------------------
+  Lesson(
+    title: 'Enterprise Routing: BGP, OSPF & Network Design',
+    difficulty: LessonDifficulty.expert,
+    estimatedMinutes: 10,
+    sections: [
+      LessonSection(
+        heading: 'Beyond a Single Router\'s Routing Table',
+        body:
+            'Everything you\'ve studied so far assumes a relatively '
+            'simple network with one or two routers deciding where '
+            'traffic goes. Real enterprise networks, and the internet '
+            'itself, rely on dynamic routing protocols that let routers '
+            'automatically discover paths and adapt when links fail — '
+            'this is genuinely expert-level material because '
+            'misconfiguring these protocols can take down not just your '
+            'own network, but potentially affect the internet routes of '
+            'other organizations too.',
+      ),
+      LessonSection(
+        heading: 'OSPF: Routing Within an Organization',
+        body:
+            'Open Shortest Path First (OSPF) is an interior gateway '
+            'protocol — used to route traffic within a single '
+            'organization\'s network. Routers running OSPF exchange '
+            'information about the networks they can reach and '
+            'calculate the shortest path to every destination using a '
+            'well-known graph algorithm (Dijkstra\'s). If a link fails, '
+            'OSPF routers detect it and recalculate automatically, '
+            'typically within seconds, without any manual '
+            'reconfiguration.',
+      ),
+      LessonSection(
+        heading: 'BGP: Routing Between Organizations',
+        body:
+            'Border Gateway Protocol (BGP) is what the internet itself '
+            'actually runs on — it\'s the exterior gateway protocol that '
+            'lets independent networks (Internet Service Providers, '
+            'large enterprises, cloud providers) announce to each other '
+            'which IP address ranges they own and how to reach them. '
+            'Unlike OSPF\'s automatic shortest-path calculation, BGP '
+            'route selection is deliberately policy-based — an '
+            'organization can prefer one path over another for '
+            'business reasons entirely unrelated to which is technically '
+            'shortest.',
+      ),
+      LessonSection(
+        heading: 'Why BGP Security Is a Genuine, Ongoing Problem',
+        body:
+            'BGP was designed in an era of implicit trust between a '
+            'small number of network operators, and it still has no '
+            'built-in mechanism to verify that an organization '
+            'announcing a particular IP range actually owns it. This has '
+            'led to real, damaging incidents: BGP hijacking, where an '
+            'attacker (or a misconfigured network) announces routes for '
+            'address space they don\'t own, silently redirecting traffic '
+            'meant for that address space through their own network '
+            'instead — sometimes for interception, sometimes purely by '
+            'accident through a fat-fingered configuration. RPKI '
+            '(Resource Public Key Infrastructure) is the current '
+            'industry effort to cryptographically verify route '
+            'announcements and close this gap, though global adoption '
+            'remains incomplete.',
+      ),
+      LessonSection(
+        heading: 'Enterprise Network Design Patterns',
+        bullets: [
+          'Core-Distribution-Access — a classic three-tier model separating high-speed backbone switching (core), policy enforcement and aggregation (distribution), and end-user connectivity (access)',
+          'Spine-Leaf — a flatter, two-tier design common in modern data centers, where every leaf switch connects to every spine switch, maximizing bandwidth and eliminating single points of failure',
+          'Software-Defined Networking (SDN) — separates the control plane (routing decisions) from the data plane (actual packet forwarding), allowing centralized, programmatic control over an entire network\'s behavior rather than configuring each device individually',
+        ],
+      ),
+      LessonSection(
+        heading: 'How This Connects Back to Everything Else You\'ve Learned',
+        body:
+            'Notice that dynamic routing and enterprise design patterns '
+            'don\'t replace segmentation, firewalls, or encryption — they '
+            'sit underneath them, determining how traffic physically '
+            'gets from one segmented zone to another in the first '
+            'place. A beautifully segmented network with airtight '
+            'firewall rules is only as trustworthy as the routing '
+            'infrastructure actually delivering traffic to the right '
+            'place — which is exactly why BGP hijacking is taken so '
+            'seriously: it can silently undermine every other control '
+            'built on top of it.',
+      ),
+    ],
+  ),
+
   // 11 ----------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
@@ -993,6 +1178,45 @@ const List<Lesson> networkingLessons = [
         ],
         correctIndex: 1,
         explanation: 'Monitoring detects deviations from normal behavior that can signal an active attack.',
+      ),
+      QuizQuestion(
+        question: 'A /26 subnet has how many usable host addresses?',
+        options: ['30', '62', '126', '254'],
+        correctIndex: 1,
+        explanation: 'A /26 leaves 6 host bits: 2^6 - 2 = 62 usable addresses.',
+      ),
+      QuizQuestion(
+        question: 'VLSM (Variable Length Subnet Masking) exists primarily to:',
+        options: [
+          'Encrypt subnet traffic automatically',
+          'Size each subnet according to actual host needs rather than wasting addresses on equal-sized subnets',
+          'Replace the need for a subnet mask entirely',
+          'Automatically detect subnet conflicts',
+        ],
+        correctIndex: 1,
+        explanation: 'VLSM allows different prefix lengths within one address block so each segment gets only the space it actually needs.',
+      ),
+      QuizQuestion(
+        question: 'BGP hijacking occurs when:',
+        options: [
+          'A router runs out of memory',
+          'An organization announces routes for IP address space it does not actually own, redirecting traffic',
+          'A firewall blocks legitimate traffic',
+          'DNS servers return incorrect IP addresses',
+        ],
+        correctIndex: 1,
+        explanation: 'BGP has no built-in ownership verification, allowing route announcements for address space the announcer does not own.',
+      ),
+      QuizQuestion(
+        question: 'What is the key functional difference between OSPF and BGP?',
+        options: [
+          'OSPF encrypts traffic; BGP does not',
+          'OSPF routes within a single organization automatically by shortest path; BGP routes between organizations based on policy',
+          'BGP is only used on local networks',
+          'OSPF and BGP are the same protocol with different names',
+        ],
+        correctIndex: 1,
+        explanation: 'OSPF is an interior gateway protocol using shortest-path calculation; BGP is an exterior gateway protocol using policy-based route selection between autonomous networks.',
       ),
     ],
   ),
