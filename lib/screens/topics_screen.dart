@@ -1,8 +1,108 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../data/levels_data.dart';
 import '../services/progress_service.dart';
 import 'topic_detail_screen.dart';
 
+// ── Per-module visual theme ───────────────────────────────────────────────
+class _ModuleTheme {
+  final List<Color> gradient;
+  final IconData icon;
+  final IconData bgIcon; // large decorative background icon
+  const _ModuleTheme(this.gradient, this.icon, this.bgIcon);
+}
+
+const Map<String, _ModuleTheme> _moduleThemes = {
+  'Cybersecurity Fundamentals': _ModuleTheme(
+    [Color(0xFF1565C0), Color(0xFF42A5F5)],
+    Icons.security,
+    Icons.shield,
+  ),
+  'Email Security': _ModuleTheme(
+    [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
+    Icons.email,
+    Icons.mark_email_read,
+  ),
+  'Networking': _ModuleTheme(
+    [Color(0xFF00695C), Color(0xFF4DB6AC)],
+    Icons.router,
+    Icons.lan,
+  ),
+  'Windows Security': _ModuleTheme(
+    [Color(0xFF0277BD), Color(0xFF29B6F6)],
+    Icons.desktop_windows,
+    Icons.computer,
+  ),
+  'Linux Security': _ModuleTheme(
+    [Color(0xFFBF360C), Color(0xFFFF8A65)],
+    Icons.terminal,
+    Icons.code,
+  ),
+  'SOC Operations': _ModuleTheme(
+    [Color(0xFF1A237E), Color(0xFF5C6BC0)],
+    Icons.visibility,
+    Icons.radar,
+  ),
+  'Capstone: Applied Defense': _ModuleTheme(
+    [Color(0xFFF57F17), Color(0xFFFFD54F)],
+    Icons.workspace_premium,
+    Icons.military_tech,
+  ),
+};
+
+_ModuleTheme _themeFor(String title) =>
+    _moduleThemes[title] ??
+    const _ModuleTheme(
+      [Color(0xFF37474F), Color(0xFF78909C)],
+      Icons.book,
+      Icons.book,
+    );
+
+// ── Watermark painter ─────────────────────────────────────────────────────
+class _WatermarkPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final textPainter = TextPainter(
+      text: const TextSpan(
+        text: 'CYBERPULSE',
+        style: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+          color: Color(0x08003580),
+          letterSpacing: 4,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+
+    final iconPainter = TextPainter(
+      text: const TextSpan(
+        text: '🛡',
+        style: TextStyle(fontSize: 18, color: Color(0x06003580)),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+
+    const rowH = 70.0;
+    const colW = 160.0;
+    canvas.save();
+    canvas.rotate(-math.pi / 8);
+
+    for (double y = -size.height; y < size.height * 2; y += rowH) {
+      final offset = (y / rowH).floor().isEven ? 0.0 : colW / 2;
+      for (double x = -size.width + offset; x < size.width * 2; x += colW) {
+        textPainter.paint(canvas, Offset(x, y));
+        iconPainter.paint(canvas, Offset(x + textPainter.width + 6, y + 2));
+      }
+    }
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
+}
+
+// ── Screen ────────────────────────────────────────────────────────────────
 class TopicsScreen extends StatefulWidget {
   const TopicsScreen({super.key});
 
@@ -23,7 +123,8 @@ class _TopicsScreenState extends State<TopicsScreen> {
   Future<void> _refresh() async {
     final scores = <int, double?>{};
     for (final entry in allTopics) {
-      scores[entry.levelIndex] = await ProgressService.getBestScore(entry.levelIndex);
+      scores[entry.levelIndex] =
+          await ProgressService.getBestScore(entry.levelIndex);
     }
     setState(() {
       _bestScoresByLevel = scores;
@@ -35,17 +136,12 @@ class _TopicsScreenState extends State<TopicsScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('About This Course'),
+        title: const Text('About CyberPulse Academy'),
         content: const Text(
           'CyberPulse Academy is a vendor-neutral cybersecurity '
-          'curriculum. The concepts taught — the CIA Triad, least '
-          'privilege, defense in depth, Zero Trust, and more — apply '
-          'across platforms and aren\'t tied to any single certification '
-          'body or vendor product.\n\n'
-          'All topics are free — just pass each level\'s exam at 80%+ '
-          'to unlock the next level. Each topic includes an audio '
-          'introduction you can listen to before diving into the '
-          'reading lessons.',
+          'curriculum. All core topics are free — pass each level\'s '
+          'exam at 80%+ to advance. Intermediate, Advanced, and Expert '
+          'tabs inside each topic unlock premium depth content.',
         ),
         actions: [
           TextButton(
@@ -60,47 +156,118 @@ class _TopicsScreenState extends State<TopicsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF0F4FF),
       appBar: AppBar(
-        title: const Text('CyberPulse Academy'),
+        backgroundColor: const Color(0xFF1565C0),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        title: Row(
+          children: [
+            const Icon(Icons.shield, color: Colors.white, size: 22),
+            const SizedBox(width: 8),
+            const Text(
+              'CyberPulse Academy',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.white),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.info_outline),
-            tooltip: 'About this course',
+            icon: const Icon(Icons.info_outline, color: Colors.white),
+            tooltip: 'About',
             onPressed: _showAbout,
           ),
         ],
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _refresh,
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: allTopics.length,
-                itemBuilder: (context, index) {
-                  final entry = allTopics[index];
-                  final bestScore = _bestScoresByLevel[entry.levelIndex];
-
-                  return _TopicCard(
-                    entry: entry,
-                    bestScore: bestScore,
-                    onTap: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => TopicDetailScreen(entry: entry),
+      body: Stack(
+        children: [
+          // Watermark background
+          Positioned.fill(
+            child: CustomPaint(painter: _WatermarkPainter()),
+          ),
+          // Content
+          _loading
+              ? const Center(child: CircularProgressIndicator())
+              : RefreshIndicator(
+                  onRefresh: _refresh,
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+                    children: [
+                      // Header
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        margin: const EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF1565C0), Color(0xFF1976D2)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.blue.withValues(alpha: 0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                      );
-                      _refresh();
-                    },
-                  );
-                },
-              ),
-            ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.school,
+                                color: Colors.white, size: 36),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Start Learning',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    '7 topics · Beginner to Expert',
+                                    style: TextStyle(
+                                        color: Colors.white70, fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Topic cards
+                      for (var i = 0; i < allTopics.length; i++)
+                        _TopicCard(
+                          entry: allTopics[i],
+                          bestScore: _bestScoresByLevel[allTopics[i].levelIndex],
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    TopicDetailScreen(entry: allTopics[i]),
+                              ),
+                            );
+                            _refresh();
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+        ],
+      ),
     );
   }
 }
 
+// ── Topic Card ────────────────────────────────────────────────────────────
 class _TopicCard extends StatelessWidget {
   final TopicEntry entry;
   final double? bestScore;
@@ -115,58 +282,188 @@ class _TopicCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final module = entry.module;
-    final level = entry.level;
+    final theme = _themeFor(module.title);
 
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: theme.gradient.first.withValues(alpha: 0.35),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Column(
             children: [
-              Icon(module.icon, size: 32, color: Colors.blue),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              // ── Image banner ───────────────────────────────────────
+              SizedBox(
+                height: 120,
+                child: Stack(
                   children: [
-                    Text(
-                      module.title,
-                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                    // Gradient background
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: theme.gradient,
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${module.lessonCount} lessons',
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    // Large decorative background icon
+                    Positioned(
+                      right: -20,
+                      bottom: -20,
+                      child: Icon(
+                        theme.bgIcon,
+                        size: 120,
+                        color: Colors.white.withValues(alpha: 0.12),
+                      ),
                     ),
-                    if (bestScore != null) ...[
-                      const SizedBox(height: 4),
-                      Row(
+                    // Small dots pattern
+                    Positioned.fill(
+                      child: CustomPaint(painter: _DotPatternPainter()),
+                    ),
+                    // Content
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Icon(Icons.emoji_events, size: 14, color: Colors.green),
-                          const SizedBox(width: 4),
+                          // Module icon badge
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(theme.icon,
+                                color: Colors.white, size: 24),
+                          ),
+                          // Module title
                           Text(
-                            '${level.title} exam best: ${bestScore!.toStringAsFixed(0)}%',
+                            module.title,
                             style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.green,
-                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black26,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                    ],
+                    ),
+                    // Level badge top right
+                    Positioned(
+                      top: 12,
+                      right: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.25),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.5)),
+                        ),
+                        child: Text(
+                          entry.level.title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios, size: 16),
+              // ── Info row ──────────────────────────────────────────
+              Container(
+                color: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Row(
+                  children: [
+                    Icon(Icons.menu_book,
+                        size: 16, color: theme.gradient.first),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${module.lessonCount} lessons',
+                      style: TextStyle(
+                          fontSize: 13, color: theme.gradient.first),
+                    ),
+                    const SizedBox(width: 16),
+                    Icon(Icons.headphones,
+                        size: 16, color: theme.gradient.first),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Audio included',
+                      style: TextStyle(
+                          fontSize: 13, color: theme.gradient.first),
+                    ),
+                    const Spacer(),
+                    if (bestScore != null)
+                      Row(
+                        children: [
+                          const Icon(Icons.emoji_events,
+                              size: 16, color: Colors.green),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${bestScore!.toStringAsFixed(0)}%',
+                            style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      )
+                    else
+                      Icon(Icons.arrow_forward_ios,
+                          size: 14, color: Colors.grey.shade400),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+// ── Subtle dot pattern painted on the card banner ─────────────────────────
+class _DotPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.07)
+      ..style = PaintingStyle.fill;
+    const spacing = 18.0;
+    for (double x = 0; x < size.width; x += spacing) {
+      for (double y = 0; y < size.height; y += spacing) {
+        canvas.drawCircle(Offset(x, y), 2, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
 }
