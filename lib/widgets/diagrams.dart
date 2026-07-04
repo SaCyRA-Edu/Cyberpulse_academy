@@ -17,6 +17,9 @@ enum DiagramType {
   tlsHandshake,
   threatActorSpectrum,
   attackVectors,
+  impersonationForms,
+  motivationalTriggers,
+  otherSocialEngineering,
 }
 
 class DiagramSpec {
@@ -66,6 +69,15 @@ class DiagramView extends StatelessWidget {
         break;
       case DiagramType.attackVectors:
         diagram = const AttackVectorsDiagram();
+        break;
+      case DiagramType.impersonationForms:
+        diagram = const ImpersonationFormsDiagram();
+        break;
+      case DiagramType.motivationalTriggers:
+        diagram = const MotivationalTriggersDiagram();
+        break;
+      case DiagramType.otherSocialEngineering:
+        diagram = const OtherSocialEngineeringDiagram();
         break;
       case DiagramType.processFlow:
         diagram = ProcessFlowDiagram(steps: spec.steps ?? const []);
@@ -840,6 +852,149 @@ class AttackVectorsDiagram extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: v.$3),
                 ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Impersonation Forms — 4 forms of impersonation-driven social engineering
+// ═══════════════════════════════════════════════════════════════════════
+
+class ImpersonationFormsDiagram extends StatelessWidget {
+  const ImpersonationFormsDiagram({super.key});
+
+  static const forms = [
+    ('Impersonation', Icons.theater_comedy, Color(0xFF1565C0), 'Posing as a trusted person'),
+    ('Brand Impersonation', Icons.branding_watermark, Color(0xFF6A1B9A), 'Faking a trusted company'),
+    ('Typosquatting', Icons.text_fields, Color(0xFFC62828), 'Near-identical lookalike domains'),
+    ('Watering Hole', Icons.pool, Color(0xFF2E7D32), 'Compromising a site victims trust'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      alignment: WrapAlignment.center,
+      children: [
+        for (final f in forms)
+          Container(
+            width: 130,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: f.$3.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: f.$3.withValues(alpha: 0.3)),
+            ),
+            child: Column(
+              children: [
+                Icon(f.$2, color: f.$3, size: 24),
+                const SizedBox(height: 6),
+                Text(f.$1,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: f.$3)),
+                const SizedBox(height: 4),
+                Text(f.$4,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 10, color: Colors.black87)),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Motivational Triggers — the 6 psychological levers social engineers use
+// ═══════════════════════════════════════════════════════════════════════
+
+class MotivationalTriggersDiagram extends StatelessWidget {
+  const MotivationalTriggersDiagram({super.key});
+
+  static const triggers = [
+    ('Authority', Icons.gavel, Color(0xFF1565C0)),
+    ('Urgency', Icons.timer, Color(0xFFC62828)),
+    ('Social Proof', Icons.groups, Color(0xFF2E7D32)),
+    ('Scarcity', Icons.hourglass_bottom, Color(0xFFEF6C00)),
+    ('Likability', Icons.favorite, Color(0xFFAD1457)),
+    ('Fear', Icons.warning_amber, Color(0xFF37474F)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      alignment: WrapAlignment.center,
+      children: [
+        for (final t in triggers)
+          Container(
+            width: 96,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            decoration: BoxDecoration(
+              color: t.$3,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                Icon(t.$2, color: Colors.white, size: 22),
+                const SizedBox(height: 6),
+                Text(
+                  t.$1,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Other Social Engineering Attacks — physical & opportunistic techniques
+// ═══════════════════════════════════════════════════════════════════════
+
+class OtherSocialEngineeringDiagram extends StatelessWidget {
+  const OtherSocialEngineeringDiagram({super.key});
+
+  static const attacks = [
+    ('Diversion Theft', Icons.local_shipping),
+    ('Hoaxes', Icons.report_problem),
+    ('Shoulder Surfing', Icons.visibility),
+    ('Dumpster Diving', Icons.delete_outline),
+    ('Eavesdropping', Icons.hearing),
+    ('Baiting', Icons.usb),
+    ('Piggybacking', Icons.people_alt),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      alignment: WrapAlignment.center,
+      children: [
+        for (final a in attacks)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.deepPurple.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.deepPurple.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(a.$2, size: 14, color: Colors.deepPurple),
+                const SizedBox(width: 6),
+                Text(a.$1, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
               ],
             ),
           ),
