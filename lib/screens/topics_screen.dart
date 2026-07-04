@@ -33,6 +33,11 @@ const Map<String, _ModuleTheme> _moduleThemes = {
     Icons.coronavirus,
     Icons.bug_report,
   ),
+  'Cryptography': _ModuleTheme(
+    [Color(0xFF00695C), Color(0xFF4DB6AC)],
+    Icons.enhanced_encryption,
+    Icons.key,
+  ),
   'Email Security': _ModuleTheme(
     [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
     Icons.email,

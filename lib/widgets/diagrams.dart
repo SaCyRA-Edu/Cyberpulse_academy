@@ -22,6 +22,7 @@ enum DiagramType {
   otherSocialEngineering,
   malwareTypes,
   virusTrojanWormTable,
+  symmetricAsymmetricTable,
 }
 
 class DiagramSpec {
@@ -86,6 +87,9 @@ class DiagramView extends StatelessWidget {
         break;
       case DiagramType.virusTrojanWormTable:
         diagram = const VirusTrojanWormTableDiagram();
+        break;
+      case DiagramType.symmetricAsymmetricTable:
+        diagram = const SymmetricAsymmetricTableDiagram();
         break;
       case DiagramType.processFlow:
         diagram = ProcessFlowDiagram(steps: spec.steps ?? const []);
@@ -1120,6 +1124,74 @@ class VirusTrojanWormTableDiagram extends StatelessWidget {
                 bodyCell(rows[i].$2),
                 bodyCell(rows[i].$3),
                 bodyCell(rows[i].$4),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Symmetric vs Asymmetric — side-by-side comparison table
+// ═══════════════════════════════════════════════════════════════════════
+
+class SymmetricAsymmetricTableDiagram extends StatelessWidget {
+  const SymmetricAsymmetricTableDiagram({super.key});
+
+  static const rows = [
+    ('Number of keys', '1 shared secret key', '2 mathematically linked keys (public + private)'),
+    ('Speed', 'Fast', 'Slower'),
+    ('Key distribution', 'Hard — must share the secret key safely', 'Easy — the public key can be shared openly'),
+    ('Typical use', 'Encrypting large volumes of data', 'Key exchange, digital signatures, authentication'),
+    ('Example algorithms', 'AES, DES, 3DES, Blowfish', 'RSA, ECC, Diffie-Hellman'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    Widget headerCell(String text, Color color) => Expanded(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            color: color,
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+            ),
+          ),
+        );
+
+    Widget bodyCell(String text, {bool bold = false}) => Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 11, fontWeight: bold ? FontWeight.bold : FontWeight.normal),
+            ),
+          ),
+        );
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            const Expanded(flex: 2, child: SizedBox()),
+            headerCell('Symmetric', const Color(0xFF1565C0)),
+            headerCell('Asymmetric', const Color(0xFF6A1B9A)),
+          ],
+        ),
+        for (var i = 0; i < rows.length; i++)
+          Container(
+            decoration: BoxDecoration(
+              color: i.isEven ? Colors.grey.shade50 : Colors.white,
+              border: const Border(bottom: BorderSide(color: Color(0xFFEEEEEE))),
+            ),
+            child: Row(
+              children: [
+                Expanded(flex: 2, child: bodyCell(rows[i].$1, bold: true)),
+                bodyCell(rows[i].$2),
+                bodyCell(rows[i].$3),
               ],
             ),
           ),
