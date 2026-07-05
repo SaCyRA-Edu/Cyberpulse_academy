@@ -10,6 +10,7 @@ import 'lessons/cryptography_lessons.dart';
 import 'lessons/iam_lessons.dart';
 import 'lessons/vulnerabilities_threats_lessons.dart';
 import 'lessons/alerts_monitoring_lessons.dart';
+import 'lessons/incident_response_lessons.dart';
 import 'lessons/email_security_lessons.dart';
 import 'lessons/networking_lessons.dart';
 import 'lessons/windows_security_lessons.dart';
@@ -131,6 +132,13 @@ final List<Level> allLevels = [
         icon: Icons.notifications_active,
         xpReward: 130,
         lessons: alertsMonitoringLessons,
+        primaryDomainIndex: 3, // Security Operations
+      ),
+      Module(
+        title: 'Security Incident Response',
+        icon: Icons.emergency,
+        xpReward: 130,
+        lessons: incidentResponseLessons,
         primaryDomainIndex: 3, // Security Operations
       ),
       Module(

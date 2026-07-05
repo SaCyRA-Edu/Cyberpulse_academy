@@ -53,6 +53,11 @@ const Map<String, _ModuleTheme> _moduleThemes = {
     Icons.notifications_active,
     Icons.monitor_heart,
   ),
+  'Security Incident Response': _ModuleTheme(
+    [Color(0xFFAD1457), Color(0xFFF06292)],
+    Icons.emergency,
+    Icons.local_fire_department,
+  ),
   'Email Security': _ModuleTheme(
     [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
     Icons.email,
