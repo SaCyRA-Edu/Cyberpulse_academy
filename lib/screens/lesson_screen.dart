@@ -35,6 +35,7 @@ class _LessonScreenState extends State<LessonScreen> {
   final FlutterTts _tts = FlutterTts();
   bool _isSpeaking = false;
   VoiceGender _voiceGender = VoiceGender.female;
+  double _speechRate = 0.65;
   List<Map<String, dynamic>> _femaleVoices = [];
   List<Map<String, dynamic>> _maleVoices = [];
   bool _voicesLoaded = false;
@@ -84,7 +85,7 @@ class _LessonScreenState extends State<LessonScreen> {
       // Fall back silently if en-IN isn't available on this platform.
     }
     await _tts.setPitch(1.0);
-    await _tts.setSpeechRate(0.46); // slightly slower reads more naturally
+    await _tts.setSpeechRate(_speechRate); // faster, natural conversational pace (~1.3x)
     await _tts.setVolume(1.0);
 
     await _discoverVoices();
@@ -172,6 +173,24 @@ class _LessonScreenState extends State<LessonScreen> {
     setState(() => _voiceGender = gender);
     await VoicePreferenceService.setPreferredGender(gender);
     await _applyPreferredVoice();
+    if (wasSpeaking) {
+      setState(() => _isSpeaking = true);
+      await _tts.speak(_lessonNarrationText(widget.lesson));
+    }
+  }
+
+  // Presets roughly map to 1x / 1.3x / 1.6x conversational pace, since
+  // flutter_tts normalizes 0.5 as the platform's "normal" speech rate.
+  static const List<double> _speedPresets = [0.5, 0.65, 0.8];
+  static const List<String> _speedLabels = ['1x', '1.3x', '1.6x'];
+
+  Future<void> _cycleSpeechRate() async {
+    final currentIdx = _speedPresets.indexOf(_speechRate);
+    final nextIdx = (currentIdx + 1) % _speedPresets.length;
+    final wasSpeaking = _isSpeaking;
+    if (wasSpeaking) await _tts.stop();
+    setState(() => _speechRate = _speedPresets[nextIdx]);
+    await _tts.setSpeechRate(_speechRate);
     if (wasSpeaking) {
       setState(() => _isSpeaking = true);
       await _tts.speak(_lessonNarrationText(widget.lesson));
@@ -316,6 +335,12 @@ class _LessonScreenState extends State<LessonScreen> {
               icon: const Icon(Icons.record_voice_over),
               tooltip: 'Choose narrator voice',
               onPressed: _showVoicePicker,
+            ),
+          if (!lesson.isQuiz)
+            TextButton.icon(
+              onPressed: _cycleSpeechRate,
+              icon: const Icon(Icons.speed, size: 18),
+              label: Text(_speedLabels[_speedPresets.indexOf(_speechRate)]),
             ),
           if (!lesson.isQuiz && !lesson.isAudio)
             IconButton(
