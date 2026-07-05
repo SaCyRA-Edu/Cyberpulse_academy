@@ -25,6 +25,7 @@ enum DiagramType {
   symmetricAsymmetricTable,
   idsIpsTable,
   networkAppliancesTable,
+  ssoComparison,
 }
 
 class DiagramSpec {
@@ -98,6 +99,9 @@ class DiagramView extends StatelessWidget {
         break;
       case DiagramType.networkAppliancesTable:
         diagram = const NetworkAppliancesTableDiagram();
+        break;
+      case DiagramType.ssoComparison:
+        diagram = const SsoComparisonDiagram();
         break;
       case DiagramType.processFlow:
         diagram = ProcessFlowDiagram(steps: spec.steps ?? const []);
@@ -1330,6 +1334,72 @@ class NetworkAppliancesTableDiagram extends StatelessWidget {
               ],
             ),
           ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// SSO vs Traditional Login — side-by-side comparison
+// ═══════════════════════════════════════════════════════════════════════
+
+class SsoComparisonDiagram extends StatelessWidget {
+  const SsoComparisonDiagram({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget column(String title, Color color, List<String> apps, bool sso) {
+      return Expanded(
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
+          ),
+          child: Column(
+            children: [
+              Text(title,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: color)),
+              const SizedBox(height: 8),
+              if (sso)
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                  decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(6)),
+                  child: const Text('One Login',
+                      style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                ),
+              const SizedBox(height: 8),
+              for (final app in apps)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 3),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: color.withValues(alpha: 0.4)),
+                    ),
+                    child: Text(
+                      sso ? app : '$app\n(own login)',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 10),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        column('Traditional Login', const Color(0xFFC62828), ['App A', 'App B', 'App C'], false),
+        column('Single Sign-On', const Color(0xFF2E7D32), ['App A', 'App B', 'App C'], true),
       ],
     );
   }

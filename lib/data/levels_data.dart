@@ -7,6 +7,7 @@ import 'lessons/threat_actors_lessons.dart';
 import 'lessons/social_engineering_lessons.dart';
 import 'lessons/malware_lessons.dart';
 import 'lessons/cryptography_lessons.dart';
+import 'lessons/iam_lessons.dart';
 import 'lessons/email_security_lessons.dart';
 import 'lessons/networking_lessons.dart';
 import 'lessons/windows_security_lessons.dart';
@@ -107,6 +108,13 @@ final List<Level> allLevels = [
         icon: Icons.enhanced_encryption,
         xpReward: 130,
         lessons: cryptographyLessons,
+        primaryDomainIndex: 0, // General Security Concepts
+      ),
+      Module(
+        title: 'Identity Access Management',
+        icon: Icons.badge,
+        xpReward: 130,
+        lessons: iamLessons,
         primaryDomainIndex: 0, // General Security Concepts
       ),
       Module(

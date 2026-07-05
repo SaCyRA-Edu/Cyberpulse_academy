@@ -38,6 +38,11 @@ const Map<String, _ModuleTheme> _moduleThemes = {
     Icons.enhanced_encryption,
     Icons.key,
   ),
+  'Identity Access Management': _ModuleTheme(
+    [Color(0xFF283593), Color(0xFF7986CB)],
+    Icons.badge,
+    Icons.fingerprint,
+  ),
   'Email Security': _ModuleTheme(
     [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
     Icons.email,
