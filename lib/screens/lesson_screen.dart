@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -35,10 +36,11 @@ class _LessonScreenState extends State<LessonScreen> {
   final FlutterTts _tts = FlutterTts();
   bool _isSpeaking = false;
   VoiceGender _voiceGender = VoiceGender.female;
-  double _speechRate = 0.65;
+  double _speechRate = kIsWeb ? 1.3 : 0.65;
   List<Map<String, dynamic>> _femaleVoices = [];
   List<Map<String, dynamic>> _maleVoices = [];
   bool _voicesLoaded = false;
+  bool _hasAnyIndianVoice = true; // assume true until discovery says otherwise
 
   // Notes state.
   final TextEditingController _notesController = TextEditingController();
@@ -105,8 +107,10 @@ class _LessonScreenState extends State<LessonScreen> {
 
       final enInVoices = voices.cast<dynamic>().where((v) {
         final locale = (v['locale'] ?? '').toString().toLowerCase();
-        return locale.contains('en-in');
+        return locale.contains('en-in') || locale.contains('en_in');
       }).toList();
+
+      _hasAnyIndianVoice = enInVoices.isNotEmpty;
 
       final female = <Map<String, dynamic>>[];
       final male = <Map<String, dynamic>>[];
@@ -181,8 +185,15 @@ class _LessonScreenState extends State<LessonScreen> {
 
   // Presets roughly map to 1x / 1.3x / 1.6x conversational pace, since
   // flutter_tts normalizes 0.5 as the platform's "normal" speech rate.
-  static const List<double> _speedPresets = [0.5, 0.65, 0.8];
-  static const List<String> _speedLabels = ['1x', '1.3x', '1.6x'];
+  // flutter_tts normalizes speech rate very differently by platform: on
+  // Android/iOS the scale is roughly 0.0-1.0 with ~0.5 as "normal" speed,
+  // but on web it passes straight through to the browser's Speech
+  // Synthesis API, where 1.0 is normal and values above that genuinely
+  // speed playback up (commonly usable up to ~2-3x before quality degrades).
+  static const List<double> _speedPresets =
+      kIsWeb ? [1.0, 1.3, 1.6, 2.0, 2.5] : [0.5, 0.65, 0.8, 1.0];
+  static const List<String> _speedLabels =
+      kIsWeb ? ['1x', '1.3x', '1.6x', '2x', '2.5x'] : ['1x', '1.3x', '1.6x', '2x'];
 
   Future<void> _cycleSpeechRate() async {
     final currentIdx = _speedPresets.indexOf(_speechRate);
@@ -210,10 +221,37 @@ class _LessonScreenState extends State<LessonScreen> {
           children: [
             const Text('Narrator Voice', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
-            Text(
-              'Indian English voice — availability depends on your device.',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-            ),
+            if (_voicesLoaded && !_hasAnyIndianVoice)
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.shade300),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.warning_amber, color: Colors.orange, size: 18),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'No Indian English voice was found on this browser/device — '
+                        'using the closest available English voice instead. On '
+                        'Windows, add an "English (India)" voice under '
+                        'Settings > Time & Language > Speech. On Android, install '
+                        'it via Google TTS language settings.',
+                        style: TextStyle(fontSize: 11.5),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              Text(
+                'Indian English voice — availability depends on your device.',
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              ),
             const SizedBox(height: 16),
             Row(
               children: [
