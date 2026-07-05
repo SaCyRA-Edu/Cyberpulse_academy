@@ -43,6 +43,11 @@ const Map<String, _ModuleTheme> _moduleThemes = {
     Icons.badge,
     Icons.fingerprint,
   ),
+  'Vulnerabilities and Threats': _ModuleTheme(
+    [Color(0xFFBF360C), Color(0xFFFF8A65)],
+    Icons.bug_report,
+    Icons.warning_amber,
+  ),
   'Email Security': _ModuleTheme(
     [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
     Icons.email,

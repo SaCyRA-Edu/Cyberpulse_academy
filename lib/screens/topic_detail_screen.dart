@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../data/levels_data.dart';
-import '../data/lesson_model.dart';
 import '../data/domains_data.dart';
 import '../widgets/watermark.dart';
 import 'lesson_screen.dart';
@@ -89,8 +88,6 @@ class TopicDetailScreen extends StatelessWidget {
                   title: Text(lesson.title),
                   subtitle: Row(
                     children: [
-                      _DifficultyBadge(difficulty: lesson.difficulty),
-                      const SizedBox(width: 8),
                       if (lesson.isAudio) ...[
                         const Text('Audio',
                             style: TextStyle(fontSize: 12, color: Colors.blue)),
@@ -106,42 +103,6 @@ class TopicDetailScreen extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ── Per-lesson difficulty badge ─────────────────────────────────────────────
-
-class _DifficultyBadge extends StatelessWidget {
-  final LessonDifficulty difficulty;
-
-  const _DifficultyBadge({required this.difficulty});
-
-  Color get _color {
-    switch (difficulty) {
-      case LessonDifficulty.beginner:
-        return Colors.green;
-      case LessonDifficulty.intermediate:
-        return Colors.orange;
-      case LessonDifficulty.advanced:
-        return Colors.deepOrange;
-      case LessonDifficulty.expert:
-        return Colors.purple;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-      decoration: BoxDecoration(
-        color: _color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        difficulty.label,
-        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: _color),
       ),
     );
   }

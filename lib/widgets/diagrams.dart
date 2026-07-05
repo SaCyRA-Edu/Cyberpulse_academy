@@ -26,6 +26,7 @@ enum DiagramType {
   idsIpsTable,
   networkAppliancesTable,
   ssoComparison,
+  xssTypes,
 }
 
 class DiagramSpec {
@@ -102,6 +103,9 @@ class DiagramView extends StatelessWidget {
         break;
       case DiagramType.ssoComparison:
         diagram = const SsoComparisonDiagram();
+        break;
+      case DiagramType.xssTypes:
+        diagram = const XssTypesDiagram();
         break;
       case DiagramType.processFlow:
         diagram = ProcessFlowDiagram(steps: spec.steps ?? const []);
@@ -1400,6 +1404,55 @@ class SsoComparisonDiagram extends StatelessWidget {
       children: [
         column('Traditional Login', const Color(0xFFC62828), ['App A', 'App B', 'App C'], false),
         column('Single Sign-On', const Color(0xFF2E7D32), ['App A', 'App B', 'App C'], true),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// XSS Types — Reflected, Persistent, DOM-based
+// ═══════════════════════════════════════════════════════════════════════
+
+class XssTypesDiagram extends StatelessWidget {
+  const XssTypesDiagram({super.key});
+
+  static const types = [
+    ('Reflected', Icons.replay, Color(0xFF1565C0), 'Payload bounces back in the immediate server response'),
+    ('Persistent', Icons.storage, Color(0xFFC62828), 'Payload is stored on the server, served to every future visitor'),
+    ('DOM-based', Icons.code, Color(0xFF6A1B9A), 'Payload executes purely in client-side JavaScript, never touching the server'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      alignment: WrapAlignment.center,
+      children: [
+        for (final t in types)
+          Container(
+            width: 150,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: t.$3.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: t.$3.withValues(alpha: 0.3)),
+            ),
+            child: Column(
+              children: [
+                Icon(t.$2, color: t.$3, size: 24),
+                const SizedBox(height: 6),
+                Text(t.$1,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: t.$3)),
+                const SizedBox(height: 4),
+                Text(
+                  t.$4,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 10, color: Colors.black87),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
