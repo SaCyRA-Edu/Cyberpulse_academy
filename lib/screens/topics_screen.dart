@@ -263,7 +263,7 @@ class _TopicsScreenState extends State<TopicsScreen> {
                             const Icon(Icons.school,
                                 color: Colors.white, size: 36),
                             const SizedBox(width: 12),
-                            const Expanded(
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
