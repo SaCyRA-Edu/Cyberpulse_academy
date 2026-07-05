@@ -4,6 +4,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../data/lesson_model.dart';
 import '../services/notes_service.dart';
+import '../services/voice_preference_service.dart';
 import '../widgets/watermark.dart';
 import '../widgets/diagrams.dart';
 
@@ -33,6 +34,10 @@ class _LessonScreenState extends State<LessonScreen> {
   // Audio narration state.
   final FlutterTts _tts = FlutterTts();
   bool _isSpeaking = false;
+  VoiceGender _voiceGender = VoiceGender.female;
+  List<Map<String, dynamic>> _femaleVoices = [];
+  List<Map<String, dynamic>> _maleVoices = [];
+  bool _voicesLoaded = false;
 
   // Notes state.
   final TextEditingController _notesController = TextEditingController();
@@ -66,10 +71,13 @@ class _LessonScreenState extends State<LessonScreen> {
       if (mounted) setState(() => _isSpeaking = false);
     });
 
+    _voiceGender = await VoicePreferenceService.getPreferredGender();
+
     // Indian English voice, tuned for a warmer, more natural delivery.
     // Actual voice quality depends on the TTS engine installed on the
     // user's device/browser — Android and Chrome typically ship at least
-    // one en-IN voice, but availability varies.
+    // one en-IN voice, but availability (and true male/female variety)
+    // varies by device.
     try {
       await _tts.setLanguage('en-IN');
     } catch (_) {
@@ -79,23 +87,148 @@ class _LessonScreenState extends State<LessonScreen> {
     await _tts.setSpeechRate(0.46); // slightly slower reads more naturally
     await _tts.setVolume(1.0);
 
+    await _discoverVoices();
+    await _applyPreferredVoice();
+  }
+
+  /// Fetches every en-IN voice the device's TTS engine offers and buckets
+  /// each one into female/male using whatever gender hint is available —
+  /// an explicit 'gender' field if the platform provides one, otherwise
+  /// common naming patterns (e.g. "female"/"male" appearing in the voice
+  /// name). This is genuinely best-effort: not every platform exposes
+  /// reliable gender metadata for its voices.
+  Future<void> _discoverVoices() async {
     try {
       final voices = await _tts.getVoices;
-      if (voices is List) {
-        final match = voices.cast<dynamic>().firstWhere(
-              (v) => (v['locale'] ?? '').toString().toLowerCase().contains('en-in'),
-              orElse: () => null,
-            );
-        if (match != null) {
-          await _tts.setVoice({
-            'name': match['name'].toString(),
-            'locale': match['locale'].toString(),
-          });
+      if (voices is! List) return;
+
+      final enInVoices = voices.cast<dynamic>().where((v) {
+        final locale = (v['locale'] ?? '').toString().toLowerCase();
+        return locale.contains('en-in');
+      }).toList();
+
+      final female = <Map<String, dynamic>>[];
+      final male = <Map<String, dynamic>>[];
+      final unknown = <Map<String, dynamic>>[];
+
+      for (final v in enInVoices) {
+        final map = Map<String, dynamic>.from(v as Map);
+        final name = (map['name'] ?? '').toString().toLowerCase();
+        final genderField = (map['gender'] ?? '').toString().toLowerCase();
+        if (genderField.contains('female') || name.contains('female')) {
+          female.add(map);
+        } else if (genderField.contains('male') || name.contains('male')) {
+          male.add(map);
+        } else {
+          unknown.add(map);
         }
       }
+
+      // If a platform gives no gender hints at all, split whatever voices
+      // exist between the two lists so a choice is still meaningful rather
+      // than both options silently resolving to the same single voice.
+      if (female.isEmpty && male.isEmpty && unknown.isNotEmpty) {
+        for (var i = 0; i < unknown.length; i++) {
+          (i.isEven ? female : male).add(unknown[i]);
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          _femaleVoices = female;
+          _maleVoices = male;
+          _voicesLoaded = true;
+        });
+      } else {
+        _femaleVoices = female;
+        _maleVoices = male;
+        _voicesLoaded = true;
+      }
     } catch (_) {
-      // Voice selection is best-effort; default en-IN locale still applies.
+      // Voice discovery is best-effort; narration still works with
+      // whatever default voice the en-IN locale resolves to.
     }
+  }
+
+  Future<void> _applyPreferredVoice() async {
+    final pool = _voiceGender == VoiceGender.female ? _femaleVoices : _maleVoices;
+    final fallbackPool = _voiceGender == VoiceGender.female ? _maleVoices : _femaleVoices;
+    final chosen = pool.isNotEmpty ? pool.first : (fallbackPool.isNotEmpty ? fallbackPool.first : null);
+    if (chosen == null) return;
+    try {
+      await _tts.setVoice({
+        'name': chosen['name'].toString(),
+        'locale': chosen['locale'].toString(),
+      });
+    } catch (_) {
+      // Best-effort — default en-IN locale voice still applies if this fails.
+    }
+  }
+
+  Future<void> _changeVoiceGender(VoiceGender gender) async {
+    if (_voiceGender == gender) return;
+    final wasSpeaking = _isSpeaking;
+    if (wasSpeaking) await _tts.stop();
+    setState(() => _voiceGender = gender);
+    await VoicePreferenceService.setPreferredGender(gender);
+    await _applyPreferredVoice();
+    if (wasSpeaking) {
+      setState(() => _isSpeaking = true);
+      await _tts.speak(_lessonNarrationText(widget.lesson));
+    }
+  }
+
+  void _showVoicePicker() {
+    final femaleAvailable = _femaleVoices.isNotEmpty || !_voicesLoaded;
+    final maleAvailable = _maleVoices.isNotEmpty || !_voicesLoaded;
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Narrator Voice', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            Text(
+              'Indian English voice — availability depends on your device.',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _VoiceOptionCard(
+                    icon: Icons.face_3,
+                    label: 'Female Voice',
+                    selected: _voiceGender == VoiceGender.female,
+                    enabled: femaleAvailable,
+                    onTap: () {
+                      _changeVoiceGender(VoiceGender.female);
+                      Navigator.pop(ctx);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _VoiceOptionCard(
+                    icon: Icons.face,
+                    label: 'Male Voice',
+                    selected: _voiceGender == VoiceGender.male,
+                    enabled: maleAvailable,
+                    onTap: () {
+                      _changeVoiceGender(VoiceGender.male);
+                      Navigator.pop(ctx);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _loadNote() async {
@@ -178,6 +311,12 @@ class _LessonScreenState extends State<LessonScreen> {
       appBar: AppBar(
         title: Text(lesson.title),
         actions: [
+          if (!lesson.isQuiz)
+            IconButton(
+              icon: const Icon(Icons.record_voice_over),
+              tooltip: 'Choose narrator voice',
+              onPressed: _showVoicePicker,
+            ),
           if (!lesson.isQuiz && !lesson.isAudio)
             IconButton(
               icon: Icon(_isSpeaking ? Icons.stop_circle : Icons.volume_up),
@@ -572,6 +711,56 @@ class _LessonScreenState extends State<LessonScreen> {
                   _selectedAnswers[qIndex] = value!;
                 });
               },
+      ),
+    );
+  }
+}
+
+class _VoiceOptionCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  const _VoiceOptionCard({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: enabled ? onTap : null,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: selected ? Colors.indigo.withValues(alpha: 0.08) : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: selected ? Colors.indigo : Colors.grey.shade300, width: selected ? 2 : 1),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 28, color: enabled ? (selected ? Colors.indigo : Colors.grey.shade700) : Colors.grey.shade400),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                color: enabled ? (selected ? Colors.indigo : Colors.black87) : Colors.grey.shade400,
+              ),
+            ),
+            if (!enabled) ...[
+              const SizedBox(height: 2),
+              Text('Not available', style: TextStyle(fontSize: 10, color: Colors.grey.shade400)),
+            ],
+          ],
+        ),
       ),
     );
   }
