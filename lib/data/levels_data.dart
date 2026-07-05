@@ -9,6 +9,7 @@ import 'lessons/malware_lessons.dart';
 import 'lessons/cryptography_lessons.dart';
 import 'lessons/iam_lessons.dart';
 import 'lessons/vulnerabilities_threats_lessons.dart';
+import 'lessons/alerts_monitoring_lessons.dart';
 import 'lessons/email_security_lessons.dart';
 import 'lessons/networking_lessons.dart';
 import 'lessons/windows_security_lessons.dart';
@@ -124,6 +125,13 @@ final List<Level> allLevels = [
         xpReward: 130,
         lessons: vulnerabilitiesThreatsLessons,
         primaryDomainIndex: 1, // Threats, Vulnerabilities & Mitigations
+      ),
+      Module(
+        title: 'Alerts and Monitoring',
+        icon: Icons.notifications_active,
+        xpReward: 130,
+        lessons: alertsMonitoringLessons,
+        primaryDomainIndex: 3, // Security Operations
       ),
       Module(
         title: 'Email Security',

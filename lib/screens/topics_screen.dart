@@ -48,6 +48,11 @@ const Map<String, _ModuleTheme> _moduleThemes = {
     Icons.bug_report,
     Icons.warning_amber,
   ),
+  'Alerts and Monitoring': _ModuleTheme(
+    [Color(0xFF0277BD), Color(0xFF4FC3F7)],
+    Icons.notifications_active,
+    Icons.monitor_heart,
+  ),
   'Email Security': _ModuleTheme(
     [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
     Icons.email,

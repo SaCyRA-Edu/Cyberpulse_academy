@@ -27,6 +27,7 @@ enum DiagramType {
   networkAppliancesTable,
   ssoComparison,
   xssTypes,
+  siemSources,
 }
 
 class DiagramSpec {
@@ -106,6 +107,9 @@ class DiagramView extends StatelessWidget {
         break;
       case DiagramType.xssTypes:
         diagram = const XssTypesDiagram();
+        break;
+      case DiagramType.siemSources:
+        diagram = const SiemSourcesDiagram();
         break;
       case DiagramType.processFlow:
         diagram = ProcessFlowDiagram(steps: spec.steps ?? const []);
@@ -1453,6 +1457,86 @@ class XssTypesDiagram extends StatelessWidget {
               ],
             ),
           ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// SIEM Sources — hub-and-spoke: on-prem and SaaS sources feeding a SIEM
+// ═══════════════════════════════════════════════════════════════════════
+
+class SiemSourcesDiagram extends StatelessWidget {
+  const SiemSourcesDiagram({super.key});
+
+  static const onPrem = [
+    ('Infra', Icons.dns),
+    ('Endpoints', Icons.computer),
+    ('Network Devices', Icons.router),
+  ];
+
+  static const saas = [
+    ('Entra ID', Icons.badge),
+    ('AWS', Icons.cloud),
+    ('GCP', Icons.cloud_queue),
+    ('Microsoft 365', Icons.email),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    Widget sourceChip(String label, IconData icon, Color color) => Container(
+          margin: const EdgeInsets.all(3),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: color.withValues(alpha: 0.4)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 12, color: color),
+              const SizedBox(width: 4),
+              Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color)),
+            ],
+          ),
+        );
+
+    return Column(
+      children: [
+        Text('On-Premises', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey.shade600)),
+        const SizedBox(height: 4),
+        Wrap(
+          alignment: WrapAlignment.center,
+          children: [for (final s in onPrem) sourceChip(s.$1, s.$2, const Color(0xFF1565C0))],
+        ),
+        const SizedBox(height: 8),
+        Icon(Icons.arrow_downward, size: 16, color: Colors.grey.shade400),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF6A1B9A),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.hub, color: Colors.white, size: 20),
+              SizedBox(width: 8),
+              Text('SIEM', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Icon(Icons.arrow_upward, size: 16, color: Colors.grey.shade400),
+        const SizedBox(height: 8),
+        Text('Cloud / SaaS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey.shade600)),
+        const SizedBox(height: 4),
+        Wrap(
+          alignment: WrapAlignment.center,
+          children: [for (final s in saas) sourceChip(s.$1, s.$2, const Color(0xFF2E7D32))],
+        ),
       ],
     );
   }
