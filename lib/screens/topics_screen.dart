@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../data/levels_data.dart';
 import '../services/progress_service.dart';
 import 'topic_detail_screen.dart';
+import 'final_exam_screen.dart';
 
 // ── Per-module visual theme ───────────────────────────────────────────────
 class _ModuleTheme {
@@ -274,7 +275,7 @@ class _TopicsScreenState extends State<TopicsScreen> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   Text(
-                                    '7 topics · Beginner to Expert',
+                                    '${allTopics.length} topics · Beginner to Expert',
                                     style: TextStyle(
                                         color: Colors.white70, fontSize: 13),
                                   ),
@@ -282,6 +283,32 @@ class _TopicsScreenState extends State<TopicsScreen> {
                               ),
                             ),
                           ],
+                        ),
+                      ),
+                      // Final Certification Exam
+                      Card(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        color: Colors.indigo.withValues(alpha: 0.06),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          side: BorderSide(color: Colors.indigo.withValues(alpha: 0.25)),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          leading: const CircleAvatar(
+                            backgroundColor: Colors.indigo,
+                            child: Icon(Icons.workspace_premium, color: Colors.white),
+                          ),
+                          title: const Text('Final Certification Exam',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: const Text('100 questions · 120 min · 75% to pass'),
+                          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const FinalExamStartScreen()),
+                            );
+                          },
                         ),
                       ),
                       // Topic cards
