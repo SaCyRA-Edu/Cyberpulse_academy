@@ -4,6 +4,7 @@ import '../data/levels_data.dart';
 import '../services/progress_service.dart';
 import 'topic_detail_screen.dart';
 import 'final_exam_screen.dart';
+import 'account_screen.dart';
 
 // ── Per-module visual theme ───────────────────────────────────────────────
 class _ModuleTheme {
@@ -218,6 +219,16 @@ class _TopicsScreenState extends State<TopicsScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.account_circle, color: Colors.white),
+            tooltip: 'My Account',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AccountScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.info_outline, color: Colors.white),
             tooltip: 'About',
