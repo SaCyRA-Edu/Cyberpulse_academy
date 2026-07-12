@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../widgets/cyberpulse_logo.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -32,13 +33,10 @@ class SplashScreen extends StatelessWidget {
                 children: [
                   // Logo
                   Container(
-                    width: 110,
-                    height: 110,
+                    width: 116,
+                    height: 116,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
-                      border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.3), width: 2),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.blue.withValues(alpha: 0.4),
@@ -47,10 +45,13 @@ class SplashScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: const Icon(
-                      Icons.shield,
-                      size: 60,
-                      color: Colors.white,
+                    child: const CyberPulseLogo(
+                      size: 116,
+                      showBackgroundCircle: true,
+                      backgroundCircleColor: Color(0xFF1565C0),
+                      lightShade: Color(0xFF1E88E5),
+                      darkShade: Color(0xFF0D47A1),
+                      outline: Color(0xFF90CAF9),
                     ),
                   ),
                   const SizedBox(height: 24),

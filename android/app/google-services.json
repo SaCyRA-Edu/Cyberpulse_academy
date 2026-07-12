@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "311505412696",
+    "project_id": "cybersecurity-pulse-9841d",
+    "storage_bucket": "cybersecurity-pulse-9841d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311505412696:android:c027bb25db0b49d7fe202d",
+        "android_client_info": {
+          "package_name": "com.example.cyberpulse_academy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "311505412696-v16ka285t4aakmvkmam16o5kbo1m13ii.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cyberpulse_academy",
+            "certificate_hash": "bb0fe7d1966125baa783b7677fc4d647548f9c4b"
+          }
+        },
+        {
+          "client_id": "311505412696-nj87o9pha5tq6h6muidpl9isl5l85tob.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzWg5jGEFbOw863S89E2SyZO6TJdpZ8-I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "311505412696-nj87o9pha5tq6h6muidpl9isl5l85tob.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "311505412696-n7mostm4cr7p9kgbvr36p7an3h3rfiaj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.cyberpulseAcademy"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -5,6 +5,7 @@ import '../services/progress_service.dart';
 import 'topic_detail_screen.dart';
 import 'final_exam_screen.dart';
 import 'account_screen.dart';
+import '../widgets/cyberpulse_logo.dart';
 
 // ── Per-module visual theme ───────────────────────────────────────────────
 class _ModuleTheme {
@@ -207,7 +208,13 @@ class _TopicsScreenState extends State<TopicsScreen> {
         elevation: 0,
         title: Row(
           children: [
-            const Icon(Icons.shield, color: Colors.white, size: 22),
+            const CyberPulseLogo(
+              size: 24,
+              lightShade: Color(0xFF64B5F6),
+              darkShade: Color(0xFFFFFFFF),
+              outline: Color(0xFFFFFFFF),
+              pulseColor: Color(0xFF0D47A1),
+            ),
             const SizedBox(width: 8),
             const Text(
               'Learning Cybersecurity',
