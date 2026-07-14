@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "311505412696-tagg8th8mvl65uh5s82h3g4gvdpdmumc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cyberpulse_academy",
+            "certificate_hash": "dda5f93e8b16d20de03ac07ec7565966592b67a4"
+          }
+        },
+        {
           "client_id": "311505412696-v16ka285t4aakmvkmam16o5kbo1m13ii.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

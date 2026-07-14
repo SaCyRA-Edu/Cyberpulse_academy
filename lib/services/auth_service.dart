@@ -69,12 +69,40 @@ class AuthService {
 
   // ── Sign out ─────────────────────────────────────────────────────────
 
+  /// Signs out of Firebase, Google, and Facebook independently — if any one
+  /// provider isn't set up (e.g. Facebook Login hasn't been configured yet)
+  /// or throws for any other reason, the others still complete instead of
+  /// the whole sign-out silently failing. Firebase's own sign-out (the one
+  /// that actually matters for the app's auth-gated navigation) always runs
+  /// first and is never blocked by the other two.
   static Future<void> signOut() async {
-    await Future.wait([
-      _auth.signOut(),
-      _googleSignIn.signOut(),
-      FacebookAuth.instance.logOut(),
-    ]);
+    // Firebase sign-out first and on its own — this is the one that
+    // actually drives the app's authStateChanges-based navigation, so it
+    // must not be skipped or delayed by an unrelated provider failure.
+    try {
+      await _auth.signOut();
+    } catch (e) {
+      // If even this fails, rethrow — the caller needs to know the actual
+      // sign-out (not just the provider cleanup) didn't succeed.
+      rethrow;
+    }
+
+    // Best-effort cleanup for the social providers — failures here (most
+    // commonly Facebook, if Part 4 of FIREBASE_SETUP.md hasn't been done
+    // yet) should never block the user from being signed out of the app.
+    try {
+      await _googleSignIn.signOut();
+    } catch (_) {
+      // Ignore — Google may not have been the sign-in method used, or the
+      // SDK may not be fully configured on this platform.
+    }
+    try {
+      await FacebookAuth.instance.logOut();
+    } catch (_) {
+      // Ignore — most commonly thrown when Facebook Login hasn't been
+      // configured (AndroidManifest.xml / strings.xml from Part 4 of
+      // FIREBASE_SETUP.md), which is an optional, deferred setup step.
+    }
   }
 
   /// Turns Firebase's error codes into short, human-readable messages —

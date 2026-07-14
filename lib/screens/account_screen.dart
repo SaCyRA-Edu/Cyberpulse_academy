@@ -1,8 +1,50 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 
-class AccountScreen extends StatelessWidget {
+class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
+
+  @override
+  State<AccountScreen> createState() => _AccountScreenState();
+}
+
+class _AccountScreenState extends State<AccountScreen> {
+  bool _signingOut = false;
+
+  Future<void> _handleSignOut() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Sign Out?'),
+        content: const Text('You can sign back in anytime with the same account.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Sign Out')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    setState(() => _signingOut = true);
+    try {
+      await AuthService.signOut();
+      // main.dart's authStateChanges StreamBuilder automatically swaps to
+      // the sign-in screen once Firebase's sign-out completes — popping
+      // back to the root route here just clears any screens (like this
+      // one) that were pushed on top of it in the meantime.
+      if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
+    } catch (e) {
+      // Only a genuine Firebase sign-out failure reaches here now —
+      // Google/Facebook cleanup failures are already handled inside
+      // AuthService.signOut() and never block this.
+      if (mounted) {
+        setState(() => _signingOut = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sign out failed: ${AuthService.friendlyError(e)}')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,27 +104,14 @@ class AccountScreen extends StatelessWidget {
                 side: const BorderSide(color: Colors.red),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              icon: const Icon(Icons.logout),
-              label: const Text('Sign Out'),
-              onPressed: () async {
-                final confirmed = await showDialog<bool>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('Sign Out?'),
-                    content: const Text('You can sign back in anytime with the same account.'),
-                    actions: [
-                      TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-                      FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Sign Out')),
-                    ],
-                  ),
-                );
-                if (confirmed == true) {
-                  await AuthService.signOut();
-                  // main.dart's authStateChanges StreamBuilder automatically
-                  // routes back to the sign-in screen once this completes.
-                  if (context.mounted) Navigator.of(context).popUntil((route) => route.isFirst);
-                }
-              },
+              icon: _signingOut
+                  ? const SizedBox(
+                      width: 18, height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.red),
+                    )
+                  : const Icon(Icons.logout),
+              label: Text(_signingOut ? 'Signing Out...' : 'Sign Out'),
+              onPressed: _signingOut ? null : _handleSignOut,
             ),
           ),
         ],
