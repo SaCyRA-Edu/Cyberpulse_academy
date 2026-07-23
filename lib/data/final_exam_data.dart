@@ -1096,4 +1096,76 @@ const List<QuizQuestion> finalExamQuestions = [
         correctIndex: 1,
         explanation: 'Reviewing incidents afterward closes the gaps that were exploited.',
       ),
+  // From: Endpoint Security
+  QuizQuestion(
+        question: 'What is the key difference between an EPP and an EDR solution?',
+        options: [
+          'They are identical technologies marketed differently',
+          'EPP focuses on preventing threats before compromise, while EDR focuses on detecting and responding to threats that bypass prevention',
+          'EDR only works on mobile devices',
+          'EPP requires no installation on the endpoint',
+        ],
+        correctIndex: 1,
+        explanation: 'EPP is prevention-focused; EDR is detection-and-response-focused for threats that get past EPP.',
+      ),
+  // From: Endpoint Security
+  QuizQuestion(
+        question: 'Why is fileless malware particularly difficult for traditional antivirus to detect?',
+        options: [
+          'It always requires a USB device to spread',
+          'It executes directly in system memory using legitimate OS tools rather than installing files on disk',
+          'It only affects mobile devices',
+          'It cannot cause any actual damage',
+        ],
+        correctIndex: 1,
+        explanation: 'Fileless malware avoids leaving file-based signatures behind, which is exactly what signature-based antivirus relies on.',
+      ),
+  // From: Endpoint Security
+  QuizQuestion(
+        question: 'What is the core principle behind endpoint hardening?',
+        options: [
+          'Installing as many security tools as possible',
+          'Reducing the attack surface by removing unnecessary software, disabling unused services, and enforcing secure configurations',
+          'Replacing the need for antivirus entirely',
+          'Only applying to mobile devices',
+        ],
+        correctIndex: 1,
+        explanation: 'Hardening prevents attacks by eliminating unnecessary weaknesses, rather than only reacting once an attack starts.',
+      ),
+  // From: Endpoint Security
+  QuizQuestion(
+        question: 'What does the Zero Trust principle "Never Trust, Always Verify" mean in practice?',
+        options: [
+          'Users inside the corporate network are automatically trusted',
+          'Every access request is evaluated using multiple factors, regardless of the user\'s network location',
+          'Verification only happens once at initial login',
+          'Only external users need to be verified',
+        ],
+        correctIndex: 1,
+        explanation: 'Zero Trust rejects the old assumption that internal network location implies trustworthiness.',
+      ),
+  // From: Endpoint Security
+  QuizQuestion(
+        question: 'Why do most organizations prohibit rooted or jailbroken mobile devices from accessing enterprise resources?',
+        options: [
+          'Rooted and jailbroken devices are actually more secure',
+          'These modifications bypass built-in security controls, can install unverified software, and often fail compliance checks',
+          'Rooting and jailbreaking are illegal everywhere',
+          'These devices cannot connect to Wi-Fi at all',
+        ],
+        correctIndex: 1,
+        explanation: 'Removing manufacturer security restrictions significantly weakens a device\'s security posture.',
+      ),
+  // From: Endpoint Security
+  QuizQuestion(
+        question: 'What is the primary purpose of Just-in-Time patch and vulnerability management on endpoints?',
+        options: [
+          'To eliminate the need for backups',
+          'To continuously scan, prioritize, and remediate vulnerabilities based on actual business risk rather than patching everything with equal urgency',
+          'To replace antivirus entirely',
+          'To only apply to virtual machines',
+        ],
+        correctIndex: 1,
+        explanation: 'Risk-based patching focuses remediation effort where it matters most, rather than treating every vulnerability identically.',
+      ),
 ];
