@@ -4,6 +4,7 @@ import 'exam_model.dart';
 import 'domains_data.dart';
 import 'lessons/fundamentals_lessons.dart';
 import 'lessons/threat_actors_lessons.dart';
+import 'lessons/threats_attacks_lessons.dart';
 import 'lessons/social_engineering_lessons.dart';
 import 'lessons/malware_lessons.dart';
 import 'lessons/cryptography_lessons.dart';
@@ -13,6 +14,7 @@ import 'lessons/alerts_monitoring_lessons.dart';
 import 'lessons/incident_response_lessons.dart';
 import 'lessons/email_security_lessons.dart';
 import 'lessons/networking_lessons.dart';
+import 'lessons/endpoint_security_lessons.dart';
 import 'lessons/windows_security_lessons.dart';
 import 'lessons/linux_security_lessons.dart';
 import 'lessons/soc_operations_lessons.dart';
@@ -93,6 +95,13 @@ final List<Level> allLevels = [
         primaryDomainIndex: 1, // Threats, Vulnerabilities & Mitigations
       ),
       Module(
+        title: 'Threats, Attacks & Vulnerabilities',
+        icon: Icons.gpp_maybe,
+        xpReward: 130,
+        lessons: threatsAttacksLessons,
+        primaryDomainIndex: 1, // Threats, Vulnerabilities & Mitigations
+      ),
+      Module(
         title: 'Social Engineering',
         icon: Icons.psychology_alt,
         xpReward: 110,
@@ -157,10 +166,17 @@ final List<Level> allLevels = [
     isFree: true,
     modules: [
       Module(
-        title: 'Networking',
+        title: 'Network Security',
         icon: Icons.router,
         xpReward: 130,
         lessons: networkingLessons,
+        primaryDomainIndex: 2, // Security Architecture
+      ),
+      Module(
+        title: 'Endpoint Security',
+        icon: Icons.laptop_chromebook,
+        xpReward: 160,
+        lessons: endpointSecurityLessons,
         primaryDomainIndex: 2, // Security Architecture
       ),
       Module(
