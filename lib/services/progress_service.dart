@@ -31,6 +31,9 @@ class ProgressService {
   static const _passedKey = 'cp_passed_levels';
   static const _purchasedKey = 'cp_purchased_levels';
   static const _bestScoreKeyPrefix = 'cp_best_score_level_';
+  static const _finalExamScoreKey = 'cp_final_exam_best_score';
+  static const _viewedLessonsKey = 'cp_viewed_lessons';
+  static const _completedQuizModulesKey = 'cp_completed_quiz_modules';
 
   static String? get _uid => FirebaseAuth.instance.currentUser?.uid;
 
@@ -88,6 +91,36 @@ class ProgressService {
     await prefs.setDouble('$_bestScoreKeyPrefix$levelIndex', score);
   }
 
+  static Future<double?> _getLocalFinalExamScore() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getDouble(_finalExamScoreKey);
+  }
+
+  static Future<void> _setLocalFinalExamScore(double score) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_finalExamScoreKey, score);
+  }
+
+  static Future<Set<String>> _getLocalViewedLessons() async {
+    final prefs = await SharedPreferences.getInstance();
+    return (prefs.getStringList(_viewedLessonsKey) ?? []).toSet();
+  }
+
+  static Future<void> _setLocalViewedLessons(Set<String> lessonKeys) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_viewedLessonsKey, lessonKeys.toList());
+  }
+
+  static Future<Set<String>> _getLocalCompletedQuizModules() async {
+    final prefs = await SharedPreferences.getInstance();
+    return (prefs.getStringList(_completedQuizModulesKey) ?? []).toSet();
+  }
+
+  static Future<void> _setLocalCompletedQuizModules(Set<String> modules) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_completedQuizModulesKey, modules.toList());
+  }
+
   // ── Cloud (Firestore) helpers ────────────────────────────────────────────
   // Every call is wrapped so a network hiccup or missing sign-in never
   // breaks the app — it just silently falls back to local-only data.
@@ -107,16 +140,29 @@ class ProgressService {
     required Set<int> passedLevels,
     required Set<int> purchasedLevels,
     required Map<int, double> bestScores,
+    double? finalExamScore,
+    Set<String>? viewedLessons,
+    Set<String>? completedQuizModules,
   }) async {
     final doc = _cloudDoc;
     if (doc == null) return;
     try {
-      await doc.set({
+      final data = <String, dynamic>{
         'passedLevels': passedLevels.toList(),
         'purchasedLevels': purchasedLevels.toList(),
         'bestScores': bestScores.map((k, v) => MapEntry(k.toString(), v)),
         'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      };
+      if (finalExamScore != null) {
+        data['finalExamScore'] = finalExamScore;
+      }
+      if (viewedLessons != null) {
+        data['viewedLessons'] = viewedLessons.toList();
+      }
+      if (completedQuizModules != null) {
+        data['completedQuizModules'] = completedQuizModules.toList();
+      }
+      await doc.set(data, SetOptions(merge: true));
     } catch (_) {
       // Offline or Firestore temporarily unreachable — local storage still
       // has the data, and this will naturally retry next time a write
@@ -128,11 +174,14 @@ class ProgressService {
   // ── Merge logic ──────────────────────────────────────────────────────────
 
   static Future<
-      ({Set<int> passed, Set<int> purchased, Map<int, double> bestScores})>
+      ({Set<int> passed, Set<int> purchased, Map<int, double> bestScores, double? finalExamScore, Set<String> viewedLessons, Set<String> completedQuizModules})>
       _getMergedProgress() async {
     final localPassed = await _getLocalPassedLevels();
     final localPurchased = await _getLocalPurchasedLevels();
     final localScores = await _getLocalBestScores();
+    final localFinalExam = await _getLocalFinalExamScore();
+    final localViewed = await _getLocalViewedLessons();
+    final localCompletedQuizzes = await _getLocalCompletedQuizModules();
 
     final cloud = await _getCloudData();
     final cloudPassed = <int>{
@@ -149,6 +198,15 @@ class ProgressService {
           (k, v) => MapEntry(int.parse(k), (v as num).toDouble()),
         ),
     };
+    final cloudFinalExam = (cloud?['finalExamScore'] as num?)?.toDouble();
+    final cloudViewed = <String>{
+      if (cloud?['viewedLessons'] is List)
+        ...List<dynamic>.from(cloud!['viewedLessons']).map((e) => e.toString()),
+    };
+    final cloudCompletedQuizzes = <String>{
+      if (cloud?['completedQuizModules'] is List)
+        ...List<dynamic>.from(cloud!['completedQuizModules']).map((e) => e.toString()),
+    };
 
     final mergedPassed = {...localPassed, ...cloudPassed};
     final mergedPurchased = {...localPurchased, ...cloudPurchased};
@@ -158,6 +216,14 @@ class ProgressService {
       final cloudVal = cloudScores[levelIndex] ?? 0;
       mergedScores[levelIndex] = localVal > cloudVal ? localVal : cloudVal;
     }
+    double? mergedFinalExam;
+    if (localFinalExam != null || cloudFinalExam != null) {
+      mergedFinalExam = (localFinalExam ?? 0) > (cloudFinalExam ?? 0)
+          ? (localFinalExam ?? cloudFinalExam)
+          : (cloudFinalExam ?? localFinalExam);
+    }
+    final mergedViewed = {...localViewed, ...cloudViewed};
+    final mergedCompletedQuizzes = {...localCompletedQuizzes, ...cloudCompletedQuizzes};
 
     // Write the merged result back to local storage so it's cached for
     // fast, offline-friendly access next time.
@@ -166,8 +232,20 @@ class ProgressService {
     for (final entry in mergedScores.entries) {
       await _setLocalBestScore(entry.key, entry.value);
     }
+    if (mergedFinalExam != null) {
+      await _setLocalFinalExamScore(mergedFinalExam);
+    }
+    await _setLocalViewedLessons(mergedViewed);
+    await _setLocalCompletedQuizModules(mergedCompletedQuizzes);
 
-    return (passed: mergedPassed, purchased: mergedPurchased, bestScores: mergedScores);
+    return (
+      passed: mergedPassed,
+      purchased: mergedPurchased,
+      bestScores: mergedScores,
+      finalExamScore: mergedFinalExam,
+      viewedLessons: mergedViewed,
+      completedQuizModules: mergedCompletedQuizzes,
+    );
   }
 
   // ── Public API (same shape as before — no other file needs to change) ───
@@ -192,7 +270,87 @@ class ProgressService {
       passedLevels: passed,
       purchasedLevels: merged.purchased,
       bestScores: scores,
+      finalExamScore: merged.finalExamScore,
     );
+  }
+
+  /// Records a Final Certification Exam attempt. Call this whenever the
+  /// exam is submitted (pass or fail) — only the highest score achieved is
+  /// ever kept, same pattern as level exam scores.
+  static Future<void> markFinalExamAttempt(double scorePercent) async {
+    final merged = await _getMergedProgress();
+    final existingBest = merged.finalExamScore ?? 0;
+    final newBest = scorePercent > existingBest ? scorePercent : existingBest;
+
+    await _setLocalFinalExamScore(newBest);
+    await _pushCloudData(
+      passedLevels: merged.passed,
+      purchasedLevels: merged.purchased,
+      bestScores: merged.bestScores,
+      finalExamScore: newBest,
+    );
+  }
+
+  /// The highest Final Certification Exam score achieved so far, or null
+  /// if it has never been attempted.
+  static Future<double?> getFinalExamBestScore() async {
+    final merged = await _getMergedProgress();
+    return merged.finalExamScore;
+  }
+
+  /// Marks a specific lesson as viewed. `lessonKey` should be a stable,
+  /// unique identifier for the lesson — lesson_screen.dart uses
+  /// "moduleTitle::lessonTitle", which is unique across the whole course
+  /// and stable across sessions (unlike, say, a list index that could
+  /// shift if lessons are reordered).
+  static Future<void> markLessonViewed(String lessonKey) async {
+    final merged = await _getMergedProgress();
+    if (merged.viewedLessons.contains(lessonKey)) return; // already recorded
+    final viewed = {...merged.viewedLessons, lessonKey};
+
+    await _setLocalViewedLessons(viewed);
+    await _pushCloudData(
+      passedLevels: merged.passed,
+      purchasedLevels: merged.purchased,
+      bestScores: merged.bestScores,
+      finalExamScore: merged.finalExamScore,
+      viewedLessons: viewed,
+    );
+  }
+
+  /// Every lesson key marked as viewed so far. Used to compute overall
+  /// course completion percentage against the total number of lessons
+  /// across every module.
+  static Future<Set<String>> getViewedLessons() async {
+    final merged = await _getMergedProgress();
+    return merged.viewedLessons;
+  }
+
+  /// Marks a topic module's practice quiz as passed. `moduleTitle` should
+  /// be the module's title (e.g. "Networking") — each topic module has
+  /// exactly one practice quiz, so this is a stable, unique key. Course
+  /// completion percentage is based on this: how many of the course's
+  /// topic modules have a passed practice quiz, out of the total.
+  static Future<void> markTopicQuizPassed(String moduleTitle) async {
+    final merged = await _getMergedProgress();
+    if (merged.completedQuizModules.contains(moduleTitle)) return; // already recorded
+    final completed = {...merged.completedQuizModules, moduleTitle};
+
+    await _setLocalCompletedQuizModules(completed);
+    await _pushCloudData(
+      passedLevels: merged.passed,
+      purchasedLevels: merged.purchased,
+      bestScores: merged.bestScores,
+      finalExamScore: merged.finalExamScore,
+      viewedLessons: merged.viewedLessons,
+      completedQuizModules: completed,
+    );
+  }
+
+  /// Every topic module title whose practice quiz has been passed.
+  static Future<Set<String>> getCompletedQuizModules() async {
+    final merged = await _getMergedProgress();
+    return merged.completedQuizModules;
   }
 
   static Future<double?> getBestScore(int levelIndex) async {

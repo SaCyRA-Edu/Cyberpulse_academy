@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../data/levels_data.dart';
 import '../services/progress_service.dart';
+import '../services/auth_service.dart';
 import 'topic_detail_screen.dart';
 import 'final_exam_screen.dart';
 import 'account_screen.dart';
@@ -155,6 +156,10 @@ class TopicsScreen extends StatefulWidget {
 
 class _TopicsScreenState extends State<TopicsScreen> {
   Map<int, double?> _bestScoresByLevel = {};
+  Set<int> _passedLevels = {};
+  double? _finalExamBestScore;
+  Set<String> _viewedLessons = {};
+  Set<String> _completedQuizModules = {};
   bool _loading = true;
 
   @override
@@ -169,8 +174,16 @@ class _TopicsScreenState extends State<TopicsScreen> {
       scores[entry.levelIndex] =
           await ProgressService.getBestScore(entry.levelIndex);
     }
+    final passed = await ProgressService.getPassedLevels();
+    final finalExamScore = await ProgressService.getFinalExamBestScore();
+    final viewed = await ProgressService.getViewedLessons();
+    final completedQuizzes = await ProgressService.getCompletedQuizModules();
     setState(() {
       _bestScoresByLevel = scores;
+      _passedLevels = passed;
+      _finalExamBestScore = finalExamScore;
+      _viewedLessons = viewed;
+      _completedQuizModules = completedQuizzes;
       _loading = false;
     });
   }
@@ -303,6 +316,14 @@ class _TopicsScreenState extends State<TopicsScreen> {
                           ],
                         ),
                       ),
+                      // Progress summary for the signed-in user
+                      _ProgressSummaryCard(
+                        passedLevels: _passedLevels,
+                        bestScoresByLevel: _bestScoresByLevel,
+                        finalExamBestScore: _finalExamBestScore,
+                        viewedLessons: _viewedLessons,
+                        completedQuizModules: _completedQuizModules,
+                      ),
                       // Final Certification Exam
                       Card(
                         margin: const EdgeInsets.only(bottom: 20),
@@ -348,6 +369,158 @@ class _TopicsScreenState extends State<TopicsScreen> {
                     ],
                   ),
                 ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Progress Summary Card ────────────────────────────────────────────────
+class _ProgressSummaryCard extends StatelessWidget {
+  final Set<int> passedLevels;
+  final Map<int, double?> bestScoresByLevel;
+  final double? finalExamBestScore;
+  final Set<String> viewedLessons;
+  final Set<String> completedQuizModules;
+
+  const _ProgressSummaryCard({
+    required this.passedLevels,
+    required this.bestScoresByLevel,
+    required this.finalExamBestScore,
+    required this.viewedLessons,
+    required this.completedQuizModules,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final user = AuthService.currentUser;
+    final name = (user?.displayName?.trim().isNotEmpty ?? false)
+        ? user!.displayName!.split(' ').first
+        : 'Learner';
+    final photoUrl = user?.photoURL;
+    final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
+
+    // Course completion is based on practice exams passed — one per topic
+    // module — rather than exam scores tied to the old level grouping or
+    // simple lesson-open tracking. Each topic counts as complete once its
+    // practice quiz has been passed at 80%+.
+    final totalTopics = allTopics.length;
+    final completedCount = completedQuizModules.length;
+    final fraction = totalTopics == 0 ? 0.0 : (completedCount / totalTopics).clamp(0.0, 1.0);
+    final completionPercent = (fraction * 100).round();
+
+    final finalExamPassed = (finalExamBestScore ?? 0) >= 75;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 22,
+                backgroundColor: const Color(0xFF1565C0),
+                backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
+                child: photoUrl == null
+                    ? Text(initial,
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))
+                    : null,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Welcome back, $name',
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 2),
+                    Text(
+                      '$completedCount of $totalTopics practice exams passed',
+                      style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '$completionPercent%',
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1565C0)),
+                  ),
+                  Text('complete', style: TextStyle(fontSize: 10, color: Colors.grey.shade500)),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: fraction,
+              minHeight: 8,
+              backgroundColor: Colors.grey.shade100,
+              color: const Color(0xFF1565C0),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: finalExamPassed
+                  ? Colors.green.withValues(alpha: 0.08)
+                  : Colors.grey.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  finalExamPassed ? Icons.workspace_premium : Icons.quiz_outlined,
+                  size: 18,
+                  color: finalExamPassed ? Colors.green.shade700 : Colors.grey.shade500,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    finalExamPassed
+                        ? 'Final Certification Exam passed'
+                        : (finalExamBestScore != null
+                            ? 'Final Certification Exam: not yet passed'
+                            : 'Final Certification Exam: not yet attempted'),
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      color: finalExamPassed ? Colors.green.shade800 : Colors.grey.shade700,
+                    ),
+                  ),
+                ),
+                if (finalExamBestScore != null)
+                  Text(
+                    '${finalExamBestScore!.toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: finalExamPassed ? Colors.green.shade800 : Colors.grey.shade600,
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ],
       ),
     );

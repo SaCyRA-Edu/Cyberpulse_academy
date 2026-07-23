@@ -28,14 +28,26 @@ enum DiagramType {
   ssoComparison,
   xssTypes,
   siemSources,
+  assetImage,
+  dataTable,
 }
 
 class DiagramSpec {
   final DiagramType type;
   final List<String>? steps; // used by processFlow
   final String? caption;
+  final String? assetPath; // used by assetImage — path to a bundled image asset
+  final List<String>? tableHeaders; // used by dataTable — column headers
+  final List<List<String>>? tableRows; // used by dataTable — one list per row, same length as tableHeaders
 
-  const DiagramSpec({required this.type, this.steps, this.caption});
+  const DiagramSpec({
+    required this.type,
+    this.steps,
+    this.caption,
+    this.assetPath,
+    this.tableHeaders,
+    this.tableRows,
+  });
 }
 
 /// Dispatches to the correct diagram widget based on [spec.type].
@@ -113,6 +125,30 @@ class DiagramView extends StatelessWidget {
         break;
       case DiagramType.processFlow:
         diagram = ProcessFlowDiagram(steps: spec.steps ?? const []);
+        break;
+      case DiagramType.assetImage:
+        diagram = ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.asset(
+            spec.assetPath ?? '',
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => Container(
+              padding: const EdgeInsets.all(20),
+              child: const Text(
+                'Image could not be loaded — check that the asset path is '
+                'declared correctly in pubspec.yaml.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.red, fontSize: 12),
+              ),
+            ),
+          ),
+        );
+        break;
+      case DiagramType.dataTable:
+        diagram = GenericDataTableDiagram(
+          headers: spec.tableHeaders ?? const [],
+          rows: spec.tableRows ?? const [],
+        );
         break;
     }
 
@@ -1538,6 +1574,71 @@ class SiemSourcesDiagram extends StatelessWidget {
           children: [for (final s in saas) sourceChip(s.$1, s.$2, const Color(0xFF2E7D32))],
         ),
       ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Generic Data Table — a real, aligned table for any headers/rows given
+// via DiagramSpec, with horizontal scroll for wide tables on narrow screens
+// ═══════════════════════════════════════════════════════════════════════
+
+class GenericDataTableDiagram extends StatelessWidget {
+  final List<String> headers;
+  final List<List<String>> rows;
+  final Color headerColor;
+
+  const GenericDataTableDiagram({
+    super.key,
+    required this.headers,
+    required this.rows,
+    this.headerColor = const Color(0xFF1565C0),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (headers.isEmpty) return const SizedBox.shrink();
+
+    Widget cell(String text, {bool isHeader = false}) => Container(
+          constraints: const BoxConstraints(minWidth: 90, maxWidth: 220),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: isHeader ? 12 : 11.5,
+              fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+              color: isHeader ? Colors.white : Colors.black87,
+              height: 1.3,
+            ),
+          ),
+        );
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Table(
+          defaultColumnWidth: const IntrinsicColumnWidth(),
+          border: TableBorder(
+            horizontalInside: BorderSide(color: Colors.grey.shade200, width: 1),
+            verticalInside: BorderSide(color: Colors.grey.shade200, width: 1),
+          ),
+          defaultVerticalAlignment: TableCellVerticalAlignment.top,
+          children: [
+            TableRow(
+              decoration: BoxDecoration(color: headerColor),
+              children: [for (final h in headers) cell(h, isHeader: true)],
+            ),
+            for (var i = 0; i < rows.length; i++)
+              TableRow(
+                decoration: BoxDecoration(
+                  color: i.isEven ? Colors.grey.shade50 : Colors.white,
+                ),
+                children: [for (final c in rows[i]) cell(c)],
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

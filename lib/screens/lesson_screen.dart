@@ -5,6 +5,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../data/lesson_model.dart';
 import '../services/notes_service.dart';
+import '../services/progress_service.dart';
 import '../services/voice_preference_service.dart';
 import '../widgets/watermark.dart';
 import '../widgets/diagrams.dart';
@@ -30,7 +31,8 @@ class _LessonScreenState extends State<LessonScreen> {
   // Quiz state — shuffled and capped at _quizLength each session.
   late List<QuizQuestion> _activeQuiz;
   late List<int> _selectedAnswers;
-  bool _submitted = false;
+  int _currentQuestionIndex = 0;
+  bool _quizCompletionRecorded = false;
 
   // Audio narration state.
   final FlutterTts _tts = FlutterTts();
@@ -58,6 +60,8 @@ class _LessonScreenState extends State<LessonScreen> {
       _activeQuiz = [];
     }
     _selectedAnswers = List.filled(_activeQuiz.length, -1);
+
+    ProgressService.markLessonViewed('${widget.moduleTitle}::${widget.lesson.title}');
 
     _setUpTts();
     _loadNote();
@@ -337,6 +341,7 @@ class _LessonScreenState extends State<LessonScreen> {
   }
 
   bool get _allAnswered => !_selectedAnswers.contains(-1);
+  int get _answeredCount => _selectedAnswers.where((a) => a != -1).length;
 
   Future<void> _sendFeedback() async {
     final subject =
@@ -651,130 +656,301 @@ class _LessonScreenState extends State<LessonScreen> {
   }
 
   // -- Practice Quiz ---------------------------------------------------------
+  // Non-linear navigation (jump to any question via the navigator, like the
+  // Final Exam) combined with immediate per-answer feedback — tap an option
+  // and instantly see whether it's correct, with the explanation shown right
+  // away, rather than waiting until every question is answered to submit.
 
   Widget _buildQuiz(List<QuizQuestion> quiz) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Showing ${quiz.length} randomly selected questions. (80% to pass)',
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          const SizedBox(height: 16),
-          if (_submitted) _buildScoreBanner(quiz.length),
-          for (var i = 0; i < quiz.length; i++) _buildQuestion(i, quiz[i]),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _submitted
-                  ? () => setState(() {
-                        final shuffled = List<QuizQuestion>.from(widget.lesson.quiz!)
-                          ..shuffle(Random());
-                        _activeQuiz = shuffled.take(_quizLength).toList();
-                        _selectedAnswers = List.filled(_activeQuiz.length, -1);
-                        _submitted = false;
-                      })
-                  : (_allAnswered ? () => setState(() => _submitted = true) : null),
-              child: Text(_submitted ? 'Retake Quiz (New Questions)' : 'Submit Quiz'),
+    if (quiz.isEmpty) return const SizedBox.shrink();
+    final q = quiz[_currentQuestionIndex];
+    final selected = _selectedAnswers[_currentQuestionIndex];
+    final isAnswered = selected != -1;
+
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Question ${_currentQuestionIndex + 1} of ${quiz.length}',
+                      style: TextStyle(fontSize: 13, color: Colors.grey.shade600, fontWeight: FontWeight.w600),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'Score: $_score / $_answeredCount answered',
+                        style: TextStyle(fontSize: 12, color: Colors.green.shade800, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: (_currentQuestionIndex + 1) / quiz.length,
+                    minHeight: 5,
+                    backgroundColor: Colors.grey.shade200,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  q.question,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, height: 1.4),
+                ),
+                const SizedBox(height: 18),
+                for (var optIndex = 0; optIndex < q.options.length; optIndex++)
+                  _buildQuizOption(q, optIndex, selected, isAnswered),
+                if (isAnswered) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: (selected == q.correctIndex ? Colors.green : Colors.orange).withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: (selected == q.correctIndex ? Colors.green : Colors.orange).withValues(alpha: 0.35),
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          selected == q.correctIndex ? Icons.check_circle : Icons.info_outline,
+                          size: 18,
+                          color: selected == q.correctIndex ? Colors.green.shade700 : Colors.orange.shade800,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            q.explanation,
+                            style: TextStyle(fontSize: 13.5, height: 1.4, color: Colors.grey.shade800),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 24),
+                _buildFeedbackSection(),
+              ],
             ),
           ),
-          const SizedBox(height: 30),
-          _buildFeedbackSection(),
-        ],
-      ),
+        ),
+        SafeArea(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 6, offset: const Offset(0, -2))],
+            ),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: _currentQuestionIndex > 0
+                      ? () => setState(() => _currentQuestionIndex--)
+                      : null,
+                  icon: const Icon(Icons.arrow_back_ios),
+                ),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _showQuizNavigator(quiz),
+                    icon: const Icon(Icons.grid_view, size: 18),
+                    label: const Text('Navigator'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: _allAnswered
+                        ? () => setState(() {
+                              final shuffled = List<QuizQuestion>.from(widget.lesson.quiz!)
+                                ..shuffle(Random());
+                              _activeQuiz = shuffled.take(_quizLength).toList();
+                              _selectedAnswers = List.filled(_activeQuiz.length, -1);
+                              _currentQuestionIndex = 0;
+                              _quizCompletionRecorded = false;
+                            })
+                        : null,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: _allAnswered ? Colors.green.shade700 : null,
+                    ),
+                    child: Text(_allAnswered ? 'Retake (New Questions)' : 'Answer All to Retake'),
+                  ),
+                ),
+                IconButton(
+                  onPressed: _currentQuestionIndex < quiz.length - 1
+                      ? () => setState(() => _currentQuestionIndex++)
+                      : null,
+                  icon: const Icon(Icons.arrow_forward_ios),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildScoreBanner(int total) {
-    final score = _score;
-    final passed = score >= (total * 0.8).ceil();
-    final suffix = passed
-        ? ' — nice work, that\'s 80%+!'
-        : ' — review the explanations and try again.';
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: passed ? Colors.green.withValues(alpha: 0.1) : Colors.orange.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: passed ? Colors.green : Colors.orange),
-      ),
-      child: Row(
-        children: [
-          Icon(passed ? Icons.emoji_events : Icons.refresh, color: passed ? Colors.green : Colors.orange),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'You scored $score / $total$suffix',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildQuizOption(QuizQuestion q, int optIndex, int selected, bool isAnswered) {
+    Color borderColor = Colors.grey.shade300;
+    Color? fillColor;
+    Widget? trailingIcon;
 
-  Widget _buildQuestion(int index, QuizQuestion q) {
-    final selected = _selectedAnswers[index];
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 18),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('${index + 1}. ${q.question}',
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          for (var optIndex = 0; optIndex < q.options.length; optIndex++)
-            _buildOption(index, q, optIndex, selected),
-          if (_submitted) ...[
-            const SizedBox(height: 8),
-            Text(
-              q.explanation,
-              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.grey.shade700),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOption(int qIndex, QuizQuestion q, int optIndex, int selected) {
-    Color? tileColor;
-    if (_submitted) {
+    if (isAnswered) {
       if (optIndex == q.correctIndex) {
-        tileColor = Colors.green.withValues(alpha: 0.15);
+        borderColor = Colors.green;
+        fillColor = Colors.green.withValues(alpha: 0.08);
+        trailingIcon = const Icon(Icons.check_circle, color: Colors.green, size: 20);
       } else if (optIndex == selected) {
-        tileColor = Colors.red.withValues(alpha: 0.15);
+        borderColor = Colors.red;
+        fillColor = Colors.red.withValues(alpha: 0.08);
+        trailingIcon = const Icon(Icons.cancel, color: Colors.red, size: 20);
       }
+    } else if (optIndex == selected) {
+      borderColor = Colors.indigo;
+      fillColor = Colors.indigo.withValues(alpha: 0.06);
     }
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 3),
-      decoration: BoxDecoration(color: tileColor, borderRadius: BorderRadius.circular(8)),
-      child: RadioListTile<int>(
-        contentPadding: EdgeInsets.zero,
-        dense: true,
-        value: optIndex,
-        groupValue: selected == -1 ? null : selected,
-        title: Text(q.options[optIndex], style: const TextStyle(fontSize: 15)),
-        onChanged: _submitted
-            ? null
-            : (value) {
-                setState(() {
-                  _selectedAnswers[qIndex] = value!;
-                });
-              },
+    return InkWell(
+      onTap: isAnswered
+          ? null
+          : () {
+              setState(() {
+                _selectedAnswers[_currentQuestionIndex] = optIndex;
+              });
+              if (_allAnswered && !_quizCompletionRecorded) {
+                _quizCompletionRecorded = true;
+                if (_score >= (_activeQuiz.length * 0.8).ceil()) {
+                  ProgressService.markTopicQuizPassed(widget.moduleTitle);
+                }
+              }
+            },
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: fillColor ?? Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: borderColor, width: (isAnswered || optIndex == selected) ? 2 : 1),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 13,
+              backgroundColor: borderColor.withValues(alpha: isAnswered || optIndex == selected ? 1 : 0.15),
+              child: Text(
+                String.fromCharCode(65 + optIndex),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: (isAnswered || optIndex == selected) ? Colors.white : Colors.black87,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: Text(q.options[optIndex], style: const TextStyle(fontSize: 15))),
+            if (trailingIcon != null) trailingIcon,
+          ],
+        ),
       ),
+    );
+  }
+
+  void _showQuizNavigator(List<QuizQuestion> quiz) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.55,
+          minChildSize: 0.35,
+          maxChildSize: 0.85,
+          expand: false,
+          builder: (context, scrollController) {
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Question Navigator', style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 12,
+                    children: [
+                      _navigatorLegendDot(Colors.green, 'Correct'),
+                      _navigatorLegendDot(Colors.red, 'Incorrect'),
+                      _navigatorLegendDot(Colors.grey.shade300, 'Unanswered'),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: GridView.builder(
+                      controller: scrollController,
+                      itemCount: quiz.length,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 6,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                      ),
+                      itemBuilder: (context, i) {
+                        final answer = _selectedAnswers[i];
+                        Color bg = Colors.grey.shade200;
+                        Color fg = Colors.black87;
+                        if (answer != -1) {
+                          final correct = answer == quiz[i].correctIndex;
+                          bg = correct ? Colors.green : Colors.red;
+                          fg = Colors.white;
+                        }
+                        final isCurrent = i == _currentQuestionIndex;
+                        return InkWell(
+                          onTap: () {
+                            setState(() => _currentQuestionIndex = i);
+                            Navigator.pop(ctx);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: bg,
+                              borderRadius: BorderRadius.circular(8),
+                              border: isCurrent ? Border.all(color: Colors.indigo, width: 2) : null,
+                            ),
+                            alignment: Alignment.center,
+                            child: Text('${i + 1}', style: TextStyle(color: fg, fontWeight: FontWeight.bold)),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _navigatorLegendDot(Color color, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        const SizedBox(width: 4),
+        Text(label, style: const TextStyle(fontSize: 11)),
+      ],
     );
   }
 }
