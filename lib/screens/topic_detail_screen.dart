@@ -3,7 +3,6 @@ import '../data/levels_data.dart';
 import '../data/domains_data.dart';
 import '../widgets/watermark.dart';
 import 'lesson_screen.dart';
-import 'level_exam_screen.dart';
 
 class TopicDetailScreen extends StatelessWidget {
   final TopicEntry entry;
@@ -28,29 +27,6 @@ class TopicDetailScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: _DomainRatioCard(primaryDomainIndex: module.primaryDomainIndex),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Card(
-                  color: Colors.blue.withValues(alpha: 0.06),
-                  child: ListTile(
-                    leading: const Icon(Icons.quiz, color: Colors.blue),
-                    title: Text('${entry.level.title} Level Exam'),
-                    subtitle: const Text('Adaptive · Test what you\'ve learned'),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => LevelExamScreen(
-                            level: entry.level,
-                            levelIndex: entry.levelIndex,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),

@@ -85,6 +85,16 @@ flutter:
     - assets/images/endpoint/
     - assets/images/netsec/
     - assets/images/endpoint2/
+    - assets/images/sso/
+    - assets/images/crypto/
+    - assets/images/secproto/
+    - assets/images/idfed/
+    - assets/images/cloud/
+    - assets/images/appsec/
+    - assets/images/cryptography/
+    - assets/images/idfed/
+    - assets/images/cyberpulse_logo.png
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

@@ -38,7 +38,7 @@ class _LessonScreenState extends State<LessonScreen> {
   final FlutterTts _tts = FlutterTts();
   bool _isSpeaking = false;
   VoiceGender _voiceGender = VoiceGender.female;
-  double _speechRate = kIsWeb ? 1.3 : 0.65;
+  double _speechRate = kIsWeb ? 1.0 : 0.5;
   List<Map<String, dynamic>> _femaleVoices = [];
   List<Map<String, dynamic>> _maleVoices = [];
   bool _voicesLoaded = false;
@@ -91,7 +91,7 @@ class _LessonScreenState extends State<LessonScreen> {
       // Fall back silently if en-IN isn't available on this platform.
     }
     await _tts.setPitch(1.0);
-    await _tts.setSpeechRate(_speechRate); // faster, natural conversational pace (~1.3x)
+    await _tts.setSpeechRate(_speechRate); // starts at native 1x pace
     await _tts.setVolume(1.0);
 
     await _discoverVoices();
@@ -373,23 +373,29 @@ class _LessonScreenState extends State<LessonScreen> {
       appBar: AppBar(
         title: Text(lesson.title),
         actions: [
-          if (!lesson.isQuiz)
-            IconButton(
-              icon: const Icon(Icons.record_voice_over),
-              tooltip: 'Choose narrator voice',
-              onPressed: _showVoicePicker,
-            ),
-          if (!lesson.isQuiz)
-            TextButton.icon(
-              onPressed: _cycleSpeechRate,
-              icon: const Icon(Icons.speed, size: 18),
-              label: Text(_speedLabels[_speedPresets.indexOf(_speechRate)]),
-            ),
           if (!lesson.isQuiz && !lesson.isAudio)
             IconButton(
               icon: Icon(_isSpeaking ? Icons.stop_circle : Icons.volume_up),
               tooltip: _isSpeaking ? 'Stop narration' : 'Listen to this lesson',
               onPressed: _toggleNarration,
+            ),
+          if (!lesson.isQuiz)
+            IconButton(
+              icon: Badge(
+                label: Text(
+                  _speedLabels[_speedPresets.indexOf(_speechRate)],
+                  style: const TextStyle(fontSize: 9),
+                ),
+                child: const Icon(Icons.speed, size: 22),
+              ),
+              tooltip: 'Narration speed',
+              onPressed: _cycleSpeechRate,
+            ),
+          if (!lesson.isQuiz)
+            IconButton(
+              icon: const Icon(Icons.record_voice_over),
+              tooltip: 'Choose narrator voice',
+              onPressed: _showVoicePicker,
             ),
         ],
         bottom: PreferredSize(

@@ -17,18 +17,76 @@ class _ModuleTheme {
 }
 
 const Map<String, _ModuleTheme> _moduleThemes = {
-  'Cybersecurity Fundamentals': _ModuleTheme(
+  // ── Core Curriculum — Chapters 1–13, each with a distinct color ────────
+  'Chapter 1: Cybersecurity Fundamentals': _ModuleTheme(
     [Color(0xFF1565C0), Color(0xFF42A5F5)],
     Icons.security,
     Icons.shield,
   ),
-  'Threat Actors': _ModuleTheme(
-    [Color(0xFFB71C1C), Color(0xFFEF5350)],
-    Icons.person_search,
-    Icons.gps_fixed,
+  'Chapter 2: Threats, Attacks & Vulnerabilities': _ModuleTheme(
+    [Color(0xFFC62828), Color(0xFFEF5350)],
+    Icons.gpp_maybe,
+    Icons.warning_amber,
   ),
-  'Social Engineering': _ModuleTheme(
+  'Chapter 3: Network Security': _ModuleTheme(
+    [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+    Icons.router,
+    Icons.lan,
+  ),
+  'Chapter 4: Identity Access Management': _ModuleTheme(
+    [Color(0xFF283593), Color(0xFF7986CB)],
+    Icons.badge,
+    Icons.fingerprint,
+  ),
+  'Chapter 5: Cryptography': _ModuleTheme(
+    [Color(0xFF00695C), Color(0xFF4DB6AC)],
+    Icons.enhanced_encryption,
+    Icons.key,
+  ),
+  'Chapter 6: Secure Protocols': _ModuleTheme(
+    [Color(0xFF00838F), Color(0xFF4DD0E1)],
+    Icons.lock,
+    Icons.https,
+  ),
+  'Chapter 7: Endpoint Security': _ModuleTheme(
+    [Color(0xFFEF6C00), Color(0xFFFFB74D)],
+    Icons.laptop_chromebook,
+    Icons.devices,
+  ),
+  'Chapter 8: Identity Federation & SSO': _ModuleTheme(
     [Color(0xFF4527A0), Color(0xFF9575CD)],
+    Icons.hub,
+    Icons.link,
+  ),
+  'Chapter 9: Application Security': _ModuleTheme(
+    [Color(0xFF4E342E), Color(0xFFA1887F)],
+    Icons.web,
+    Icons.integration_instructions,
+  ),
+  'Chapter 10: Cloud Security': _ModuleTheme(
+    [Color(0xFF0277BD), Color(0xFF4FC3F7)],
+    Icons.cloud,
+    Icons.cloud_queue,
+  ),
+  'Chapter 11: Security Operations': _ModuleTheme(
+    [Color(0xFF1A237E), Color(0xFF5C6BC0)],
+    Icons.visibility,
+    Icons.radar,
+  ),
+  'Chapter 12: Incident Response': _ModuleTheme(
+    [Color(0xFFAD1457), Color(0xFFF06292)],
+    Icons.emergency,
+    Icons.local_fire_department,
+  ),
+  'Chapter 13: Governance, Risk & Compliance': _ModuleTheme(
+    [Color(0xFFF9A825), Color(0xFFFFD54F)],
+    Icons.gavel,
+    Icons.fact_check,
+  ),
+
+  // ── Bonus Chapters — supplementary modules outside the numbered sequence ──
+  'Social Engineering': _ModuleTheme(
+    [Color(0xFF6A1B9A), Color(0xFFBA68C8)],
     Icons.psychology_alt,
     Icons.record_voice_over,
   ),
@@ -37,40 +95,20 @@ const Map<String, _ModuleTheme> _moduleThemes = {
     Icons.coronavirus,
     Icons.bug_report,
   ),
-  'Cryptography': _ModuleTheme(
-    [Color(0xFF00695C), Color(0xFF4DB6AC)],
-    Icons.enhanced_encryption,
-    Icons.key,
-  ),
-  'Identity Access Management': _ModuleTheme(
-    [Color(0xFF283593), Color(0xFF7986CB)],
-    Icons.badge,
-    Icons.fingerprint,
-  ),
   'Vulnerabilities and Threats': _ModuleTheme(
     [Color(0xFFBF360C), Color(0xFFFF8A65)],
     Icons.bug_report,
     Icons.warning_amber,
   ),
   'Alerts and Monitoring': _ModuleTheme(
-    [Color(0xFF0277BD), Color(0xFF4FC3F7)],
+    [Color(0xFF0288D1), Color(0xFF81D4FA)],
     Icons.notifications_active,
     Icons.monitor_heart,
   ),
-  'Security Incident Response': _ModuleTheme(
-    [Color(0xFFAD1457), Color(0xFFF06292)],
-    Icons.emergency,
-    Icons.local_fire_department,
-  ),
   'Email Security': _ModuleTheme(
-    [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
+    [Color(0xFF00838F), Color(0xFF80DEEA)],
     Icons.email,
     Icons.mark_email_read,
-  ),
-  'Networking': _ModuleTheme(
-    [Color(0xFF00695C), Color(0xFF4DB6AC)],
-    Icons.router,
-    Icons.lan,
   ),
   'Windows Security': _ModuleTheme(
     [Color(0xFF0277BD), Color(0xFF29B6F6)],
@@ -78,14 +116,9 @@ const Map<String, _ModuleTheme> _moduleThemes = {
     Icons.computer,
   ),
   'Linux Security': _ModuleTheme(
-    [Color(0xFFBF360C), Color(0xFFFF8A65)],
+    [Color(0xFFBF360C), Color(0xFFFFAB91)],
     Icons.terminal,
     Icons.code,
-  ),
-  'SOC Operations': _ModuleTheme(
-    [Color(0xFF1A237E), Color(0xFF5C6BC0)],
-    Icons.visibility,
-    Icons.radar,
   ),
   'Capstone: Applied Defense': _ModuleTheme(
     [Color(0xFFF57F17), Color(0xFFFFD54F)],
@@ -108,7 +141,7 @@ class _WatermarkPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final textPainter = TextPainter(
       text: const TextSpan(
-        text: 'LEARN CYBERSECURITY',
+        text: 'CYBERPULSE',
         style: TextStyle(
           fontSize: 22,
           fontWeight: FontWeight.bold,
@@ -194,12 +227,13 @@ class _TopicsScreenState extends State<TopicsScreen> {
       builder: (_) => AlertDialog(
         title: const Text('About Learning Cybersecurity'),
         content: const Text(
-          'Learning Cybersecurity is a vendor-neutral cybersecurity '
-          'curriculum aligned with CompTIA Security+ (SY0-701). Every '
-          'topic contains lessons spanning Beginner through Expert '
-          'difficulty — look for the colored badge on each lesson. '
-          'Pass each level\'s adaptive exam at 80%+ to track your '
-          'progress.',
+          'Sacyra makes cybersecurity practical, engaging, and accessible for everyone '
+          'Learn through real-world scenarios '
+          ' practise your skills, and build confidence that '
+          'goes beyond the classroom. '
+          'Learn. Practise. Advocate. — and make cybersecurity part of everyday life. '
+          
+          ,
         ),
         actions: [
           TextButton(
@@ -306,7 +340,7 @@ class _TopicsScreenState extends State<TopicsScreen> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   Text(
-                                    '${allTopics.length} topics · Beginner to Expert',
+                                    '${allTopics.where((e) => e.levelIndex == 0).length} chapters · Fundamentals to GRC',
                                     style: TextStyle(
                                         color: Colors.white70, fontSize: 13),
                                   ),
@@ -350,22 +384,55 @@ class _TopicsScreenState extends State<TopicsScreen> {
                           },
                         ),
                       ),
-                      // Topic cards
-                      for (var i = 0; i < allTopics.length; i++)
+                      // Topic cards — Core Curriculum only (Chapters 1–13)
+                      for (final entry in allTopics.where((e) => e.levelIndex == 0))
                         _TopicCard(
-                          entry: allTopics[i],
-                          bestScore: _bestScoresByLevel[allTopics[i].levelIndex],
+                          entry: entry,
+                          bestScore: _bestScoresByLevel[entry.levelIndex],
                           onTap: () async {
                             await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (_) =>
-                                    TopicDetailScreen(entry: allTopics[i]),
+                                    TopicDetailScreen(entry: entry),
                               ),
                             );
                             _refresh();
                           },
                         ),
+                      // Bonus Chapters — collapsed behind a single link
+                      Card(
+                        margin: const EdgeInsets.only(top: 4, bottom: 20),
+                        color: Colors.amber.withValues(alpha: 0.08),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          side: BorderSide(color: Colors.amber.withValues(alpha: 0.3)),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          leading: const CircleAvatar(
+                            backgroundColor: Colors.amber,
+                            child: Icon(Icons.card_giftcard, color: Colors.white),
+                          ),
+                          title: const Text('Bonus Chapters',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: Text(
+                            '${allTopics.where((e) => e.levelIndex == 1).length} supplementary chapters',
+                          ),
+                          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => _BonusChaptersScreen(
+                                  bestScoresByLevel: _bestScoresByLevel,
+                                ),
+                              ),
+                            );
+                            _refresh();
+                          },
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -704,4 +771,86 @@ class _DotPatternPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_) => false;
+}
+
+// ── Bonus Chapters Screen ───────────────────────────────────────────────
+// Supplementary chapters live behind this dedicated screen instead of
+// appearing inline with the numbered Core Curriculum, keeping the main
+// list focused on the 13-chapter sequence.
+class _BonusChaptersScreen extends StatelessWidget {
+  final Map<int, double?> bestScoresByLevel;
+
+  const _BonusChaptersScreen({required this.bestScoresByLevel});
+
+  @override
+  Widget build(BuildContext context) {
+    final bonusTopics = allTopics.where((e) => e.levelIndex == 1).toList();
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF0F4FF),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1565C0),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'Bonus Chapters',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+      ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(painter: _WatermarkPainter()),
+          ),
+          ListView(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.card_giftcard, color: Colors.amber.shade700, size: 22),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Text(
+                        'Supplementary chapters outside the core 13-chapter '
+                        'sequence — dig deeper into specific threats, '
+                        'platforms, and the capstone.',
+                        style: TextStyle(fontSize: 13, color: Colors.black87),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              for (final entry in bonusTopics)
+                _TopicCard(
+                  entry: entry,
+                  bestScore: bestScoresByLevel[entry.levelIndex],
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TopicDetailScreen(entry: entry),
+                      ),
+                    );
+                  },
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -28,18 +28,6 @@ const List<QuizQuestion> finalExamQuestions = [
         correctIndex: 1,
         explanation: 'A false positive incorrectly flags benign activity as malicious, contributing to alert fatigue.',
       ),
-  // From: Identity Access Management
-  QuizQuestion(
-        question: 'A temporal account is specifically designed to:',
-        options: [
-          'Provide permanent access for a contractor',
-          'Have a defined expiration built in from creation, addressing the delayed-deprovisioning risk for short-term access needs',
-          'Bypass MFA requirements',
-          'Replace the need for a password vault',
-        ],
-        correctIndex: 1,
-        explanation: 'Temporal accounts expire automatically rather than relying on someone remembering to deprovision them later.',
-      ),
   // From: Linux Security
   QuizQuestion(
         question: 'Running "find / -perm -4000" on a Linux system reveals:',
@@ -188,18 +176,6 @@ const List<QuizQuestion> finalExamQuestions = [
         correctIndex: 1,
         explanation: 'VLANs logically separate traffic on the same physical hardware for security and performance.',
       ),
-  // From: Identity Access Management
-  QuizQuestion(
-        question: 'Delayed deprovisioning is risky primarily because:',
-        options: [
-          'It slows down new employee onboarding',
-          'It leaves access active for someone who no longer needs or should have it, such as a departed employee',
-          'It requires more storage space',
-          'It only affects password policy',
-        ],
-        correctIndex: 1,
-        explanation: 'Prompt deprovisioning closes off access the moment it is no longer appropriate — delay creates unnecessary risk.',
-      ),
   // From: Cybersecurity Fundamentals
   QuizQuestion(
         question: 'Which of the following best describes the Zero Trust principle of "adaptive identity"?',
@@ -310,18 +286,6 @@ const List<QuizQuestion> finalExamQuestions = [
         ],
         correctIndex: 1,
         explanation: 'OCSP stapling avoids the client needing to separately contact the CA, improving speed and reducing CA load.',
-      ),
-  // From: Identity Access Management
-  QuizQuestion(
-        question: 'What is attestation in the IAM lifecycle?',
-        options: [
-          'Creating a new user account',
-          'A periodic formal review where managers confirm existing access is still appropriate',
-          'Generating a one-time password',
-          'Encrypting stored credentials',
-        ],
-        correctIndex: 1,
-        explanation: 'Attestation is a recurring review process catching accumulated unnecessary access before it becomes a risk.',
       ),
   // From: Social Engineering
   QuizQuestion(
@@ -444,18 +408,6 @@ const List<QuizQuestion> finalExamQuestions = [
         ],
         correctIndex: 1,
         explanation: 'Red/blue simulations test real detection tooling and response speed under genuine, unscripted pressure.',
-      ),
-  // From: Identity Access Management
-  QuizQuestion(
-        question: 'Password spraying is designed specifically to evade:',
-        options: [
-          'Encryption at rest',
-          'Account lockout policies tuned only to detect many failed attempts against one specific account',
-          'Firewall rules',
-          'DNS filtering',
-        ],
-        correctIndex: 1,
-        explanation: 'Spraying spreads attempts thin across many accounts, so per-account lockout thresholds rarely trigger.',
       ),
   // From: SOC Operations
   QuizQuestion(
@@ -919,18 +871,6 @@ const List<QuizQuestion> finalExamQuestions = [
         correctIndex: 1,
         explanation: 'AppArmor confines individual applications using path-based profiles.',
       ),
-  // From: Identity Access Management
-  QuizQuestion(
-        question: 'OAuth is best described as:',
-        options: [
-          'An authentication protocol only',
-          'An authorization protocol letting a user grant limited access to their data without sharing their password',
-          'A password hashing algorithm',
-          'A type of firewall',
-        ],
-        correctIndex: 1,
-        explanation: 'OAuth handles authorization — granting limited access — rather than authentication itself.',
-      ),
   // From: Malware
   QuizQuestion(
         question: 'Which of the four ransomware best practices most directly limits how far a single compromised password can spread an attack?',
@@ -956,18 +896,6 @@ const List<QuizQuestion> finalExamQuestions = [
         options: ['Financial gain', 'Political or social causes', 'Personal curiosity only', 'Government contracts'],
         correctIndex: 1,
         explanation: 'Hacktivists target organizations they view as opposed to their political or social cause.',
-      ),
-  // From: Identity Access Management
-  QuizQuestion(
-        question: 'What role does an Identity Provider (IdP) play in SSO?',
-        options: [
-          'It stores application data',
-          'It performs authentication centrally and vouches for that identity to every connected service provider',
-          'It replaces the need for any authentication at all',
-          'It only works with biometric login',
-        ],
-        correctIndex: 1,
-        explanation: 'The IdP authenticates the user once and asserts that identity to every connected application.',
       ),
   // From: Vulnerabilities and Threats
   QuizQuestion(
@@ -1167,5 +1095,523 @@ const List<QuizQuestion> finalExamQuestions = [
         ],
         correctIndex: 1,
         explanation: 'Risk-based patching focuses remediation effort where it matters most, rather than treating every vulnerability identically.',
+      ),
+  // From: Cryptography
+  QuizQuestion(
+        question: 'What is the key difference between encryption and hashing?',
+        options: [
+          'They are identical processes',
+          'Encryption is reversible with the correct key (providing confidentiality); hashing is a one-way process used to verify integrity',
+          'Hashing is reversible but encryption is not',
+          'Both require the exact same key management practices',
+        ],
+        correctIndex: 1,
+        explanation: 'Encryption protects confidentiality and can be decrypted; hashing verifies integrity and cannot be reversed.',
+      ),
+  // From: Cryptography
+  QuizQuestion(
+        question: 'Why is AES-GCM widely deployed in modern enterprise systems?',
+        options: [
+          'It only provides confidentiality with no other benefits',
+          'It combines the performance of Counter Mode with built-in integrity verification, providing authenticated encryption',
+          'It is the slowest available cipher mode',
+          'It eliminates the need for any encryption key',
+        ],
+        correctIndex: 1,
+        explanation: 'GCM adds authentication on top of CTR mode\'s speed, letting systems both encrypt and detect tampering in one pass.',
+      ),
+  // From: Cryptography
+  QuizQuestion(
+        question: 'What is the main advantage of hybrid encryption, as used in protocols like TLS?',
+        options: [
+          'It avoids using any asymmetric cryptography',
+          'It combines asymmetric encryption for secure key exchange with fast symmetric encryption for the actual data',
+          'It only works for email communications',
+          'It requires no cryptographic keys whatsoever',
+        ],
+        correctIndex: 1,
+        explanation: 'Hybrid encryption uses asymmetric crypto\'s secure key exchange plus symmetric crypto\'s speed for bulk data.',
+      ),
+  // From: Cryptography
+  QuizQuestion(
+        question: 'Why does the compromise of a Root Certificate Authority represent such a severe risk?',
+        options: [
+          'It only affects a single website',
+          'Because the Root CA is the foundation of trust for the entire PKI hierarchy — compromising it could invalidate every certificate issued beneath it',
+          'Root CAs have no actual security role',
+          'It only impacts internal test environments',
+        ],
+        correctIndex: 1,
+        explanation: 'Every certificate in the chain traces its trust back to the Root CA, so its compromise cascades through the entire hierarchy.',
+      ),
+  // From: Cryptography
+  QuizQuestion(
+        question: 'What distinguishes a downgrade attack from other cryptographic attacks?',
+        options: [
+          'It attempts to physically damage cryptographic hardware',
+          'It forces communicating systems to negotiate older, weaker protocols or cipher suites that are easier to exploit',
+          'It only targets hashing algorithms',
+          'It requires no network access at all',
+        ],
+        correctIndex: 1,
+        explanation: 'Downgrade attacks manipulate protocol negotiation to force weaker, more exploitable encryption.',
+      ),
+  // From: Cryptography
+  QuizQuestion(
+        question: 'Why are organizations beginning to prepare for Post-Quantum Cryptography (PQC)?',
+        options: [
+          'Quantum computing already routinely breaks all encryption today',
+          'Quantum algorithms like Shor\'s Algorithm could theoretically weaken RSA, Diffie-Hellman, and ECC in the future, so agility now reduces future migration risk',
+          'PQC is required for all symmetric encryption immediately',
+          'Quantum computing has no relevance to cryptography',
+        ],
+        correctIndex: 1,
+        explanation: 'While large-scale practical quantum attacks aren\'t here yet, organizations build cryptographic agility now to migrate smoothly when needed.',
+      ),
+  // From: Network Security
+  QuizQuestion(
+        question: 'Which OSI layer is responsible for routing and logical addressing?',
+        options: ['Data Link (Layer 2)', 'Network (Layer 3)', 'Session (Layer 5)', 'Presentation (Layer 6)'],
+        correctIndex: 1,
+        explanation: 'The Network layer (Layer 3) handles routing and logical addressing using protocols like IP and ICMP.',
+      ),
+  // From: Network Security
+  QuizQuestion(
+        question: 'Why does the TCP/IP model have only four layers compared to the OSI model\'s seven?',
+        options: [
+          'TCP/IP is a purely theoretical model with no real-world use',
+          'TCP/IP is the practical implementation actually used by the Internet, consolidating some OSI functions into fewer, more implementation-focused layers',
+          'The OSI model was developed after TCP/IP and added unnecessary layers',
+          'TCP/IP cannot support routing',
+        ],
+        correctIndex: 1,
+        explanation: 'TCP/IP is the practical, real-world protocol suite; OSI is a more granular conceptual reference model used mainly for teaching and troubleshooting.',
+      ),
+  // From: Network Security
+  QuizQuestion(
+        question: 'Between IPsec, SSL/TLS VPN, and WireGuard, which is specifically noted for excellent firewall traversal because it runs over the same port as ordinary HTTPS traffic?',
+        options: ['IPsec', 'SSL/TLS VPN', 'WireGuard', 'None of these traverse firewalls well'],
+        correctIndex: 1,
+        explanation: 'SSL/TLS VPN uses TCP port 443, the same port as HTTPS, letting it blend in with normal web traffic through most firewalls.',
+      ),
+  // From: Network Security
+  QuizQuestion(
+        question: 'What is the primary purpose of Port Address Translation (PAT)?',
+        options: [
+          'To map one private IP address to one public IP address exclusively',
+          'To allow many internal devices to share a single public IP address by using different source port numbers',
+          'To encrypt all outbound network traffic',
+          'To replace the need for a firewall entirely',
+        ],
+        correctIndex: 1,
+        explanation: 'PAT\'s many-to-one mapping via port numbers is what conserves public IPv4 addresses so efficiently.',
+      ),
+  // From: Network Security
+  QuizQuestion(
+        question: 'In the real-world DNS misconfiguration scenario, what was the actual root cause of the customer-facing outage?',
+        options: [
+          'The web servers had crashed',
+          'An incorrect DNS record prevented name resolution from directing customers to the correct server, even though the servers themselves were fully operational',
+          'A DDoS attack overwhelmed the network',
+          'The load balancer was physically unplugged',
+        ],
+        correctIndex: 1,
+        explanation: 'This scenario illustrates that DNS failures can cause outages entirely independent of actual server or application health.',
+      ),
+  // From: Network Security
+  QuizQuestion(
+        question: 'What does data encapsulation accomplish as information moves down the protocol stack for transmission?',
+        options: [
+          'It permanently deletes unnecessary data',
+          'Each layer adds its own header, enabling reliable communication, routing, error detection, and interoperability between different network technologies',
+          'It only applies to wireless transmissions',
+          'It removes all security protections from the data',
+        ],
+        correctIndex: 1,
+        explanation: 'Encapsulation progressively wraps data with protocol headers at each layer, supporting reliable delivery and cross-technology interoperability.',
+      ),
+  // From: Secure Protocols
+  QuizQuestion(
+        question: 'What does Perfect Forward Secrecy (PFS) specifically protect against?',
+        options: [
+          'It prevents any encryption from ever being used',
+          'It ensures that even if a server\'s long-term private key is later compromised, previously captured encrypted sessions remain protected because they used unique, discarded session keys',
+          'It only protects data at rest, never data in transit',
+          'It eliminates the need for any certificate validation',
+        ],
+        correctIndex: 1,
+        explanation: 'PFS\'s core benefit is that a future key compromise can\'t retroactively expose past communications, since each session had its own unique, since-discarded key.',
+      ),
+  // From: Secure Protocols
+  QuizQuestion(
+        question: 'Why does SSH public key authentication provide stronger security than password authentication?',
+        options: [
+          'Because the private key is transmitted to the server during every login',
+          'Because the private key never leaves the client device — the server verifies ownership without the key ever being transmitted',
+          'Because public key authentication requires no verification at all',
+          'Because passwords are actually more secure than key pairs',
+        ],
+        correctIndex: 1,
+        explanation: 'The administrator proves possession of the private key without ever transmitting it, unlike passwords which must be sent during authentication.',
+      ),
+  // From: Secure Protocols
+  QuizQuestion(
+        question: 'How does DKIM differ from SPF in what it actually verifies?',
+        options: [
+          'They verify exactly the same thing',
+          'SPF verifies the sending server is authorized; DKIM verifies the message itself hasn\'t been altered using a digital signature',
+          'DKIM only works with POP3, not SMTP',
+          'SPF verifies message content while DKIM verifies the server',
+        ],
+        correctIndex: 1,
+        explanation: 'SPF is about server authorization; DKIM is about message integrity via a cryptographic signature — genuinely different checks that complement each other.',
+      ),
+  // From: Secure Protocols
+  QuizQuestion(
+        question: 'What is the key difference between SFTP and FTPS?',
+        options: [
+          'They are identical protocols with different names',
+          'SFTP uses the SSH protocol for encryption, while FTPS adds TLS encryption on top of the traditional FTP protocol',
+          'FTPS uses SSH, while SFTP uses TLS',
+          'Neither protocol provides any encryption',
+        ],
+        correctIndex: 1,
+        explanation: 'SFTP is SSH-based file transfer; FTPS is traditional FTP with TLS added — different underlying mechanisms achieving similar security goals.',
+      ),
+  // From: Secure Protocols
+  QuizQuestion(
+        question: 'Why is accurate time synchronization (NTP) critical for security operations?',
+        options: [
+          'It has no real impact on security investigations',
+          'Without synchronized timestamps, investigators and SIEM platforms may struggle to correctly reconstruct or correlate the sequence of events during a security incident',
+          'NTP is only used for scheduling meetings',
+          'Time synchronization only matters for billing purposes',
+        ],
+        correctIndex: 1,
+        explanation: 'Consistent timestamps across devices are essential for accurately reconstructing attack timelines and correlating related events.',
+      ),
+  // From: Secure Protocols
+  QuizQuestion(
+        question: 'What does Mutual TLS (mTLS) require that standard TLS does not?',
+        options: [
+          'Only the server needs to present a certificate, exactly like standard TLS',
+          'Both the client AND the server must authenticate each other using digital certificates',
+          'Neither party needs any certificate at all',
+          'mTLS eliminates the need for encryption entirely',
+        ],
+        correctIndex: 1,
+        explanation: 'Standard TLS authenticates only the server; mTLS adds client-side certificate authentication, reducing impersonation risk for sensitive integrations.',
+      ),
+  // From: Secure Protocols
+  QuizQuestion(
+        question: 'What is SSL stripping specifically designed to do?',
+        options: [
+          'Strengthen an HTTPS connection with additional encryption',
+          'Attempt to downgrade or replace an HTTPS connection with an unencrypted HTTP connection, exposing data that would otherwise be protected',
+          'Automatically renew expired certificates',
+          'Permanently disable a user\'s Internet connection',
+        ],
+        correctIndex: 1,
+        explanation: 'SSL stripping specifically targets the HTTPS-to-HTTP downgrade path, which HSTS is specifically designed to prevent.',
+      ),
+  // From: Secure Protocols
+  QuizQuestion(
+        question: 'What is the primary security benefit of SNMPv3 over SNMPv1 and SNMPv2c?',
+        options: [
+          'SNMPv3 removes all security features for faster performance',
+          'SNMPv3 introduces user authentication, message integrity, and encryption of management traffic',
+          'SNMPv3 only works with community strings, just like v1 and v2c',
+          'SNMPv3 is identical in security to SNMPv1',
+        ],
+        correctIndex: 1,
+        explanation: 'SNMPv3 is specifically recommended because it addresses the security weaknesses present in earlier, less secure versions.',
+      ),
+  // From: Cloud Security
+  QuizQuestion(
+        question: 'What is the fundamental principle of the Shared Responsibility Model?',
+        options: [
+          'The cloud provider is responsible for absolutely everything, including customer data',
+          'The provider secures the cloud infrastructure, while the customer secures what they deploy and manage within the cloud',
+          'The customer is solely responsible for physical data center security',
+          'Security responsibility disappears once data moves to the cloud',
+        ],
+        correctIndex: 1,
+        explanation: 'This is one of the most commonly misunderstood concepts in cloud security — the provider and customer each own distinct parts of the security responsibility.',
+      ),
+  // From: Cloud Security
+  QuizQuestion(
+        question: 'As organizations move from IaaS to PaaS to SaaS, what happens to the division of responsibility?',
+        options: [
+          'The customer takes on more and more responsibility',
+          'The cloud provider assumes greater responsibility for managing the environment',
+          'Responsibility remains exactly the same across all three models',
+          'The customer becomes responsible for the physical infrastructure',
+        ],
+        correctIndex: 1,
+        explanation: 'IaaS gives customers the most control (and responsibility); SaaS shifts nearly all infrastructure and platform responsibility to the provider.',
+      ),
+  // From: Cloud Security
+  QuizQuestion(
+        question: 'What is the key difference between RBAC and ABAC?',
+        options: [
+          'They are identical access control models',
+          'RBAC grants permissions based on predefined roles; ABAC makes access decisions using multiple attributes like department, device compliance, location, and time of day',
+          'ABAC is simpler to administer than RBAC',
+          'RBAC is commonly used in Zero Trust architectures, not ABAC',
+        ],
+        correctIndex: 1,
+        explanation: 'ABAC provides more dynamic, context-aware access decisions using multiple attributes, while RBAC relies on simpler, predefined role assignments.',
+      ),
+  // From: Cloud Security
+  QuizQuestion(
+        question: 'How does Tokenization differ from encryption in protecting sensitive data like credit card numbers?',
+        options: [
+          'They are functionally identical',
+          'Tokenization replaces sensitive data with a non-reversible token mapped in a secure database, rather than relying on a mathematically reversible decryption key',
+          'Tokenization requires a decryption key just like encryption',
+          'Tokenization is only used for encrypting entire databases',
+        ],
+        correctIndex: 1,
+        explanation: 'Tokenized data has no mathematical relationship to the original value — an attacker who steals it has nothing to decrypt, unlike stolen ciphertext.',
+      ),
+  // From: Cloud Security
+  QuizQuestion(
+        question: 'What is the key difference between CSPM and CWPP?',
+        options: [
+          'They are identical tools with different names',
+          'CSPM focuses on cloud configuration security (misconfigurations), while CWPP focuses on protecting the workloads themselves during runtime',
+          'CWPP only evaluates compliance, never actual workload threats',
+          'CSPM protects containers while CWPP protects storage accounts',
+        ],
+        correctIndex: 1,
+        explanation: 'CSPM is about getting the configuration right; CWPP is about protecting the running workload itself — complementary, not overlapping, functions.',
+      ),
+  // From: Cloud Security
+  QuizQuestion(
+        question: 'What does a Cloud Access Security Broker (CASB) provide?',
+        options: [
+          'Nothing related to SaaS application security',
+          'A policy enforcement point between users and cloud applications, providing visibility, access control, DLP, and consistent security across multiple SaaS services',
+          'CASB only works for a single cloud application',
+          'CASB replaces the need for any encryption',
+        ],
+        correctIndex: 1,
+        explanation: 'CASB gives organizations centralized visibility and control across the many different SaaS applications employees actually use.',
+      ),
+  // From: Cloud Security
+  QuizQuestion(
+        question: 'What is the key difference between Rehosting ("Lift and Shift") and Refactoring during cloud migration?',
+        options: [
+          'They are identical migration strategies',
+          'Rehosting moves applications with minimal changes (fast but may carry over existing weaknesses); Refactoring redesigns applications to use cloud-native services (more effort, better long-term scalability)',
+          'Refactoring is always faster than Rehosting',
+          'Rehosting always produces better long-term results than Refactoring',
+        ],
+        correctIndex: 1,
+        explanation: 'Rehosting prioritizes migration speed; Refactoring prioritizes long-term cloud-native benefits at the cost of greater upfront effort.',
+      ),
+  // From: Cloud Security
+  QuizQuestion(
+        question: 'What security risks does Infrastructure as Code (IaC) specifically introduce if not properly managed?',
+        options: [
+          'IaC introduces no security risks whatsoever',
+          'Insecure default configurations, hardcoded credentials, excessive permissions, and unreviewed configuration changes — all of which get replicated at scale through automation',
+          'IaC only affects a single server at a time, limiting any risk',
+          'IaC eliminates the possibility of misconfiguration entirely',
+        ],
+        correctIndex: 1,
+        explanation: 'Because IaC templates are reused repeatedly, a single flawed template can replicate a security weakness across many deployments.',
+      ),
+  // From: Identity Access Management
+  QuizQuestion(
+        question: 'What are the four pillars of IAM, commonly abbreviated as IAAA?',
+        options: [
+          'Installation, Access, Audit, Authorization',
+          'Identification, Authentication, Authorization, Accounting',
+          'Identity, Authorization, Access, Alerting',
+          'Inspection, Authentication, Approval, Archiving',
+        ],
+        correctIndex: 1,
+        explanation: 'IAM is built on four fundamental concepts: Identification, Authentication, Authorization, and Accounting (Auditing).',
+      ),
+  // From: Identity Access Management
+  QuizQuestion(
+        question: 'What happens during the "Move" stage of the Joiner-Mover-Leaver (JML) identity lifecycle?',
+        options: [
+          'A new user account is created for the first time',
+          'Old permissions are removed and new permissions are assigned based on the employee\'s new role',
+          'The account is permanently deleted',
+          'Devices are recovered and email is archived',
+        ],
+        correctIndex: 1,
+        explanation: 'During the Move stage, an employee changes departments — old permissions are removed and new permissions are assigned based on the new role.',
+      ),
+  // From: Identity Access Management
+  QuizQuestion(
+        question: 'A hardware security key (such as a FIDO2 key) is an example of which authentication factor?',
+        options: [
+          'Something you know',
+          'Something you have',
+          'Something you are',
+          'Something you do',
+        ],
+        correctIndex: 1,
+        explanation: 'A hardware security key requires the user to physically possess a device, making it a "something you have" (possession) factor.',
+      ),
+  // From: Identity Access Management
+  QuizQuestion(
+        question: 'Between "P@ssw0rd!" and "BlueTiger!RunsAcross7Mountains," which is the passphrase, and why is it generally preferred?',
+        options: [
+          'P@ssw0rd! is the passphrase because it is shorter',
+          'BlueTiger!RunsAcross7Mountains is the passphrase — it is longer, easier to remember, and more resistant to brute-force attacks',
+          'Both are equally secure passwords',
+          'Neither example is a valid passphrase',
+        ],
+        correctIndex: 1,
+        explanation: 'A passphrase is a longer sequence of words that is easier to remember and generally more resistant to brute-force attacks than a short, complex password.',
+      ),
+  // From: Identity Access Management
+  QuizQuestion(
+        question: 'Which of the following is listed as a benefit of passwordless authentication?',
+        options: [
+          'It eliminates the need for any device compliance checks',
+          'Reduced phishing risk and fewer password reset requests',
+          'It requires no hardware of any kind',
+          'It is only compatible with legacy on-premises systems',
+        ],
+        correctIndex: 1,
+        explanation: 'Passwordless authentication reduces phishing risk, improves user experience, reduces password reset requests, and strengthens overall security.',
+      ),
+  // From: Identity Access Management
+  QuizQuestion(
+        question: 'Why does Multi-Factor Authentication (MFA) make it significantly harder for an attacker to gain unauthorized access after stealing a password?',
+        options: [
+          'MFA automatically resets the stolen password',
+          'The attacker is unlikely to also possess the required second, independent authentication factor',
+          'MFA blocks all network traffic from unknown IP addresses',
+          'MFA disables the user account permanently after any login attempt',
+        ],
+        correctIndex: 1,
+        explanation: 'Even with a stolen password, an attacker is unlikely to have access to the required second independent authentication factor, which is what makes MFA effective.',
+      ),
+  // From: Identity Access Management
+  QuizQuestion(
+        question: 'Why are SMS-based One-Time Passwords (OTPs) considered a weaker MFA method compared to authenticator apps or hardware security keys?',
+        options: [
+          'SMS OTPs never actually get delivered to the user',
+          'SMS-based OTPs can be vulnerable to SIM-swapping attacks',
+          'SMS OTPs require expensive hardware to use',
+          'SMS OTPs are not compatible with mobile phones',
+        ],
+        correctIndex: 1,
+        explanation: 'SMS-based OTPs can be vulnerable to SIM-swapping attacks, which is why best practice favors authenticator apps or hardware security keys instead.',
+      ),
+  // From: Identity Access Management
+  QuizQuestion(
+        question: 'In the IAAA model, which pillar is responsible for recording login times, files accessed, and failed login attempts?',
+        options: [
+          'Identification',
+          'Authentication',
+          'Authorization',
+          'Accounting',
+        ],
+        correctIndex: 3,
+        explanation: 'Accounting (Auditing) records user activities such as login/logout time, files accessed, administrative actions, and failed login attempts for security and compliance purposes.',
+      ),
+  // From: Identity Federation and SSO
+  QuizQuestion(
+        question: 'What is the fundamental relationship between Single Sign-On (SSO) and Identity Federation?',
+        options: [
+          'They are unrelated technologies with no connection',
+          'Federation establishes trust between security domains, while SSO provides the seamless single-login experience built on top of that trust',
+          'SSO always requires passwords to be shared between every application',
+          'Federation only works within a single organization',
+        ],
+        correctIndex: 1,
+        explanation: 'Identity federation establishes trust between different organizations or security domains, while SSO provides a seamless authentication experience once that trust exists.',
+      ),
+  // From: Identity Federation and SSO
+  QuizQuestion(
+        question: 'In a SAML authentication flow, what does the Service Provider verify when it receives a returned assertion?',
+        options: [
+          'Nothing — assertions are trusted automatically',
+          'Digital signature, certificate validity, assertion expiration, trusted Identity Provider, and audience restrictions',
+          'Only the user\'s IP address',
+          'The physical location of the Identity Provider\'s servers',
+        ],
+        correctIndex: 1,
+        explanation: 'Before granting access, the Service Provider validates the digital signature, certificate validity, assertion expiration, trusted IdP, and audience restrictions.',
+      ),
+  // From: Identity Federation and SSO
+  QuizQuestion(
+        question: 'Which protocol would be most appropriate for a mobile app that needs delegated access to a user\'s cloud storage without ever seeing their password?',
+        options: [
+          'Kerberos',
+          'OAuth 2.0',
+          'LDAP',
+          'Group Policy',
+        ],
+        correctIndex: 1,
+        explanation: 'OAuth 2.0 is designed exactly for this scenario — an application gains limited, delegated access to a resource via an access token, without ever handling the user\'s password.',
+      ),
+  // From: Identity Federation and SSO
+  QuizQuestion(
+        question: 'What is a "password spray attack" specifically designed to evade?',
+        options: [
+          'Encryption at rest',
+          'Account lockout policies tuned to detect many failed attempts against a single account',
+          'Firewall rules',
+          'DNS filtering',
+        ],
+        correctIndex: 1,
+        explanation: 'By trying only a few common passwords against many different accounts, password spraying stays under lockout thresholds designed to catch repeated attempts against one account.',
+      ),
+  // From: Identity Federation and SSO
+  QuizQuestion(
+        question: 'What does UEBA (User and Entity Behavior Analytics) use to detect a potentially compromised account?',
+        options: [
+          'A static list of banned passwords only',
+          'Behavioral baselines built from historical activity, flagging significant deviations as anomalous',
+          'Manual review of every login attempt by IT staff',
+          'The user\'s job title alone',
+        ],
+        correctIndex: 1,
+        explanation: 'UEBA builds a behavioral baseline for each user and flags significant deviations — such as a login from an unusual location at an unusual time — as anomalous.',
+      ),
+  // From: Identity Federation and SSO
+  QuizQuestion(
+        question: 'What does Continuous Access Evaluation (CAE) allow that traditional token-based access does not?',
+        options: [
+          'Tokens that never expire under any circumstances',
+          'Near real-time reassessment of an active session when a significant security event occurs, rather than waiting for the token to expire',
+          'Elimination of the need for any authentication token',
+          'Automatic approval of all access requests',
+        ],
+        correctIndex: 1,
+        explanation: 'CAE lets applications and identity providers reassess access immediately when events like account disablement or high risk are detected, instead of waiting for the token\'s natural expiration.',
+      ),
+  // From: Identity Federation and SSO
+  QuizQuestion(
+        question: 'What is the primary difference between Active Directory Domain Services (AD DS) and Microsoft Entra ID?',
+        options: [
+          'They are the same product marketed under two names',
+          'AD DS is an on-premises directory using Kerberos/NTLM, while Microsoft Entra ID is cloud-based and supports modern protocols like OAuth 2.0 and SAML',
+          'Entra ID only works for printer management',
+          'AD DS cannot issue Kerberos tickets',
+        ],
+        correctIndex: 1,
+        explanation: 'AD DS is Microsoft\'s on-premises directory service using Kerberos/NTLM authentication, while Microsoft Entra ID is a cloud-native identity platform supporting modern authentication protocols.',
+      ),
+  // From: Identity Federation and SSO
+  QuizQuestion(
+        question: 'Why is the Identity Provider (IdP) considered a particularly high-value target for attackers in an SSO architecture?',
+        options: [
+          'The IdP has no special importance compared to other systems',
+          'Because it is the central trust authority — compromising it could grant access to every connected application',
+          'The IdP only stores cosmetic user preferences',
+          'Attackers cannot target identity infrastructure',
+        ],
+        correctIndex: 1,
+        explanation: 'Since every Service Provider trusts the IdP\'s authentication decisions, compromising the IdP could give an attacker access to every application connected through it.',
       ),
 ];

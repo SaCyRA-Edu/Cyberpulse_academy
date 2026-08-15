@@ -127,22 +127,7 @@ class DiagramView extends StatelessWidget {
         diagram = ProcessFlowDiagram(steps: spec.steps ?? const []);
         break;
       case DiagramType.assetImage:
-        diagram = ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Image.asset(
-            spec.assetPath ?? '',
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) => Container(
-              padding: const EdgeInsets.all(20),
-              child: const Text(
-                'Image could not be loaded — check that the asset path is '
-                'declared correctly in pubspec.yaml.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.red, fontSize: 12),
-              ),
-            ),
-          ),
-        );
+        diagram = ZoomableAssetImage(assetPath: spec.assetPath ?? '');
         break;
       case DiagramType.dataTable:
         diagram = GenericDataTableDiagram(
@@ -1636,6 +1621,182 @@ class GenericDataTableDiagram extends StatelessWidget {
                 ),
                 children: [for (final c in rows[i]) cell(c)],
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Zoomable Asset Image — shows a small zoom-in button over the thumbnail;
+// tapping it opens a full-screen pinch-to-zoom viewer with +/- controls
+// ═══════════════════════════════════════════════════════════════════════
+
+class ZoomableAssetImage extends StatelessWidget {
+  final String assetPath;
+
+  const ZoomableAssetImage({super.key, required this.assetPath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.asset(
+            assetPath,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => Container(
+              padding: const EdgeInsets.all(20),
+              child: const Text(
+                'Image could not be loaded — check that the asset path is '
+                'declared correctly in pubspec.yaml.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.red, fontSize: 12),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 8,
+          right: 8,
+          child: Material(
+            color: Colors.black.withValues(alpha: 0.55),
+            shape: const CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: () {
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    opaque: false,
+                    barrierColor: Colors.black87,
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        _ZoomableImagePage(assetPath: assetPath),
+                  ),
+                );
+              },
+              child: const Padding(
+                padding: EdgeInsets.all(8),
+                child: Icon(Icons.zoom_in, color: Colors.white, size: 20),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ZoomableImagePage extends StatefulWidget {
+  final String assetPath;
+
+  const _ZoomableImagePage({required this.assetPath});
+
+  @override
+  State<_ZoomableImagePage> createState() => _ZoomableImagePageState();
+}
+
+class _ZoomableImagePageState extends State<_ZoomableImagePage> {
+  final TransformationController _controller = TransformationController();
+  double _scale = 1.0;
+  static const double _minScale = 1.0;
+  static const double _maxScale = 5.0;
+  static const double _scaleStep = 0.5;
+
+  void _applyScale(double newScale) {
+    setState(() {
+      _scale = newScale.clamp(_minScale, _maxScale);
+      _controller.value = Matrix4.identity()..scale(_scale);
+    });
+  }
+
+  void _zoomIn() => _applyScale(_scale + _scaleStep);
+  void _zoomOut() => _applyScale(_scale - _scaleStep);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _controlButton(IconData icon, VoidCallback? onTap) {
+    return Material(
+      color: Colors.white.withValues(alpha: 0.15),
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Icon(
+            icon,
+            color: onTap == null ? Colors.white38 : Colors.white,
+            size: 26,
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Center(
+              child: InteractiveViewer(
+                transformationController: _controller,
+                minScale: _minScale,
+                maxScale: _maxScale,
+                onInteractionEnd: (details) {
+                  final currentScale = _controller.value.getMaxScaleOnAxis();
+                  setState(() => _scale = currentScale.clamp(_minScale, _maxScale));
+                },
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: Image.asset(widget.assetPath, fit: BoxFit.contain),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Material(
+                color: Colors.white.withValues(alpha: 0.15),
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () => Navigator.of(context).pop(),
+                  child: const Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Icon(Icons.close, color: Colors.white, size: 26),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 24,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _controlButton(
+                    Icons.zoom_out,
+                    _scale > _minScale ? _zoomOut : null,
+                  ),
+                  const SizedBox(width: 20),
+                  _controlButton(
+                    Icons.zoom_in,
+                    _scale < _maxScale ? _zoomIn : null,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

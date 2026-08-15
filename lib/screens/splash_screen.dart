@@ -31,36 +31,30 @@ class SplashScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo
+                  // Logo — the raster mark already includes the
+                  // "CyberPulse Academy" wordmark, so it needs to render
+                  // large enough to stay legible, and un-cropped (no
+                  // circular mask, which would clip the ribbon/text).
                   Container(
-                    width: 116,
-                    height: 116,
+                    padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.blue.withValues(alpha: 0.4),
-                          blurRadius: 30,
-                          spreadRadius: 5,
+                          blurRadius: 40,
+                          spreadRadius: 8,
                         ),
                       ],
                     ),
-                    child: const CyberPulseLogo(
-                      size: 116,
-                      showBackgroundCircle: true,
-                      backgroundCircleColor: Color(0xFF1565C0),
-                      lightShade: Color(0xFF1E88E5),
-                      darkShade: Color(0xFF0D47A1),
-                      outline: Color(0xFF90CAF9),
-                    ),
+                    child: const CyberPulseLogo(size: 240),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   // App name
                   const Text(
                     'Learning',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 36,
+                      fontSize: 32,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 2,
                     ),
@@ -69,9 +63,24 @@ class SplashScreen extends StatelessWidget {
                     'CYBERSECURITY',
                     style: TextStyle(
                       color: Color(0xFF90CAF9),
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.w500,
                       letterSpacing: 8,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  // Mission tagline
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      'SaCyra makes cybersecurity practical, engaging, '
+                      'and accessible for everyone.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                        height: 1.4,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -83,12 +92,12 @@ class SplashScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Text(
-                      'Learn · Practice · Defend',
+                      'Learn. Practise. Advocate.',
                       style:
                           TextStyle(color: Colors.white70, fontSize: 13),
                     ),
                   ),
-                  const SizedBox(height: 56),
+                  const SizedBox(height: 48),
                   const SizedBox(
                     width: 28,
                     height: 28,
@@ -97,9 +106,9 @@ class SplashScreen extends StatelessWidget {
                       color: Colors.white70,
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 32),
                   const Text(
-                    'Vendor-neutral · Beginner to Expert',
+                    'Vendor-neutral · Fundamentals to GRC',
                     style: TextStyle(color: Colors.white38, fontSize: 12),
                   ),
                 ],

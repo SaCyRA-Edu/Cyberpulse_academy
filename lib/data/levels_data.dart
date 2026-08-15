@@ -3,7 +3,6 @@ import 'lesson_model.dart';
 import 'exam_model.dart';
 import 'domains_data.dart';
 import 'lessons/fundamentals_lessons.dart';
-import 'lessons/threat_actors_lessons.dart';
 import 'lessons/threats_attacks_lessons.dart';
 import 'lessons/social_engineering_lessons.dart';
 import 'lessons/malware_lessons.dart';
@@ -15,9 +14,14 @@ import 'lessons/incident_response_lessons.dart';
 import 'lessons/email_security_lessons.dart';
 import 'lessons/networking_lessons.dart';
 import 'lessons/endpoint_security_lessons.dart';
+import 'lessons/secure_protocols_lessons.dart';
 import 'lessons/windows_security_lessons.dart';
 import 'lessons/linux_security_lessons.dart';
 import 'lessons/soc_operations_lessons.dart';
+import 'lessons/cloud_security_lessons.dart';
+import 'lessons/application_security_lessons.dart';
+import 'lessons/identity_federation_sso_lessons.dart';
+import 'lessons/grc_lessons.dart';
 import 'lessons/capstone_lessons.dart';
 import 'exams/beginner_exam.dart';
 import 'exams/intermediate_exam.dart';
@@ -47,14 +51,12 @@ class Module {
   int get lessonCount => lessons.length;
 }
 
-/// A Level is the top-level unit of the course (Beginner / Intermediate /
-/// Advanced / Expert). Each level bundles one or more [Module]s plus an
-/// adaptive [examBank] used for the gating Level Exam.
+/// A Level is the top-level unit of the course. The course is organized as
+/// a single numbered Core Curriculum (Chapters 1-13) followed by a Bonus
+/// Chapters section containing supplementary modules outside the core
+/// numbered sequence.
 ///
-/// [isFree] marks a level as freely accessible without purchase. When true,
-/// users only need to pass the previous level's exam at 80%+ to unlock it.
-/// When false (Expert/Capstone), passing the previous exam is still required
-/// AND the level must be purchased.
+/// [isFree] marks a level as freely accessible without purchase.
 class Level {
   final String title;
   final String description;
@@ -76,31 +78,117 @@ class Level {
 
 final List<Level> allLevels = [
   Level(
-    title: 'Beginner',
-    description: 'Core security concepts and email safety — start here.',
+    title: 'Core Curriculum',
+    description:
+        'The main 13-chapter course, in order — from cybersecurity '
+        'fundamentals through governance, risk, and compliance.',
     isFree: true,
     modules: [
       Module(
-        title: 'Cybersecurity Fundamentals',
+        title: 'Chapter 1: Cybersecurity Fundamentals',
         icon: Icons.security,
         xpReward: 100,
         lessons: fundamentalsLessons,
         primaryDomainIndex: 0, // General Security Concepts
       ),
       Module(
-        title: 'Threat Actors',
-        icon: Icons.person_search,
-        xpReward: 110,
-        lessons: threatActorsLessons,
-        primaryDomainIndex: 1, // Threats, Vulnerabilities & Mitigations
-      ),
-      Module(
-        title: 'Threats, Attacks & Vulnerabilities',
+        title: 'Chapter 2: Threats, Attacks & Vulnerabilities',
         icon: Icons.gpp_maybe,
         xpReward: 130,
         lessons: threatsAttacksLessons,
         primaryDomainIndex: 1, // Threats, Vulnerabilities & Mitigations
       ),
+      Module(
+        title: 'Chapter 3: Network Security',
+        icon: Icons.router,
+        xpReward: 130,
+        lessons: networkingLessons,
+        primaryDomainIndex: 2, // Security Architecture
+      ),
+      Module(
+        title: 'Chapter 4: Identity Access Management',
+        icon: Icons.badge,
+        xpReward: 130,
+        lessons: iamLessons,
+        primaryDomainIndex: 0, // General Security Concepts
+      ),
+      Module(
+        title: 'Chapter 5: Cryptography',
+        icon: Icons.enhanced_encryption,
+        xpReward: 150,
+        lessons: cryptographyLessons,
+        primaryDomainIndex: 0, // General Security Concepts
+      ),
+      Module(
+        title: 'Chapter 6: Secure Protocols',
+        icon: Icons.lock,
+        xpReward: 160,
+        lessons: secureProtocolsLessons,
+        primaryDomainIndex: 2, // Security Architecture
+      ),
+      Module(
+        title: 'Chapter 7: Endpoint Security',
+        icon: Icons.laptop_chromebook,
+        xpReward: 160,
+        lessons: endpointSecurityLessons,
+        primaryDomainIndex: 2, // Security Architecture
+      ),
+      Module(
+        title: 'Chapter 8: Identity Federation & SSO',
+        icon: Icons.hub,
+        xpReward: 190,
+        lessons: identityFederationSsoLessons,
+        primaryDomainIndex: 0, // General Security Concepts
+      ),
+      Module(
+        title: 'Chapter 9: Application Security',
+        icon: Icons.web,
+        xpReward: 200,
+        lessons: applicationSecurityLessons,
+        primaryDomainIndex: 2, // Security Architecture
+      ),
+      Module(
+        title: 'Chapter 10: Cloud Security',
+        icon: Icons.cloud,
+        xpReward: 200,
+        lessons: cloudSecurityLessons,
+        primaryDomainIndex: 2, // Security Architecture
+      ),
+      Module(
+        title: 'Chapter 11: Security Operations',
+        icon: Icons.visibility,
+        xpReward: 160,
+        lessons: socOperationsLessons,
+        primaryDomainIndex: 3, // Security Operations
+      ),
+      Module(
+        title: 'Chapter 12: Incident Response',
+        icon: Icons.emergency,
+        xpReward: 130,
+        lessons: incidentResponseLessons,
+        primaryDomainIndex: 3, // Security Operations
+      ),
+      Module(
+        title: 'Chapter 13: Governance, Risk & Compliance',
+        icon: Icons.gavel,
+        xpReward: 180,
+        lessons: grcLessons,
+        primaryDomainIndex: 4, // Security Program Management & Oversight
+      ),
+    ],
+    examBank: [
+      ...beginnerExamBank,
+      ...intermediateExamBank,
+      ...advancedExamBank,
+    ],
+  ),
+  Level(
+    title: 'Bonus Chapters',
+    description:
+        'Supplementary chapters outside the core 13-chapter sequence — '
+        'dig deeper into specific threats, platforms, and the capstone.',
+    isFree: true,
+    modules: [
       Module(
         title: 'Social Engineering',
         icon: Icons.psychology_alt,
@@ -114,20 +202,6 @@ final List<Level> allLevels = [
         xpReward: 120,
         lessons: malwareLessons,
         primaryDomainIndex: 1, // Threats, Vulnerabilities & Mitigations
-      ),
-      Module(
-        title: 'Cryptography',
-        icon: Icons.enhanced_encryption,
-        xpReward: 130,
-        lessons: cryptographyLessons,
-        primaryDomainIndex: 0, // General Security Concepts
-      ),
-      Module(
-        title: 'Identity Access Management',
-        icon: Icons.badge,
-        xpReward: 130,
-        lessons: iamLessons,
-        primaryDomainIndex: 0, // General Security Concepts
       ),
       Module(
         title: 'Vulnerabilities and Threats',
@@ -144,40 +218,11 @@ final List<Level> allLevels = [
         primaryDomainIndex: 3, // Security Operations
       ),
       Module(
-        title: 'Security Incident Response',
-        icon: Icons.emergency,
-        xpReward: 130,
-        lessons: incidentResponseLessons,
-        primaryDomainIndex: 3, // Security Operations
-      ),
-      Module(
         title: 'Email Security',
         icon: Icons.email,
         xpReward: 100,
         lessons: emailSecurityLessons,
         primaryDomainIndex: 1, // Threats, Vulnerabilities & Mitigations
-      ),
-    ],
-    examBank: beginnerExamBank,
-  ),
-  Level(
-    title: 'Intermediate',
-    description: 'Networking fundamentals and Windows hardening.',
-    isFree: true,
-    modules: [
-      Module(
-        title: 'Network Security',
-        icon: Icons.router,
-        xpReward: 130,
-        lessons: networkingLessons,
-        primaryDomainIndex: 2, // Security Architecture
-      ),
-      Module(
-        title: 'Endpoint Security',
-        icon: Icons.laptop_chromebook,
-        xpReward: 160,
-        lessons: endpointSecurityLessons,
-        primaryDomainIndex: 2, // Security Architecture
       ),
       Module(
         title: 'Windows Security',
@@ -186,14 +231,6 @@ final List<Level> allLevels = [
         lessons: windowsSecurityLessons,
         primaryDomainIndex: 2, // Security Architecture
       ),
-    ],
-    examBank: intermediateExamBank,
-  ),
-  Level(
-    title: 'Advanced',
-    description: 'Linux hardening and Security Operations Center skills.',
-    isFree: true,
-    modules: [
       Module(
         title: 'Linux Security',
         icon: Icons.terminal,
@@ -201,24 +238,6 @@ final List<Level> allLevels = [
         lessons: linuxSecurityLessons,
         primaryDomainIndex: 3, // Security Operations
       ),
-      Module(
-        title: 'SOC Operations',
-        icon: Icons.visibility,
-        xpReward: 160,
-        lessons: socOperationsLessons,
-        primaryDomainIndex: 3, // Security Operations
-      ),
-    ],
-    examBank: advancedExamBank,
-  ),
-  Level(
-    title: 'Expert',
-    description:
-        'Capstone: threat modeling, ethical hacking, forensics, Zero '
-        'Trust, and GRC — tying every prior level together. '
-        'Pass the Advanced exam to unlock.',
-    isFree: true,
-    modules: [
       Module(
         title: 'Capstone: Applied Defense',
         icon: Icons.workspace_premium,

@@ -10,7 +10,7 @@ class CyberPulseWatermark extends StatelessWidget {
   const CyberPulseWatermark({
     super.key,
     this.color = const Color(0xFF003580),
-    this.opacity = 0.035,
+    this.opacity = 0.05,
   });
 
   @override
@@ -39,8 +39,21 @@ class _WatermarkPainter extends CustomPainter {
       letterSpacing: 3,
     );
 
-    const rowH = 64.0;
-    const colW = 150.0;
+    const watermarkText = 'CYBERPULSE';
+
+    // Measure the actual painted text once, then derive row/column spacing
+    // from its real dimensions plus a fixed gap — this guarantees the
+    // watermark never overlaps itself no matter what text or font size is
+    // used, instead of relying on a spacing constant tuned for one string.
+    final measureTp = TextPainter(
+      text: TextSpan(text: watermarkText, style: textStyle),
+      textDirection: TextDirection.ltr,
+    )..layout();
+
+    const gap = 48.0;
+    final colW = measureTp.width + gap;
+    final rowH = measureTp.height + gap * 0.6;
+
     canvas.save();
     canvas.translate(size.width / 2, size.height / 2);
     canvas.rotate(-math.pi / 8);
@@ -50,7 +63,7 @@ class _WatermarkPainter extends CustomPainter {
       final offset = (y / rowH).floor().isEven ? 0.0 : colW / 2;
       for (double x = -size.width + offset; x < size.width * 2; x += colW) {
         final tp = TextPainter(
-          text: TextSpan(text: 'LEARN CYBERSECURITY', style: textStyle),
+          text: TextSpan(text: watermarkText, style: textStyle),
           textDirection: TextDirection.ltr,
         )..layout();
         tp.paint(canvas, Offset(x, y));

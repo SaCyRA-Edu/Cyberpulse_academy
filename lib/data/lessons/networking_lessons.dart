@@ -4,159 +4,12 @@ import '../../widgets/diagrams.dart';
 const List<Lesson> networkingLessons = [
   // 1 ----------------------------------------------------------------------
   Lesson(
-    title: 'Enterprise Network Communication & Architecture',
+    title: 'The OSI Reference Model',
     difficulty: LessonDifficulty.beginner,
     estimatedMinutes: 13,
     sections: [
       LessonSection(
-        heading: 'Why Networking Is Inseparable From Security',
-        body:
-            'Enterprise networking enables users, applications, servers, '
-            'cloud services, and security platforms to exchange '
-            'information efficiently and securely. Every authentication '
-            'request, email, database query, and cloud transaction '
-            'relies on network communication underneath it. As '
-            'organizations continue adopting hybrid and multi-cloud '
-            'environments, networking has become genuinely inseparable '
-            'from cybersecurity.',
-      ),
-      LessonSection(
-        heading: 'How Enterprise Communication Actually Works',
-        body:
-            'When a user accesses a website or signs in to a cloud '
-            'application, the information is divided into packets, '
-            'transmitted through multiple networking devices, inspected '
-            'by security controls along the way, and reassembled at its '
-            'destination. Unlike small office environments, enterprise '
-            'networks contain multiple security layers designed to '
-            'preserve confidentiality, integrity, and availability while '
-            'maintaining business continuity.',
-      ),
-      LessonSection(
-        heading: 'The Core Components Involved',
-        bullets: [
-          'Endpoints — laptops, desktops, and mobile devices',
-          'Switches and routers — moving traffic within and between networks',
-          'Firewalls — inspecting and filtering traffic against policy',
-          'Load balancers — distributing traffic across multiple servers',
-          'Wireless access points — enterprise Wi-Fi connectivity',
-          'VPN gateways — securing remote and site-to-site connections',
-          'Cloud connectivity — links out to cloud-hosted infrastructure',
-          'Servers and identity services — the actual resources and authentication backbone being protected',
-        ],
-      ),
-      LessonSection(
-        diagram: DiagramSpec(
-          type: DiagramType.assetImage,
-          assetPath: 'assets/images/networking/fig_3_1_communication_workflow.jpg',
-          caption:
-              'Enterprise network communication path illustrating how '
-              'traffic flows through multiple security and networking '
-              'devices before reaching business resources.',
-        ),
-      ),
-      LessonSection(
-        heading: 'Enterprise Insight: Traffic Gets Inspected More Than Once',
-        body:
-            'In large organizations, traffic is inspected multiple times '
-            'before ever reaching internal resources. Next-generation '
-            'firewalls, intrusion prevention systems, secure web '
-            'gateways, and endpoint protection platforms all work '
-            'together — this is Defense in Depth applied directly to '
-            'network design: if one control fails, additional layers '
-            'continue protecting organizational assets.',
-      ),
-      LessonSection(
-        heading: 'Enterprise Network Architecture: Zones, Not One Flat Network',
-        body:
-            'An enterprise network is designed to support business '
-            'operations while protecting critical assets from '
-            'unauthorized access. Rather than connecting every device to '
-            'a single flat network, organizations divide infrastructure '
-            'into logical security zones — improving performance, '
-            'simplifying administration, and significantly reducing the '
-            'impact of cyberattacks by limiting lateral movement.',
-      ),
-      LessonSection(
-        diagram: DiagramSpec(
-          type: DiagramType.assetImage,
-          assetPath: 'assets/images/networking/fig_3_2_enterprise_architecture.jpg',
-          caption:
-              'Typical enterprise network architecture showing network '
-              'zones, trust boundaries, and connectivity between '
-              'on-premises and cloud environments.',
-        ),
-      ),
-      LessonSection(
-        heading: 'Network Zones',
-        bullets: [
-          'Internet — public connectivity for external users',
-          'DMZ — public-facing services: web, email, DNS',
-          'Internal LAN — employee devices: workstations, printers',
-          'Server network — business applications: databases, file servers',
-          'Management network — administrative systems: switches, routers, hypervisors',
-          'Guest network — visitor access, internet-only devices',
-        ],
-      ),
-      LessonSection(
-        heading: 'Enterprise Insight',
-        body:
-            'Separating users, servers, management systems, and '
-            'public-facing applications into dedicated security zones '
-            'significantly reduces an attacker\'s ability to move '
-            'laterally after an initial compromise.',
-      ),
-      LessonSection(
-        heading: 'Real-World Case Study: The Target Data Breach (2013)',
-        body:
-            'Attackers initially compromised a third-party HVAC vendor '
-            'and used stolen credentials to gain access to Target\'s '
-            'corporate network. Due to inadequate network segmentation, '
-            'they moved laterally into the payment card environment, '
-            'ultimately stealing payment card information belonging to '
-            'approximately 40 million customers.',
-      ),
-      LessonSection(
-        heading: 'Lessons Learned',
-        bullets: [
-          'Segment critical systems',
-          'Restrict third-party access',
-          'Monitor east-west (internal, lateral) network traffic',
-          'Implement least-privilege access',
-          'Continuously monitor privileged accounts',
-        ],
-      ),
-    ],
-  ),
-
-  // 2 ----------------------------------------------------------------------
-  Lesson(
-    title: 'Network Devices & the OSI Model',
-    difficulty: LessonDifficulty.beginner,
-    estimatedMinutes: 13,
-    sections: [
-      LessonSection(
-        heading: 'Choosing and Placing Devices Correctly',
-        body:
-            'Enterprise networks rely on specialized devices that '
-            'perform distinct communication and security functions. '
-            'Selecting the appropriate device and placing it correctly '
-            'within the architecture is essential for maintaining '
-            'network availability, scalability, and security together.',
-      ),
-      LessonSection(
-        heading: 'Best Practices for Enterprise Networking',
-        bullets: [
-          'Implement network segmentation using VLANs',
-          'Apply the principle of least privilege to network access',
-          'Restrict administrative access through dedicated management networks',
-          'Protect remote access using multi-factor authentication (MFA)',
-          'Regularly review firewall rules and remove obsolete entries',
-          'Monitor network traffic continuously using centralized logging and security monitoring platforms',
-        ],
-      ),
-      LessonSection(
-        heading: 'Understanding the OSI Reference Model',
+        heading: 'A Universal Framework for Network Communication',
         body:
             'The Open Systems Interconnection (OSI) Reference Model is a '
             'conceptual framework that standardizes how data is '
@@ -164,9 +17,18 @@ const List<Lesson> networkingLessons = [
             'modern enterprise networks use the TCP/IP protocol suite, '
             'the OSI model remains one of the most valuable tools for '
             'understanding network communication, troubleshooting '
-            'connectivity issues, and implementing security controls. '
-            'Each layer performs a specific function and communicates '
-            'with the corresponding layer on another device.',
+            'connectivity issues, and implementing security controls.',
+      ),
+      LessonSection(
+        heading: 'Why a Layered Model Matters',
+        body:
+            'Each layer of the OSI model performs a specific function '
+            'and communicates with the corresponding layer on another '
+            'device. This layered approach allows different hardware '
+            'and software vendors to develop interoperable networking '
+            'solutions while enabling security professionals to '
+            'identify where attacks occur and where defensive controls '
+            'should be applied.',
       ),
       LessonSection(
         heading: 'The Seven Layers of the OSI Model',
@@ -174,11 +36,8 @@ const List<Lesson> networkingLessons = [
       LessonSection(
         diagram: DiagramSpec(
           type: DiagramType.assetImage,
-          assetPath: 'assets/images/networking/fig_3_4_osi_model.jpg',
-          caption:
-              'The OSI model separates network communication into seven '
-              'logical layers, enabling standardized communication, '
-              'troubleshooting, and security implementation.',
+          assetPath: 'assets/images/netsec/osi_seven_layers.jpg',
+          caption: 'The OSI model separates network communication into seven logical layers, enabling standardized communication, troubleshooting, and security implementation.',
         ),
       ),
       LessonSection(
@@ -201,11 +60,12 @@ const List<Lesson> networkingLessons = [
         body:
             'Although the OSI model is conceptual, enterprise security '
             'teams frequently use it during incident response and '
-            'troubleshooting. Packet loss may indicate a Layer 1 or '
-            'Layer 2 issue, whereas failed web access may point to a '
-            'Layer 7 problem. Security technologies such as firewalls, '
-            'intrusion prevention systems, and web application firewalls '
-            'are also mapped to specific OSI layers.',
+            'troubleshooting. For example, packet loss may indicate a '
+            'Layer 1 or Layer 2 issue, whereas failed web access may '
+            'point to Layer 7 problems. Security technologies such as '
+            'firewalls, intrusion prevention systems, and web '
+            'application firewalls are also mapped to specific OSI '
+            'layers.',
       ),
       LessonSection(
         heading: 'Common Threats by OSI Layer',
@@ -225,35 +85,43 @@ const List<Lesson> networkingLessons = [
           ],
         ),
       ),
+      LessonSection(
+        heading: 'Why This Matters for Every Lesson That Follows',
+        body:
+            'Every technology covered in the rest of this chapter — '
+            'firewalls, VLANs, NAC, VPNs, wireless security, IDS and IPS '
+            '— maps to one or more of these seven layers. Understanding '
+            'where a given control or attack sits in this model makes it '
+            'far easier to reason about what a security technology '
+            'actually protects, and what it does not.',
+      ),
     ],
   ),
 
-  // 3 ----------------------------------------------------------------------
+  // 2 ----------------------------------------------------------------------
   Lesson(
-    title: 'The TCP/IP Protocol Suite & Data Encapsulation',
-    difficulty: LessonDifficulty.intermediate,
-    estimatedMinutes: 12,
+    title: 'TCP/IP, Encapsulation & Common Protocols',
+    difficulty: LessonDifficulty.beginner,
+    estimatedMinutes: 14,
     sections: [
       LessonSection(
-        heading: 'TCP/IP: The Practical Implementation',
+        heading: 'The Practical Foundation of Modern Networking',
         body:
             'The Transmission Control Protocol/Internet Protocol '
             '(TCP/IP) suite forms the foundation of modern networking. '
             'Unlike the OSI model, which is conceptual, TCP/IP is the '
-            'practical implementation actually used by the internet and '
-            'enterprise networks. The TCP/IP model consists of four '
-            'layers — Application, Transport, Internet, and Network '
-            'Access — each performing a defined role while interacting '
-            'with the layers above and below it.',
+            'practical implementation used by the Internet and '
+            'enterprise networks.',
+        bullets: ['Application', 'Transport', 'Internet', 'Network Access'],
       ),
       LessonSection(
-        heading: 'The Four TCP/IP Layers',
+        heading: 'The TCP/IP Protocol Suite',
       ),
       LessonSection(
         diagram: DiagramSpec(
           type: DiagramType.assetImage,
-          assetPath: 'assets/images/networking/fig_3_5_tcpip_suite.jpg',
-          caption: 'The TCP/IP model provides the practical framework used for modern internet and enterprise communication.',
+          assetPath: 'assets/images/netsec/tcpip_protocol_suite.jpg',
+          caption: 'The TCP/IP model provides the practical framework used for modern Internet and enterprise communication.',
         ),
       ),
       LessonSection(
@@ -289,22 +157,10 @@ const List<Lesson> networkingLessons = [
         body:
             'When data is transmitted across a network, each OSI or '
             'TCP/IP layer adds its own header information before '
-            'passing the data to the next layer — this process is known '
-            'as encapsulation. At the receiving device, those headers '
-            'are removed in reverse order through decapsulation, '
-            'allowing the original data to be reconstructed.',
-      ),
-      LessonSection(
-        diagram: DiagramSpec(
-          type: DiagramType.assetImage,
-          assetPath: 'assets/images/networking/fig_3_6_encapsulation.jpg',
-          caption:
-              'Data is progressively encapsulated with protocol headers '
-              'before transmission and decapsulated at the receiving endpoint.',
-        ),
-      ),
-      LessonSection(
-        heading: 'Why Encapsulation Matters',
+            'passing the data to the next layer. This process is known '
+            'as encapsulation. At the receiving device, the headers are '
+            'removed in reverse order through decapsulation, allowing '
+            'the original data to be reconstructed.',
         bullets: [
           'Reliable communication',
           'Routing across multiple networks',
@@ -314,26 +170,19 @@ const List<Lesson> networkingLessons = [
           'Interoperability between different network technologies',
         ],
       ),
-    ],
-  ),
-
-  // 4 ----------------------------------------------------------------------
-  Lesson(
-    title: 'Common Protocols, DNS & DHCP',
-    difficulty: LessonDifficulty.intermediate,
-    estimatedMinutes: 12,
-    sections: [
       LessonSection(
-        heading: 'Standardized Protocols Keep Enterprises Running',
+        diagram: DiagramSpec(
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/netsec/data_encapsulation.jpg',
+          caption: 'Data is progressively encapsulated with protocol headers before transmission and decapsulated at the receiving endpoint.',
+        ),
+      ),
+      LessonSection(
+        heading: 'Common Network Protocols',
         body:
             'Modern enterprise environments rely on standardized '
             'protocols to deliver network services securely and '
-            'efficiently — recognizing each one, its default port, and '
-            'its transport layer is foundational for reading firewall '
-            'rules, packet captures, and security alerts.',
-      ),
-      LessonSection(
-        heading: 'Protocols, Ports, and Transport',
+            'efficiently.',
       ),
       LessonSection(
         diagram: DiagramSpec(
@@ -365,36 +214,26 @@ const List<Lesson> networkingLessons = [
             'sensitive information during transmission.',
       ),
       LessonSection(
-        heading: 'DNS: Turning Names Into Addresses',
+        heading: 'DNS and DHCP',
         body:
-            'The Domain Name System translates human-readable domain '
-            'names into IP addresses, enabling users to access resources '
-            'without memorizing numerical addresses.',
+            'Two foundational services support almost every enterprise '
+            'network. The Domain Name System (DNS) translates '
+            'human-readable domain names into IP addresses, enabling '
+            'users to access resources without memorizing numerical '
+            'addresses. Dynamic Host Configuration Protocol (DHCP) '
+            'automatically assigns IP addresses and network '
+            'configuration settings to devices, simplifying network '
+            'administration and reducing configuration errors.',
       ),
       LessonSection(
         diagram: DiagramSpec(
           type: DiagramType.assetImage,
-          assetPath: 'assets/images/networking/fig_3_7_dns_resolution.jpg',
-          caption: 'The DNS resolution workflow, from typing a name to actually reaching the server behind it.',
+          assetPath: 'assets/images/netsec/dhcp_lease_process.jpg',
+          caption: 'The DHCP lease process automatically assigns and renews IP address configuration for enterprise devices.',
         ),
       ),
       LessonSection(
-        heading: 'DHCP: Automatic Address Assignment',
-        body:
-            'The Dynamic Host Configuration Protocol automatically '
-            'assigns IP addresses and network configuration settings to '
-            'devices, simplifying network administration and reducing '
-            'configuration errors.',
-      ),
-      LessonSection(
-        diagram: DiagramSpec(
-          type: DiagramType.assetImage,
-          assetPath: 'assets/images/networking/fig_3_8_dhcp_lease.jpg',
-          caption: 'The DHCP lease process — often abbreviated DORA (Discover, Offer, Request, Acknowledge).',
-        ),
-      ),
-      LessonSection(
-        heading: 'DNS and DHCP Best Practices',
+        heading: 'Best Practices',
         bullets: [
           'Deploy redundant DNS servers',
           'Restrict unauthorized DHCP servers',
@@ -409,43 +248,41 @@ const List<Lesson> networkingLessons = [
             'A global retailer experienced a major outage after an '
             'incorrect DNS record update prevented customers from '
             'reaching its e-commerce platform. Although the servers '
-            'remained operational, incorrect name resolution rendered '
-            'the application unavailable. Implementing change '
+            'remained fully operational, incorrect name resolution '
+            'rendered the application unavailable. Implementing change '
             'management, redundant DNS infrastructure, and automated '
             'validation could have prevented the incident.',
       ),
     ],
   ),
 
-  // 5 ----------------------------------------------------------------------
+  // 3 ----------------------------------------------------------------------
   Lesson(
-    title: 'Network Segmentation, NAT & PAT',
-    difficulty: LessonDifficulty.advanced,
-    estimatedMinutes: 11,
+    title: 'Network Segmentation Fundamentals & NAT/PAT',
+    difficulty: LessonDifficulty.intermediate,
+    estimatedMinutes: 12,
     sections: [
       LessonSection(
-        heading: 'Why Segmentation Matters',
+        heading: 'Dividing the Network Into Logical Zones',
         body:
             'Modern enterprise networks are designed to minimize cyber '
             'risk by dividing infrastructure into logical security '
             'zones. Rather than placing every device on a single flat '
             'network, organizations create multiple isolated network '
             'segments that restrict communication between departments, '
-            'business applications, and critical infrastructure — '
-            'reducing the attack surface and significantly limiting an '
-            'attacker\'s ability to move laterally after compromising a '
-            'device.',
+            'business applications, and critical infrastructure. '
+            'Network segmentation reduces the attack surface and '
+            'significantly limits an attacker\'s ability to move '
+            'laterally after compromising a device.',
       ),
       LessonSection(
-        heading: 'Without Segmentation vs. With It',
+        heading: 'Why Network Segmentation Matters',
         body:
             'Without segmentation, malware can quickly spread throughout '
-            'an organization. With properly configured VLANs, Access '
-            'Control Lists, and internal firewalls, compromised systems '
-            'instead remain isolated from critical business resources.',
-      ),
-      LessonSection(
-        heading: 'Benefits of Segmentation',
+            'an organization. With properly configured Virtual Local '
+            'Area Networks (VLANs), Access Control Lists (ACLs), and '
+            'internal firewalls, compromised systems remain isolated '
+            'from critical business resources.',
         bullets: [
           'Limits lateral movement',
           'Improves performance',
@@ -456,50 +293,51 @@ const List<Lesson> networkingLessons = [
         ],
       ),
       LessonSection(
-        diagram: DiagramSpec(
-          type: DiagramType.assetImage,
-          assetPath: 'assets/images/networking/fig_3_9_segmentation.jpg',
-          caption: 'Logical segmentation prevents attackers from moving freely across enterprise networks.',
-        ),
-      ),
-      LessonSection(
-        heading: 'Enterprise Insight: Micro-Segmentation',
+        heading: 'Enterprise Insight',
         body:
             'Micro-segmentation extends traditional VLAN-based '
             'segmentation by enforcing security policies at the '
             'workload or application level. Technologies such as VMware '
             'NSX, Cisco ACI, and software-defined networking (SDN) '
             'provide granular traffic control within data centers and '
-            'cloud environments.',
-      ),
-      LessonSection(
-        heading: 'Network Address Translation (NAT)',
-        body:
-            'NAT enables private IP addresses to communicate with '
-            'external networks by translating them into public IP '
-            'addresses. This conserves public IP space and hides '
-            'internal addressing from external users.',
-        bullets: [
-          'Conserves IPv4 addresses',
-          'Hides internal network structure',
-          'Simplifies internet connectivity',
-          'Supports basic network isolation',
-        ],
+            'cloud environments — a theme covered in much greater depth '
+            'later in this chapter.',
       ),
       LessonSection(
         diagram: DiagramSpec(
           type: DiagramType.assetImage,
-          assetPath: 'assets/images/networking/fig_3_10_nat.jpg',
-          caption: 'The NAT translation workflow — how a private internal address is mapped to a public address at the network edge.',
+          assetPath: 'assets/images/netsec/enterprise_network_segmentation.jpg',
+          caption: 'Logical segmentation prevents attackers from moving freely across enterprise networks.',
         ),
+      ),
+      LessonSection(
+        heading: 'Network Address Translation (NAT)',
+        body:
+            'Network Address Translation enables private IP addresses '
+            'to communicate with external networks by translating them '
+            'into public IP addresses. This conserves public IP space '
+            'and hides internal addressing from external users.',
+        bullets: [
+          'Conserves IPv4 addresses',
+          'Hides internal network structure',
+          'Simplifies Internet connectivity',
+          'Supports basic network isolation',
+        ],
       ),
       LessonSection(
         heading: 'Port Address Translation (PAT)',
         body:
-            'PAT allows multiple internal devices to share a single '
-            'public IP address by using different source port numbers. '
-            'PAT is commonly implemented in enterprise edge routers and '
-            'firewalls.',
+            'Port Address Translation allows multiple internal devices '
+            'to share a single public IP address by using different '
+            'source port numbers. PAT is commonly implemented in '
+            'enterprise edge routers and firewalls.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/netsec/nat_translation_workflow.jpg',
+          caption: 'NAT and PAT translate private internal addresses into public addresses, conserving IPv4 space while shielding internal network structure.',
+        ),
       ),
       LessonSection(
         heading: 'NAT vs. PAT',
@@ -519,7 +357,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 6 ----------------------------------------------------------------------
+  // 4 ----------------------------------------------------------------------
   Lesson(
     title: 'IP Subnetting',
     difficulty: LessonDifficulty.advanced,
@@ -824,7 +662,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 8 ----------------------------------------------------------------------
+  // 5 ----------------------------------------------------------------------
   Lesson(
     title: 'What Is Network Security?',
     difficulty: LessonDifficulty.beginner,
@@ -1060,7 +898,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 9 ----------------------------------------------------------------------
+  // 6 ----------------------------------------------------------------------
   Lesson(
     title: 'Major Components of an Enterprise Network',
     difficulty: LessonDifficulty.beginner,
@@ -1219,7 +1057,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 10 ---------------------------------------------------------------------
+  // 7 ---------------------------------------------------------------------
   Lesson(
     title: 'Understanding Firewalls',
     difficulty: LessonDifficulty.intermediate,
@@ -1379,7 +1217,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 11 ---------------------------------------------------------------------
+  // 8 ---------------------------------------------------------------------
   Lesson(
     title: 'Types of Firewalls',
     difficulty: LessonDifficulty.intermediate,
@@ -1409,6 +1247,13 @@ const List<Lesson> networkingLessons = [
         ],
       ),
       LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/netsec/packet_filtering_firewall.jpg',
+          caption: 'Packet filtering firewalls evaluate individual packets using network-layer header information alone, without awareness of session state or application content.',
+        ),
+      ),
+      LessonSection(
         heading: 'Stateful Inspection Firewall',
         body:
             'Tracks the state of every active connection passing '
@@ -1423,6 +1268,13 @@ const List<Lesson> networkingLessons = [
           'Advantages — better security than packet filtering, blocks unsolicited inbound traffic, reduces false positives',
           'Limitations — higher resource utilization, limited application visibility, cannot inspect encrypted content without additional features',
         ],
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/netsec/stateful_inspection_firewall.jpg',
+          caption: 'Stateful inspection firewalls maintain information about active sessions, allowing them to distinguish legitimate return traffic from unsolicited connection attempts.',
+        ),
       ),
       LessonSection(
         heading: 'Circuit-Level Gateway',
@@ -1450,6 +1302,13 @@ const List<Lesson> networkingLessons = [
           'Advantages — excellent application visibility, strong content filtering, user authentication, URL filtering',
           'Limitations — higher latency, greater processing requirements, more complex deployment',
         ],
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/netsec/proxy_firewall.jpg',
+          caption: 'A proxy firewall acts as an intermediary, inspecting and controlling application-layer traffic before forwarding approved requests to their destination.',
+        ),
       ),
       LessonSection(
         heading: 'Comparing Traditional Firewall Technologies',
@@ -1494,7 +1353,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 12 ---------------------------------------------------------------------
+  // 9 ---------------------------------------------------------------------
   Lesson(
     title: 'Next-Generation Firewalls (NGFW)',
     difficulty: LessonDifficulty.advanced,
@@ -1600,7 +1459,7 @@ const List<Lesson> networkingLessons = [
       LessonSection(
         diagram: DiagramSpec(
           type: DiagramType.assetImage,
-          assetPath: 'assets/images/netsec/firewall_evolution.jpg',
+          assetPath: 'assets/images/netsec/ngfw_evaluation.jpg',
           caption: 'A Next-Generation Firewall evaluates network traffic through multiple inspection layers — including state, application, user identity, deep packet inspection, and intrusion prevention — before enforcing a security decision.',
         ),
       ),
@@ -1628,7 +1487,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 13 ---------------------------------------------------------------------
+  // 10 ---------------------------------------------------------------------
   Lesson(
     title: 'WAF, Host-Based & Cloud Firewalls',
     difficulty: LessonDifficulty.advanced,
@@ -1668,6 +1527,13 @@ const List<Lesson> networkingLessons = [
             'requests are forwarded. The WAF can also inspect server '
             'responses to prevent sensitive information from being '
             'unintentionally exposed.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/netsec/waf_traffic_flow.jpg',
+          caption: 'A Web Application Firewall inspects HTTP/HTTPS traffic between users and web applications, blocking malicious requests before they reach the server.',
+        ),
       ),
       LessonSection(
         heading: 'Benefits of a WAF',
@@ -1800,7 +1666,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 14 ---------------------------------------------------------------------
+  // 11 ---------------------------------------------------------------------
   Lesson(
     title: 'Network Segmentation',
     difficulty: LessonDifficulty.advanced,
@@ -1943,7 +1809,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 15 ---------------------------------------------------------------------
+  // 12 ---------------------------------------------------------------------
   Lesson(
     title: 'Network Access Control (NAC)',
     difficulty: LessonDifficulty.advanced,
@@ -1989,7 +1855,7 @@ const List<Lesson> networkingLessons = [
       LessonSection(
         diagram: DiagramSpec(
           type: DiagramType.assetImage,
-          assetPath: 'assets/images/netsec/network_infrastructure.jpg',
+          assetPath: 'assets/images/netsec/nac_authentication.jpg',
           caption: 'Network Access Control (NAC) authenticates users, validates devices, evaluates endpoint compliance, and applies organizational security policies before determining the appropriate level of network access.',
         ),
       ),
@@ -2026,6 +1892,13 @@ const List<Lesson> networkingLessons = [
             'access points, and campus networks. Instead of immediately '
             'enabling a switch port, the network first verifies the '
             'identity of the user or device.',
+      ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/netsec/dot1x_deployment.jpg',
+          caption: 'In an IEEE 802.1X deployment, the endpoint (supplicant) requests network access through the authenticator, which validates credentials against the authentication server before granting or denying the connection.',
+        ),
       ),
       LessonSection(
         heading: 'Components of 802.1X',
@@ -2076,7 +1949,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 16 ---------------------------------------------------------------------
+  // 13 ---------------------------------------------------------------------
   Lesson(
     title: 'Virtual Private Networks (VPNs)',
     difficulty: LessonDifficulty.advanced,
@@ -2120,8 +1993,8 @@ const List<Lesson> networkingLessons = [
       ),
       LessonSection(
         diagram: DiagramSpec(
-          type: DiagramType.processFlow,
-          steps: ['User Launches VPN Client', 'Authenticate with Gateway', 'Encrypted Tunnel Established', 'Traffic Encrypted & Sent', 'Gateway Decrypts & Forwards'],
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/netsec/vpn_tunnel_architecture.jpg',
           caption: 'A VPN establishes an encrypted tunnel across the public Internet, allowing remote users to securely access corporate resources while protecting sensitive information from interception.',
         ),
       ),
@@ -2145,6 +2018,13 @@ const List<Lesson> networkingLessons = [
             'receives secure access to authorized corporate resources.',
       ),
       LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/netsec/remote_access_vpn_workflow.jpg',
+          caption: 'A remote access VPN authenticates the user, establishes an encrypted tunnel, and grants secure access to authorized internal resources.',
+        ),
+      ),
+      LessonSection(
         heading: 'Site-to-Site VPN',
         body:
             'A Site-to-Site VPN securely connects two or more entire '
@@ -2158,15 +2038,34 @@ const List<Lesson> networkingLessons = [
       ),
       LessonSection(
         heading: 'VPN Protocols',
+        body: 'Several protocols are used to establish secure VPN connections, each with different performance, security, and deployment characteristics.',
+      ),
+      LessonSection(
+        heading: 'IPsec, SSL/TLS VPN & WireGuard',
+        bullets: [
+          'IPsec — one of the most widely used enterprise VPN technologies, providing encryption, authentication, integrity protection, and secure key exchange while operating at the Network Layer (Layer 3)',
+          'SSL/TLS VPN — uses the same encryption technologies that secure HTTPS websites; commonly used for remote access because it operates over TCP port 443 and can traverse most firewalls',
+          'WireGuard — a modern VPN protocol designed to be lightweight, high-performing, and easier to configure while providing strong cryptographic protection',
+        ],
+      ),
+      LessonSection(
+        heading: 'VPN Protocol Comparison',
       ),
       LessonSection(
         diagram: DiagramSpec(
           type: DiagramType.dataTable,
-          tableHeaders: ['Protocol', 'OSI Layer', 'Primary Use Case', 'Key Advantage'],
+          tableHeaders: ['Feature', 'IPsec', 'SSL/TLS VPN', 'WireGuard'],
           tableRows: [
-            ['IPsec', 'Layer 3 (Network)', 'Site-to-Site and Remote Access VPN', 'Mature, widely supported, enterprise standard'],
-            ['SSL/TLS VPN', 'Layer 7 (Application)', 'Remote Access VPN', 'Easy deployment and firewall-friendly (HTTPS over 443)'],
-            ['WireGuard', 'Layer 3 (Network)', 'Remote Access and Site-to-Site VPN', 'Lightweight, fast, simple, modern'],
+            ['OSI Layer', 'Layer 3 (Network)', 'Layer 7 (Application)', 'Layer 3 (Network)'],
+            ['Primary Use Case', 'Site-to-Site and Remote Access VPN', 'Remote Access VPN', 'Remote Access and Site-to-Site VPN'],
+            ['Encryption', 'AES, ChaCha20 (implementation-dependent)', 'TLS encryption', 'ChaCha20-Poly1305'],
+            ['Authentication', 'Pre-shared keys, certificates, MFA', 'Username/password, certificates, MFA', 'Public/private key pairs'],
+            ['Performance', 'High', 'Moderate', 'Very High'],
+            ['Configuration Complexity', 'High', 'Moderate', 'Low'],
+            ['Firewall Traversal', 'May require UDP 500/4500 and ESP', 'Excellent (HTTPS over TCP 443)', 'Good (UDP-based)'],
+            ['Enterprise Deployment', 'Branch offices, hybrid cloud, data centers', 'Remote workforce', 'Cloud infrastructure, Linux servers, modern VPNs'],
+            ['Key Advantages', 'Mature, widely supported, enterprise standard', 'Easy deployment and firewall-friendly', 'Lightweight, fast, simple, modern'],
+            ['Limitations', 'More complex to deploy and troubleshoot', 'Less suitable for permanent network-to-network tunnels', 'Limited support on some legacy networking devices'],
           ],
         ),
       ),
@@ -2195,7 +2094,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 17 ---------------------------------------------------------------------
+  // 14 ---------------------------------------------------------------------
   Lesson(
     title: 'Wireless Network Security',
     difficulty: LessonDifficulty.advanced,
@@ -2338,7 +2237,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 18 ---------------------------------------------------------------------
+  // 15 ---------------------------------------------------------------------
   Lesson(
     title: 'Network Monitoring & Traffic Analysis',
     difficulty: LessonDifficulty.expert,
@@ -2521,7 +2420,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 19 ---------------------------------------------------------------------
+  // 16 ---------------------------------------------------------------------
   Lesson(
     title: 'Flow-Based Network Monitoring',
     difficulty: LessonDifficulty.expert,
@@ -2557,8 +2456,8 @@ const List<Lesson> networkingLessons = [
       ),
       LessonSection(
         diagram: DiagramSpec(
-          type: DiagramType.processFlow,
-          steps: ['Network Devices Generate Flows', 'Flow Records Exported', 'Centralized Collector', 'Monitoring & Security Analysis'],
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/netsec/netflow_record.jpg',
           caption: 'A network flow record summarizes communication between two devices by recording key metadata such as IP addresses, ports, protocol, packet count, data volume, and session duration.',
         ),
       ),
@@ -2672,7 +2571,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 20 ---------------------------------------------------------------------
+  // 17 ---------------------------------------------------------------------
   Lesson(
     title: 'Intrusion Detection Systems (IDS)',
     difficulty: LessonDifficulty.expert,
@@ -2836,7 +2735,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 21 ---------------------------------------------------------------------
+  // 18 ---------------------------------------------------------------------
   Lesson(
     title: 'IDS Detection Methodologies',
     difficulty: LessonDifficulty.expert,
@@ -2998,7 +2897,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 22 ---------------------------------------------------------------------
+  // 19 ---------------------------------------------------------------------
   Lesson(
     title: 'Intrusion Prevention Systems (IPS)',
     difficulty: LessonDifficulty.expert,
@@ -3140,7 +3039,7 @@ const List<Lesson> networkingLessons = [
     ],
   ),
 
-  // 23 -------------------------------------------------------------- Quiz
+  // 20 -------------------------------------------------------------- Quiz
   Lesson(
     title: 'Practice Quiz',
     difficulty: LessonDifficulty.expert,
@@ -3514,6 +3413,96 @@ const List<Lesson> networkingLessons = [
         ],
         correctIndex: 1,
         explanation: 'IDS is detection-only and out-of-band; IPS sits inline in the traffic path and can actively prevent attacks.',
+      ),
+      QuizQuestion(
+        question: 'At which OSI layer does a stateful firewall primarily operate?',
+        options: ['Layer 2 (Data Link)', 'Layer 4 (Transport)', 'Layer 6 (Presentation)', 'Layer 7 (Application) only'],
+        correctIndex: 1,
+        explanation: 'Stateful firewalls track connection state at the Transport layer, though modern NGFWs also inspect higher layers.',
+      ),
+      QuizQuestion(
+        question: 'Which OSI layer is most directly associated with ARP poisoning and MAC flooding attacks?',
+        options: ['Physical (Layer 1)', 'Data Link (Layer 2)', 'Network (Layer 3)', 'Session (Layer 5)'],
+        correctIndex: 1,
+        explanation: 'ARP and MAC addressing both operate at Layer 2, making it the layer most associated with these specific attacks.',
+      ),
+      QuizQuestion(
+        question: 'What is the key practical difference between the OSI model and the TCP/IP model?',
+        options: [
+          'They are functionally identical',
+          'OSI is a 7-layer conceptual reference model used mainly for learning and troubleshooting, while TCP/IP is the practical 4-layer implementation that actually runs the Internet',
+          'TCP/IP has more layers than OSI',
+          'OSI was developed by DARPA and TCP/IP by ISO',
+        ],
+        correctIndex: 1,
+        explanation: 'OSI is the teaching/reference model; TCP/IP is what real networks and the Internet actually implement.',
+      ),
+      QuizQuestion(
+        question: 'What happens during data encapsulation as information moves down the protocol stack?',
+        options: [
+          'Data is deleted after each layer',
+          'Each layer adds its own header before passing the data to the next layer, wrapping it progressively',
+          'Only the Application layer adds any header information',
+          'Encapsulation only applies to wireless networks',
+        ],
+        correctIndex: 1,
+        explanation: 'Encapsulation wraps data with a header at each layer on the way out, and decapsulation reverses this at the receiving end.',
+      ),
+      QuizQuestion(
+        question: 'Which port does DHCP use by default?',
+        options: ['53', '67/68', '389', '3389'],
+        correctIndex: 1,
+        explanation: 'DHCP uses UDP ports 67 (server) and 68 (client) for dynamic IP address assignment.',
+      ),
+      QuizQuestion(
+        question: 'In the DNS misconfiguration scenario, why did customers lose access despite the servers being fully operational?',
+        options: [
+          'The servers were actually down, contrary to what monitoring showed',
+          'An incorrect DNS record prevented name resolution from directing customers to the correct server at all',
+          'A firewall blocked all inbound traffic',
+          'The load balancer failed silently',
+        ],
+        correctIndex: 1,
+        explanation: 'DNS misconfiguration breaks name resolution independent of actual server health — the servers were fine, but customers couldn\'t find them.',
+      ),
+      QuizQuestion(
+        question: 'What is the primary security benefit of basic network segmentation using VLANs and internal firewalls?',
+        options: [
+          'It increases available bandwidth',
+          'It limits how far an attacker can move laterally after compromising one device',
+          'It eliminates the need for any firewalls',
+          'It automatically encrypts all internal traffic',
+        ],
+        correctIndex: 1,
+        explanation: 'Segmentation confines a compromise to one segment rather than allowing free lateral movement across the whole network.',
+      ),
+      QuizQuestion(
+        question: 'What is the key difference between NAT and PAT?',
+        options: [
+          'They are the same technology with different names',
+          'NAT maps addresses one-to-one; PAT allows many internal devices to share a single public IP using different ports',
+          'PAT requires more public IP addresses than NAT',
+          'NAT is used only for internal traffic',
+        ],
+        correctIndex: 1,
+        explanation: 'PAT\'s many-to-one mapping via port numbers is what lets an entire office share a single public IP address.',
+      ),
+      QuizQuestion(
+        question: 'According to the detailed VPN protocol comparison, which protocol is specifically noted for "Very High" performance and low configuration complexity?',
+        options: ['IPsec', 'SSL/TLS VPN', 'WireGuard', 'All three are equally complex'],
+        correctIndex: 2,
+        explanation: 'WireGuard is specifically designed to be lightweight and simple to configure while delivering very high performance.',
+      ),
+      QuizQuestion(
+        question: 'Why does SSL/TLS VPN generally traverse firewalls more easily than IPsec?',
+        options: [
+          'SSL/TLS VPN does not use any encryption',
+          'SSL/TLS VPN operates over TCP port 443, the same port used for ordinary HTTPS traffic, which most firewalls already permit',
+          'IPsec is never blocked by any firewall',
+          'SSL/TLS VPN does not require any authentication',
+        ],
+        correctIndex: 1,
+        explanation: 'Because SSL/TLS VPN rides on standard HTTPS (port 443), it blends in with normal web traffic and rarely needs special firewall rules, unlike IPsec\'s UDP 500/4500 and ESP requirements.',
       ),
     ],
   ),
