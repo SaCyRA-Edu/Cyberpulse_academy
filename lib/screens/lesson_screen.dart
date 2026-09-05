@@ -7,11 +7,15 @@ import '../data/lesson_model.dart';
 import '../services/notes_service.dart';
 import '../services/progress_service.dart';
 import '../services/voice_preference_service.dart';
+import '../services/tts_voice_check_service.dart';
 import '../widgets/watermark.dart';
 import '../widgets/diagrams.dart';
+import 'podcast_data.dart';
+import 'podcast_player_screen.dart';
+import 'paywall_screen.dart';
 
 const int _quizLength = 20;
-const String _feedbackEmail = 'sacyra@gmail.com';
+const String _feedbackEmail = 'sacyra.edu@gmail.com';
 
 class LessonScreen extends StatefulWidget {
   final Lesson lesson;
@@ -33,6 +37,7 @@ class _LessonScreenState extends State<LessonScreen> {
   late List<int> _selectedAnswers;
   int _currentQuestionIndex = 0;
   bool _quizCompletionRecorded = false;
+  bool _hasFullAccess = false;
 
   // Audio narration state.
   final FlutterTts _tts = FlutterTts();
@@ -62,6 +67,9 @@ class _LessonScreenState extends State<LessonScreen> {
     _selectedAnswers = List.filled(_activeQuiz.length, -1);
 
     ProgressService.markLessonViewed('${widget.moduleTitle}::${widget.lesson.title}');
+    ProgressService.hasFullAccess().then((value) {
+      if (mounted) setState(() => _hasFullAccess = value);
+    });
 
     _setUpTts();
     _loadNote();
@@ -322,12 +330,34 @@ class _LessonScreenState extends State<LessonScreen> {
     return buffer.toString();
   }
 
+  /// This is the single play/pause toggle button used throughout the
+  /// lesson. Deliberately calls pause(), not stop() — flutter_tts
+  /// internally tracks the word/character position it was interrupted
+  /// at (via the platform's onRangeStart callback on Android, natively
+  /// on iOS/macOS) and resumes from there the next time speak() is
+  /// called with the same text, rather than restarting from the
+  /// beginning. stop() fully discards that position, which is what
+  /// caused every resume to start over from scratch before this fix.
   Future<void> _toggleNarration() async {
     if (_isSpeaking) {
-      await _tts.stop();
+      try {
+        await _tts.pause();
+      } catch (_) {
+        // pause() isn't supported on every platform (only guaranteed on
+        // iOS, macOS, and Android) — fall back to a full stop rather
+        // than crash on an unsupported platform. Resume will restart
+        // from the beginning there, same as before this fix, but that's
+        // a graceful degradation rather than a failure.
+        await _tts.stop();
+      }
       setState(() => _isSpeaking = false);
     } else {
       setState(() => _isSpeaking = true);
+      // Fire-and-forget: doesn't block playback starting, just surfaces
+      // a dialog/reminder afterward if the voice pack turns out to be
+      // missing — narration still plays either way, just possibly with
+      // a less natural-sounding fallback voice.
+      TtsVoiceCheckService.checkAndPromptIfNeeded(context, _tts);
       await _tts.speak(_lessonNarrationText(widget.lesson));
     }
   }
@@ -398,24 +428,6 @@ class _LessonScreenState extends State<LessonScreen> {
               onPressed: _showVoicePicker,
             ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(30),
-          child: Container(
-            color: Colors.black12,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            width: double.infinity,
-            child: Row(
-              children: [
-                const Icon(Icons.timer_outlined, size: 14),
-                const SizedBox(width: 4),
-                Text(
-                  '~${lesson.estimatedMinutes} min',
-                  style: const TextStyle(fontSize: 12),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
       body: Stack(
         children: [
@@ -507,9 +519,80 @@ class _LessonScreenState extends State<LessonScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildPodcastConnectBanner(),
           for (final section in lesson.sections) _buildSection(section),
           _buildNotesSection(),
           _buildFeedbackSection(),
+        ],
+      ),
+    );
+  }
+
+  /// Looks up whether this lesson's chapter has a real podcast episode
+  /// (podcast covers the 13 core chapters only, not Bonus Chapters, so
+  /// this correctly returns nothing for those). Only shown for actual
+  /// reading lessons, not quizzes or already-audio lesson types.
+  PodcastEpisode? _findPodcastEpisode() {
+    for (final chapter in podcastChapters) {
+      if (chapter.moduleTitle == widget.moduleTitle) {
+        return chapter.episodes.isNotEmpty ? chapter.episodes.first : null;
+      }
+    }
+    return null;
+  }
+
+  Widget _buildPodcastConnectBanner() {
+    final episode = _findPodcastEpisode();
+    if (episode == null || episode.audioStoragePath == null) return const SizedBox.shrink();
+
+    final isFreeChapter = widget.moduleTitle == 'Chapter 1: Cybersecurity Fundamentals';
+    final canPlayFreely = _hasFullAccess || isFreeChapter;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.deepPurple.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.deepPurple.withValues(alpha: 0.15)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.podcasts, color: Colors.deepPurple.shade300, size: 22),
+          const SizedBox(width: 10),
+          const Expanded(
+            child: Text(
+              'Prefer to listen? This chapter is also available as a podcast.',
+              style: TextStyle(fontSize: 12.5),
+            ),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: Colors.deepPurple.shade400),
+            onPressed: () async {
+              // Stop any active TTS narration first — Navigator.push
+              // doesn't dispose this screen, it just goes behind the
+              // new one, so without this the on-device narration and
+              // the real podcast audio would both keep playing at
+              // once.
+              if (_isSpeaking) {
+                await _tts.stop();
+                if (mounted) setState(() => _isSpeaking = false);
+              }
+              if (canPlayFreely) {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => PodcastPlayerScreen(episode: episode, moduleTitle: widget.moduleTitle)),
+                );
+                return;
+              }
+              final unlocked = await Navigator.push<bool>(
+                context,
+                MaterialPageRoute(builder: (_) => PaywallScreen(lockedItemTitle: episode.title)),
+              );
+              if (unlocked == true && mounted) setState(() => _hasFullAccess = true);
+            },
+            child: const Text('Listen'),
+          ),
         ],
       ),
     );

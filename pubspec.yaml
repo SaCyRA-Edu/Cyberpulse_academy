@@ -31,6 +31,29 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Renders the certificate as an image and hands it to the native
+  # share sheet (LinkedIn, Facebook, Mail, WhatsApp, etc.)
+  share_plus: ^10.1.2
+
+  # Razorpay Checkout for the "Unlock Full Access" purchase, plus the
+  # Cloud Functions client needed to create/verify orders server-side.
+  razorpay_flutter: ^1.4.0
+  cloud_functions: ^5.1.6
+
+  # Chapter/lesson diagram images now live in Firebase Storage instead
+  # of being bundled into the app — these two packages fetch and cache
+  # them at runtime instead.
+  firebase_storage: ^12.3.6
+  cached_network_image: ^3.4.1
+
+  # Opens Android's system TTS settings screen, for the "Install
+  # Indian English voice" reminder in tts_voice_check_service.dart.
+  android_intent_plus: ^5.2.0
+
+  # Streams real recorded/generated podcast episode audio (e.g. from
+  # NotebookLM) in podcast_player_screen.dart.
+  just_audio: ^0.9.42
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -56,6 +79,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.3
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -63,6 +87,14 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/icon.png"
+  adaptive_icon_background: "#0D1B3E"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+  min_sdk_android: 21
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -73,26 +105,16 @@ flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
- 
-
   uses-material-design: true
 
+  # NOTE: the 14 assets/images/<chapter>/ folder entries that used to
+  # live here have been removed on purpose — those images now live in
+  # Firebase Storage (see diagrams.dart) instead of being bundled into
+  # the app, which is what actually shrinks the APK. Only
+  # cyberpulse_logo.png stays bundled, since it's small and needs to
+  # render instantly at app launch, before any network call could
+  # possibly complete.
   assets:
-    - assets/images/networking/
-    - assets/images/threats/
-    - assets/images/fundamentals/
-    - assets/images/iam/
-    - assets/images/endpoint/
-    - assets/images/netsec/
-    - assets/images/endpoint2/
-    - assets/images/sso/
-    - assets/images/crypto/
-    - assets/images/secproto/
-    - assets/images/idfed/
-    - assets/images/cloud/
-    - assets/images/appsec/
-    - assets/images/cryptography/
-    - assets/images/idfed/
     - assets/images/cyberpulse_logo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see

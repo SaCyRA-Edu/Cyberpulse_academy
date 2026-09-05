@@ -78,7 +78,7 @@ const List<Lesson> threatsAttacksLessons = [
       LessonSection(
         diagram: DiagramSpec(
           type: DiagramType.assetImage,
-          assetPath: 'assets/images/threats/fig_2_1_threat_landscape.jpg',
+          assetPath: 'assets/images/threats/fig_2_1_threat_landscape.png',
           caption:
               'Modern enterprises face threats from multiple external '
               'and internal sources simultaneously — attackers target '
@@ -222,8 +222,8 @@ const List<Lesson> threatsAttacksLessons = [
       ),
       LessonSection(
         diagram: DiagramSpec(
-          type: DiagramType.processFlow,
-          steps: ['Threat', 'Finds a Vulnerability', 'Uses an Exploit', 'Security Incident', 'Business Risk'],
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/threats/fig_2_2_threat_relationship.png',
           caption:
               'Cyber risk materializes when a threat successfully '
               'exploits a vulnerability, resulting in a security '
@@ -508,6 +508,16 @@ const List<Lesson> threatsAttacksLessons = [
             'threat profile matters as much as understanding threat '
             'actors in the abstract.',
       ),
+      LessonSection(
+        diagram: DiagramSpec(
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/threats/fig_2_3_threat_actor_ecosystem.png',
+          caption:
+              'Different threat actors operate with varying motivations, '
+              'targets, and skill levels, all posing potential risk to '
+              'the enterprise.',
+        ),
+      ),
     ],
   ),
 
@@ -547,8 +557,8 @@ const List<Lesson> threatsAttacksLessons = [
       ),
       LessonSection(
         diagram: DiagramSpec(
-          type: DiagramType.processFlow,
-          steps: ['Reconnaissance', 'Initial Access', 'Privilege Escalation', 'Lateral Movement', 'Data Collection', 'Exfiltration', 'Impact'],
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/threats/fig_2_4_cyber_attack_lifecycle.png',
           caption: 'The typical progression of a cyberattack — each stage represents an opportunity for defenders to detect and interrupt it.',
         ),
       ),
@@ -697,8 +707,8 @@ const List<Lesson> threatsAttacksLessons = [
       ),
       LessonSection(
         diagram: DiagramSpec(
-          type: DiagramType.processFlow,
-          steps: ['Reconnaissance', 'Weaponization', 'Delivery', 'Exploitation', 'Installation', 'Command & Control', 'Actions on Objectives'],
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/threats/fig_2_5_cyber_kill_chain.png',
           caption: 'Understanding the Kill Chain helps organizations deploy layered security controls at each individual stage.',
         ),
       ),
@@ -1133,8 +1143,8 @@ const List<Lesson> threatsAttacksLessons = [
       ),
       LessonSection(
         diagram: DiagramSpec(
-          type: DiagramType.processFlow,
-          steps: ['Unknown Vulnerability', 'Attacker Discovers Flaw', 'Exploit Developed', 'Active Attacks', 'Vendor Releases Patch', 'Organizations Apply Updates'],
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/threats/fig_2_6_zero_day_lifecycle.png',
           caption: 'A zero-day vulnerability exists before a vendor releases a security update, creating a window during which attackers may exploit affected systems.',
         ),
       ),
@@ -1168,8 +1178,8 @@ const List<Lesson> threatsAttacksLessons = [
       ),
       LessonSection(
         diagram: DiagramSpec(
-          type: DiagramType.processFlow,
-          steps: ['Asset Discovery', 'Vulnerability Scan', 'Risk Assessment', 'Prioritization', 'Remediation', 'Validation', 'Continuous Monitoring'],
+          type: DiagramType.assetImage,
+          assetPath: 'assets/images/threats/fig_2_7_vulnerability_management_lifecycle.png',
           caption: 'Vulnerability management is a continuous process that combines technical assessments with genuine business risk evaluation.',
         ),
       ),

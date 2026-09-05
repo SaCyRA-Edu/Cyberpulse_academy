@@ -1,0 +1,19 @@
+// Add this rule block into your existing firestore.rules file, inside
+// the top-level `service cloud.firestore { match /databases/{database}/documents { ... } }`
+// block, alongside your existing rules (like the otpVerifications and
+// users/{uid} rules from earlier).
+//
+// Read is open to any signed-in user, since the price needs to be
+// shown on the paywall before purchase. Write is blocked entirely for
+// clients — this is important: if a client could write here, someone
+// could set the price to ₹1 right before triggering checkout, and the
+// createRazorpayOrder Cloud Function (which reads this same document
+// server-side) would honestly create a legitimately-priced order for
+// that manipulated low price. Only you, editing directly in the
+// Firebase Console (or the Admin SDK, which bypasses these rules
+// entirely), should ever be able to change it.
+
+match /config/{document} {
+  allow read: if request.auth != null;
+  allow write: if false;
+}

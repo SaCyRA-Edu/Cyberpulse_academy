@@ -3,138 +3,15 @@ import 'package:flutter/material.dart';
 import '../data/levels_data.dart';
 import '../services/progress_service.dart';
 import '../services/auth_service.dart';
-import 'topic_detail_screen.dart';
+import '../services/activity_tracker.dart';
 import 'final_exam_screen.dart';
 import 'account_screen.dart';
+import 'paywall_screen.dart';
+import 'read_through_screen.dart';
+import 'podcast_screen.dart';
+import 'puzzle_screen.dart';
+import 'admin_report_screen.dart';
 import '../widgets/cyberpulse_logo.dart';
-
-// ── Per-module visual theme ───────────────────────────────────────────────
-class _ModuleTheme {
-  final List<Color> gradient;
-  final IconData icon;
-  final IconData bgIcon; // large decorative background icon
-  const _ModuleTheme(this.gradient, this.icon, this.bgIcon);
-}
-
-const Map<String, _ModuleTheme> _moduleThemes = {
-  // ── Core Curriculum — Chapters 1–13, each with a distinct color ────────
-  'Chapter 1: Cybersecurity Fundamentals': _ModuleTheme(
-    [Color(0xFF1565C0), Color(0xFF42A5F5)],
-    Icons.security,
-    Icons.shield,
-  ),
-  'Chapter 2: Threats, Attacks & Vulnerabilities': _ModuleTheme(
-    [Color(0xFFC62828), Color(0xFFEF5350)],
-    Icons.gpp_maybe,
-    Icons.warning_amber,
-  ),
-  'Chapter 3: Network Security': _ModuleTheme(
-    [Color(0xFF2E7D32), Color(0xFF66BB6A)],
-    Icons.router,
-    Icons.lan,
-  ),
-  'Chapter 4: Identity Access Management': _ModuleTheme(
-    [Color(0xFF283593), Color(0xFF7986CB)],
-    Icons.badge,
-    Icons.fingerprint,
-  ),
-  'Chapter 5: Cryptography': _ModuleTheme(
-    [Color(0xFF00695C), Color(0xFF4DB6AC)],
-    Icons.enhanced_encryption,
-    Icons.key,
-  ),
-  'Chapter 6: Secure Protocols': _ModuleTheme(
-    [Color(0xFF00838F), Color(0xFF4DD0E1)],
-    Icons.lock,
-    Icons.https,
-  ),
-  'Chapter 7: Endpoint Security': _ModuleTheme(
-    [Color(0xFFEF6C00), Color(0xFFFFB74D)],
-    Icons.laptop_chromebook,
-    Icons.devices,
-  ),
-  'Chapter 8: Identity Federation & SSO': _ModuleTheme(
-    [Color(0xFF4527A0), Color(0xFF9575CD)],
-    Icons.hub,
-    Icons.link,
-  ),
-  'Chapter 9: Application Security': _ModuleTheme(
-    [Color(0xFF4E342E), Color(0xFFA1887F)],
-    Icons.web,
-    Icons.integration_instructions,
-  ),
-  'Chapter 10: Cloud Security': _ModuleTheme(
-    [Color(0xFF0277BD), Color(0xFF4FC3F7)],
-    Icons.cloud,
-    Icons.cloud_queue,
-  ),
-  'Chapter 11: Security Operations': _ModuleTheme(
-    [Color(0xFF1A237E), Color(0xFF5C6BC0)],
-    Icons.visibility,
-    Icons.radar,
-  ),
-  'Chapter 12: Incident Response': _ModuleTheme(
-    [Color(0xFFAD1457), Color(0xFFF06292)],
-    Icons.emergency,
-    Icons.local_fire_department,
-  ),
-  'Chapter 13: Governance, Risk & Compliance': _ModuleTheme(
-    [Color(0xFFF9A825), Color(0xFFFFD54F)],
-    Icons.gavel,
-    Icons.fact_check,
-  ),
-
-  // ── Bonus Chapters — supplementary modules outside the numbered sequence ──
-  'Social Engineering': _ModuleTheme(
-    [Color(0xFF6A1B9A), Color(0xFFBA68C8)],
-    Icons.psychology_alt,
-    Icons.record_voice_over,
-  ),
-  'Malware': _ModuleTheme(
-    [Color(0xFF212121), Color(0xFF757575)],
-    Icons.coronavirus,
-    Icons.bug_report,
-  ),
-  'Vulnerabilities and Threats': _ModuleTheme(
-    [Color(0xFFBF360C), Color(0xFFFF8A65)],
-    Icons.bug_report,
-    Icons.warning_amber,
-  ),
-  'Alerts and Monitoring': _ModuleTheme(
-    [Color(0xFF0288D1), Color(0xFF81D4FA)],
-    Icons.notifications_active,
-    Icons.monitor_heart,
-  ),
-  'Email Security': _ModuleTheme(
-    [Color(0xFF00838F), Color(0xFF80DEEA)],
-    Icons.email,
-    Icons.mark_email_read,
-  ),
-  'Windows Security': _ModuleTheme(
-    [Color(0xFF0277BD), Color(0xFF29B6F6)],
-    Icons.desktop_windows,
-    Icons.computer,
-  ),
-  'Linux Security': _ModuleTheme(
-    [Color(0xFFBF360C), Color(0xFFFFAB91)],
-    Icons.terminal,
-    Icons.code,
-  ),
-  'Capstone: Applied Defense': _ModuleTheme(
-    [Color(0xFFF57F17), Color(0xFFFFD54F)],
-    Icons.workspace_premium,
-    Icons.military_tech,
-  ),
-};
-
-_ModuleTheme _themeFor(String title) =>
-    _moduleThemes[title] ??
-    const _ModuleTheme(
-      [Color(0xFF37474F), Color(0xFF78909C)],
-      Icons.book,
-      Icons.book,
-    );
-
 // ── Watermark painter ─────────────────────────────────────────────────────
 class _WatermarkPainter extends CustomPainter {
   @override
@@ -188,37 +65,53 @@ class TopicsScreen extends StatefulWidget {
 }
 
 class _TopicsScreenState extends State<TopicsScreen> {
-  Map<int, double?> _bestScoresByLevel = {};
-  Set<int> _passedLevels = {};
   double? _finalExamBestScore;
-  Set<String> _viewedLessons = {};
-  Set<String> _completedQuizModules = {};
+  bool _hasFullAccess = false;
+  bool _isAdmin = false;
   bool _loading = true;
 
   @override
   void initState() {
     super.initState();
     _refresh();
+    // Fire-and-forget: records "the user was active today" for the
+    // inactivity-reminder email job. TopicsScreen is the home screen,
+    // so its initState firing is a reliable "opened the app" signal —
+    // no need to await this or block on it.
+    ActivityTracker.recordActivity();
   }
 
   Future<void> _refresh() async {
-    final scores = <int, double?>{};
-    for (final entry in allTopics) {
-      scores[entry.levelIndex] =
-          await ProgressService.getBestScore(entry.levelIndex);
-    }
-    final passed = await ProgressService.getPassedLevels();
     final finalExamScore = await ProgressService.getFinalExamBestScore();
-    final viewed = await ProgressService.getViewedLessons();
-    final completedQuizzes = await ProgressService.getCompletedQuizModules();
+    final hasFullAccess = await ProgressService.hasFullAccess();
+    final isAdmin = await ProgressService.isAdmin();
     setState(() {
-      _bestScoresByLevel = scores;
-      _passedLevels = passed;
       _finalExamBestScore = finalExamScore;
-      _viewedLessons = viewed;
-      _completedQuizModules = completedQuizzes;
+      _hasFullAccess = hasFullAccess;
+      _isAdmin = isAdmin;
       _loading = false;
     });
+  }
+
+  /// For cards still in development (Podcast, Video Tutorials,
+  /// Puzzles & Games): admins get real access for testing; everyone
+  /// else sees a friendly "not yet" message instead of navigating in.
+  void _handleComingSoonTap(Future<void> Function() onAdminTap) {
+    if (_isAdmin) {
+      onAdminTap();
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("This one's still cooking — hang tight, it's coming soon!")),
+    );
+  }
+
+  Future<void> _showPaywall({String? lockedItemTitle}) async {
+    final unlocked = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => PaywallScreen(lockedItemTitle: lockedItemTitle)),
+    );
+    if (unlocked == true) _refresh();
   }
 
   void _showAbout() {
@@ -273,6 +166,17 @@ class _TopicsScreenState extends State<TopicsScreen> {
           ],
         ),
         actions: [
+          if (_isAdmin)
+            IconButton(
+              icon: const Icon(Icons.bar_chart, color: Colors.white),
+              tooltip: 'Admin Report',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AdminReportScreen()),
+                );
+              },
+            ),
           IconButton(
             icon: const Icon(Icons.account_circle, color: Colors.white),
             tooltip: 'My Account',
@@ -290,7 +194,8 @@ class _TopicsScreenState extends State<TopicsScreen> {
           ),
         ],
       ),
-      body: Stack(
+      body: SafeArea(
+        child: Stack(
         children: [
           // Watermark background
           Positioned.fill(
@@ -350,13 +255,9 @@ class _TopicsScreenState extends State<TopicsScreen> {
                           ],
                         ),
                       ),
-                      // Progress summary for the signed-in user
+                      // Welcome message + Final Exam status notification
                       _ProgressSummaryCard(
-                        passedLevels: _passedLevels,
-                        bestScoresByLevel: _bestScoresByLevel,
                         finalExamBestScore: _finalExamBestScore,
-                        viewedLessons: _viewedLessons,
-                        completedQuizModules: _completedQuizModules,
                       ),
                       // Final Certification Exam
                       Card(
@@ -368,15 +269,26 @@ class _TopicsScreenState extends State<TopicsScreen> {
                         ),
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          leading: const CircleAvatar(
+                          leading: CircleAvatar(
                             backgroundColor: Colors.indigo,
-                            child: Icon(Icons.workspace_premium, color: Colors.white),
+                            child: Icon(
+                              _hasFullAccess ? Icons.workspace_premium : Icons.lock,
+                              color: Colors.white,
+                            ),
                           ),
                           title: const Text('Final Certification Exam',
                               style: TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: const Text('100 questions · 120 min · 75% to pass'),
+                          subtitle: Text(
+                            _hasFullAccess
+                                ? '100 questions · 120 min · 75% to pass'
+                                : 'Requires full access · tap to unlock',
+                          ),
                           trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                           onTap: () {
+                            if (!_hasFullAccess) {
+                              _showPaywall(lockedItemTitle: 'Final Certification Exam');
+                              return;
+                            }
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (_) => const FinalExamStartScreen()),
@@ -384,59 +296,72 @@ class _TopicsScreenState extends State<TopicsScreen> {
                           },
                         ),
                       ),
-                      // Topic cards — Core Curriculum only (Chapters 1–13)
-                      for (final entry in allTopics.where((e) => e.levelIndex == 0))
-                        _TopicCard(
-                          entry: entry,
-                          bestScore: _bestScoresByLevel[entry.levelIndex],
-                          onTap: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    TopicDetailScreen(entry: entry),
-                              ),
-                            );
-                            _refresh();
-                          },
-                        ),
-                      // Bonus Chapters — collapsed behind a single link
-                      Card(
-                        margin: const EdgeInsets.only(top: 4, bottom: 20),
-                        color: Colors.amber.withValues(alpha: 0.08),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          side: BorderSide(color: Colors.amber.withValues(alpha: 0.3)),
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          leading: const CircleAvatar(
-                            backgroundColor: Colors.amber,
-                            child: Icon(Icons.card_giftcard, color: Colors.white),
-                          ),
-                          title: const Text('Bonus Chapters',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text(
-                            '${allTopics.where((e) => e.levelIndex == 1).length} supplementary chapters',
-                          ),
-                          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                          onTap: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => _BonusChaptersScreen(
-                                  bestScoresByLevel: _bestScoresByLevel,
-                                ),
-                              ),
-                            );
-                            _refresh();
-                          },
-                        ),
+                      // Learning mode selector — "Read Through" is
+                      // fully live for everyone. "Podcast", "Video
+                      // Tutorials", and "Puzzles & Games" are still in
+                      // development: admins get real access to test
+                      // them, everyone else sees a friendly "coming
+                      // soon" message on tap instead of navigating in.
+                      // Built as a repeated card pattern so adding a
+                      // fully-launched mode later is just deleting one
+                      // "comingSoon: true" flag, not a redesign.
+                      _LearningModeCard(
+                        icon: Icons.menu_book,
+                        iconColor: Colors.blue,
+                        title: 'Read Through',
+                        subtitle: 'The full written course — 13 chapters plus bonus content',
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ReadThroughScreen()),
+                          );
+                          _refresh();
+                        },
                       ),
+                      const SizedBox(height: 14),
+                      _LearningModeCard(
+                        icon: Icons.extension,
+                        iconColor: Colors.teal,
+                        title: 'Cybersecurity Puzzles & Games',
+                        subtitle: 'Test what you know with quick, playful challenges',
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const PuzzleScreen()),
+                          );
+                          _refresh();
+                        },
+                      ),
+                      const SizedBox(height: 14),
+                      _LearningModeCard(
+                        icon: Icons.podcasts,
+                        iconColor: Colors.deepPurple,
+                        title: 'Podcast',
+                        subtitle: 'All 13 core chapters, told as a conversation between two hosts',
+                        badge: _hasFullAccess ? null : 'Chapter 1 Free',
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const PodcastScreen()),
+                          );
+                          _refresh();
+                        },
+                      ),
+                      const SizedBox(height: 14),
+                      _LearningModeCard(
+                        icon: Icons.smart_display,
+                        iconColor: Colors.redAccent,
+                        title: 'Video Tutorials',
+                        subtitle: 'Short video walkthroughs of key concepts',
+                        badge: 'Coming Soon',
+                        onTap: () => _handleComingSoonTap(() async {}),
+                      ),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
         ],
+        ),
       ),
     );
   }
@@ -444,18 +369,10 @@ class _TopicsScreenState extends State<TopicsScreen> {
 
 // ── Progress Summary Card ────────────────────────────────────────────────
 class _ProgressSummaryCard extends StatelessWidget {
-  final Set<int> passedLevels;
-  final Map<int, double?> bestScoresByLevel;
   final double? finalExamBestScore;
-  final Set<String> viewedLessons;
-  final Set<String> completedQuizModules;
 
   const _ProgressSummaryCard({
-    required this.passedLevels,
-    required this.bestScoresByLevel,
     required this.finalExamBestScore,
-    required this.viewedLessons,
-    required this.completedQuizModules,
   });
 
   @override
@@ -466,15 +383,6 @@ class _ProgressSummaryCard extends StatelessWidget {
         : 'Learner';
     final photoUrl = user?.photoURL;
     final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
-
-    // Course completion is based on practice exams passed — one per topic
-    // module — rather than exam scores tied to the old level grouping or
-    // simple lesson-open tracking. Each topic counts as complete once its
-    // practice quiz has been passed at 80%+.
-    final totalTopics = allTopics.length;
-    final completedCount = completedQuizModules.length;
-    final fraction = totalTopics == 0 ? 0.0 : (completedCount / totalTopics).clamp(0.0, 1.0);
-    final completionPercent = (fraction * 100).round();
 
     final finalExamPassed = (finalExamBestScore ?? 0) >= 75;
 
@@ -509,43 +417,16 @@ class _ProgressSummaryCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Welcome back, $name',
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 2),
-                    Text(
-                      '$completedCount of $totalTopics practice exams passed',
-                      style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '$completionPercent%',
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1565C0)),
-                  ),
-                  Text('complete', style: TextStyle(fontSize: 10, color: Colors.grey.shade500)),
-                ],
+                child: Text('Welcome back, $name',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
           const SizedBox(height: 14),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: fraction,
-              minHeight: 8,
-              backgroundColor: Colors.grey.shade100,
-              color: const Color(0xFF1565C0),
-            ),
-          ),
-          const SizedBox(height: 14),
+          // Notification: whether the Final Certification Exam has been
+          // taken yet — this is the ONLY status shown here now, per
+          // request, replacing the practice-exam completion percentage
+          // and progress bar that used to live in this card.
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
@@ -594,262 +475,97 @@ class _ProgressSummaryCard extends StatelessWidget {
   }
 }
 
-// ── Topic Card ────────────────────────────────────────────────────────────
-class _TopicCard extends StatelessWidget {
-  final TopicEntry entry;
-  final double? bestScore;
+// ── Learning mode selector card ─────────────────────────────────────────
+// Reused for "Read Through", "Podcast", and any future modes (video,
+// etc.) — one consistent card shape, so adding a new mode later is a
+// single new instantiation of this widget, not new layout code.
+class _LearningModeCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final String? badge;
   final VoidCallback onTap;
 
-  const _TopicCard({
-    required this.entry,
-    required this.bestScore,
+  const _LearningModeCard({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    this.badge,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final module = entry.module;
-    final theme = _themeFor(module.title);
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: theme.gradient.first.withValues(alpha: 0.35),
-              blurRadius: 12,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Column(
+    return Card(
+      margin: EdgeInsets.zero,
+      elevation: 0,
+      color: iconColor.withValues(alpha: 0.05),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: iconColor.withValues(alpha: 0.18)),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
             children: [
-              // ── Image banner ───────────────────────────────────────
-              SizedBox(
-                height: 120,
-                child: Stack(
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: iconColor, size: 26),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Gradient background
-                    Positioned.fill(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: theme.gradient,
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      ),
-                    ),
-                    // Large decorative background icon
-                    Positioned(
-                      right: -20,
-                      bottom: -20,
-                      child: Icon(
-                        theme.bgIcon,
-                        size: 120,
-                        color: Colors.white.withValues(alpha: 0.12),
-                      ),
-                    ),
-                    // Small dots pattern
-                    Positioned.fill(
-                      child: CustomPaint(painter: _DotPatternPainter()),
-                    ),
-                    // Module icon badge — fixed top-left position
-                    Positioned(
-                      top: 16,
-                      left: 16,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(theme.icon, color: Colors.white, size: 24),
-                      ),
-                    ),
-                    // Module title — fixed bottom-left position, max 2 lines
-                    Positioned(
-                      left: 16,
-                      right: 70,
-                      bottom: 14,
-                      child: Text(
-                        module.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          height: 1.2,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black26,
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
+                        if (badge != null) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: iconColor,
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // ── Info row ──────────────────────────────────────────
-              Container(
-                color: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Row(
-                  children: [
-                    Icon(Icons.menu_book,
-                        size: 16, color: theme.gradient.first),
-                    const SizedBox(width: 6),
-                    Text(
-                      '${module.lessonCount} lessons',
-                      style: TextStyle(
-                          fontSize: 13, color: theme.gradient.first),
-                    ),
-                    const SizedBox(width: 16),
-                    Icon(Icons.headphones,
-                        size: 16, color: theme.gradient.first),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Audio included',
-                      style: TextStyle(
-                          fontSize: 13, color: theme.gradient.first),
-                    ),
-                    const Spacer(),
-                    if (bestScore != null)
-                      Row(
-                        children: [
-                          const Icon(Icons.emoji_events,
-                              size: 16, color: Colors.green),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${bestScore!.toStringAsFixed(0)}%',
-                            style: const TextStyle(
-                                fontSize: 13,
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold),
+                            child: Text(
+                              badge!,
+                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                            ),
                           ),
                         ],
-                      )
-                    else
-                      Icon(Icons.arrow_forward_ios,
-                          size: 14, color: Colors.grey.shade400),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Subtle dot pattern painted on the card banner ─────────────────────────
-class _DotPatternPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.07)
-      ..style = PaintingStyle.fill;
-    const spacing = 18.0;
-    for (double x = 0; x < size.width; x += spacing) {
-      for (double y = 0; y < size.height; y += spacing) {
-        canvas.drawCircle(Offset(x, y), 2, paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_) => false;
-}
-
-// ── Bonus Chapters Screen ───────────────────────────────────────────────
-// Supplementary chapters live behind this dedicated screen instead of
-// appearing inline with the numbered Core Curriculum, keeping the main
-// list focused on the 13-chapter sequence.
-class _BonusChaptersScreen extends StatelessWidget {
-  final Map<int, double?> bestScoresByLevel;
-
-  const _BonusChaptersScreen({required this.bestScoresByLevel});
-
-  @override
-  Widget build(BuildContext context) {
-    final bonusTopics = allTopics.where((e) => e.levelIndex == 1).toList();
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF0F4FF),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1565C0),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'Bonus Chapters',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-      ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: CustomPaint(painter: _WatermarkPainter()),
-          ),
-          ListView(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
-            children: [
-              Container(
-                padding: const EdgeInsets.all(14),
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                      ],
                     ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.card_giftcard, color: Colors.amber.shade700, size: 22),
-                    const SizedBox(width: 10),
-                    const Expanded(
-                      child: Text(
-                        'Supplementary chapters outside the core 13-chapter '
-                        'sequence — dig deeper into specific threats, '
-                        'platforms, and the capstone.',
-                        style: TextStyle(fontSize: 13, color: Colors.black87),
-                      ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitle,
+                      style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              for (final entry in bonusTopics)
-                _TopicCard(
-                  entry: entry,
-                  bestScore: bestScoresByLevel[entry.levelIndex],
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => TopicDetailScreen(entry: entry),
-                      ),
-                    );
-                  },
-                ),
+              Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey.shade400),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

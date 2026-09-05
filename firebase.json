@@ -1,1 +1,37 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"cybersecurity-pulse-9841d","appId":"1:311505412696:android:c027bb25db0b49d7fe202d","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"cybersecurity-pulse-9841d","configurations":{"android":"1:311505412696:android:c027bb25db0b49d7fe202d","web":"1:311505412696:web:b2748a15214b601cfe202d","windows":"1:311505412696:web:1098452d9b0769b0fe202d"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "cybersecurity-pulse-9841d",
+          "appId": "1:311505412696:android:c027bb25db0b49d7fe202d",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "cybersecurity-pulse-9841d",
+          "configurations": {
+            "android": "1:311505412696:android:c027bb25db0b49d7fe202d",
+            "web": "1:311505412696:web:b2748a15214b601cfe202d",
+            "windows": "1:311505412696:web:1098452d9b0769b0fe202d"
+          }
+        }
+      }
+    }
+  },
+  "functions": {
+    "source": "functions",
+    "codebase": "default",
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log",
+      "*.local"
+    ],
+    "predeploy": [
+      "npm --prefix \"$RESOURCE_DIR\" run build"
+    ]
+  }
+}

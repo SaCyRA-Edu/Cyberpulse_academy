@@ -1,1617 +1,2545 @@
 import 'lesson_model.dart';
 
-// 100 questions curated from across every module's quiz bank,
-// covering every difficulty level. Used by the Final Certification Exam.
-
+// Scenario-based questions in the style of CISSP/CISM: each presents a
+// short situation and asks what the BEST or NEXT action is, with four
+// similarly-detailed options. This structure is intentionally resistant
+// to "pick the longest option" or "pick option B" test-taking shortcuts,
+// since every option is a comparably substantive, plausible course of
+// action rather than one detailed correct explanation next to three
+// short dismissals.
 const List<QuizQuestion> finalExamQuestions = [
   // From: Cybersecurity Fundamentals
   QuizQuestion(
-        question: 'A supply chain attack targets:',
-        options: [
-          'Physical warehouses',
-          'A trusted vendor or software provider to reach their customers',
-          'The company cafeteria supply',
-          'Shipping logistics systems',
-        ],
-        correctIndex: 1,
-        explanation: 'Supply chain attacks compromise a trusted third party to indirectly reach the target.',
-      ),
-  // From: Alerts and Monitoring
-  QuizQuestion(
-        question: 'What is a false positive in the context of security alerting?',
-        options: [
-          'An alert that correctly identifies genuine malicious activity',
-          'An alert that fires on entirely benign activity',
-          'A system that is completely offline',
-          'A type of encryption failure',
-        ],
-        correctIndex: 1,
-        explanation: 'A false positive incorrectly flags benign activity as malicious, contributing to alert fatigue.',
-      ),
-  // From: Linux Security
-  QuizQuestion(
-        question: 'Running "find / -perm -4000" on a Linux system reveals:',
-        options: [
-          'All world-writable files',
-          'All SUID binaries on the system',
-          'All running processes',
-          'All open network ports',
-        ],
-        correctIndex: 1,
-        explanation: 'This command finds all SUID binaries — a key step in security auditing.',
-      ),
-  // From: Social Engineering
-  QuizQuestion(
-        question: 'Business Email Compromise (BEC) is particularly dangerous because:',
-        options: [
-          'It always contains detectable malware',
-          'It typically involves no malicious link or attachment for technical filters to catch, relying purely on social engineering',
-          'It only targets government agencies',
-          'It requires physical access to a building',
-        ],
-        correctIndex: 1,
-        explanation: 'BEC is pure social engineering with no technical payload, making it hard for automated filters to catch.',
-      ),
-  // From: Vulnerabilities and Threats
-  QuizQuestion(
-        question: 'Which MDM capability directly addresses a lost or stolen device?',
-        options: ['App management', 'Remote wipe', 'Compliance reporting', 'VPN enforcement'],
-        correctIndex: 1,
-        explanation: 'Remote wipe lets an organization erase corporate data immediately on a lost or stolen device.',
-      ),
-  // From: Networking
-  QuizQuestion(
-        question: 'What does a stateful firewall track that a basic packet filter does not?',
-        options: [
-          'Application names',
-          'Connection state allowing return traffic from established sessions',
-          'User identities',
-          'File types',
-        ],
-        correctIndex: 1,
-        explanation: 'Stateful firewalls track connection state enabling smarter allow/deny decisions.',
-      ),
-  // From: Cybersecurity Fundamentals
-  QuizQuestion(
-        question: 'Ransomware is best described as:',
-        options: [
-          'A type of network scanner',
-          'Malware that encrypts data and demands payment',
-          'A social engineering technique',
-          'A firewall rule',
-        ],
-        correctIndex: 1,
-        explanation: 'Ransomware encrypts victim data and extorts payment for the decryption key.',
-      ),
-  // From: Capstone
-  QuizQuestion(
-        question: 'A stateful firewall differs from a basic packet-filtering firewall because it:',
-        options: [
-          'Cannot inspect any traffic',
-          'Tracks the state of active connections, correctly allowing return traffic for established sessions',
-          'Only works with UDP traffic',
-          'Requires no configuration at all',
-        ],
-        correctIndex: 1,
-        explanation: 'Stateful firewalls track connection state; packet filters only look at individual packets in isolation.',
-      ),
-  // From: Networking
-  QuizQuestion(
-        question: 'Which DNS record type maps a domain name directly to an IPv4 address?',
-        options: ['CNAME', 'MX', 'A', 'TXT'],
-        correctIndex: 2,
-        explanation: 'The A record is the fundamental record type mapping a domain name to an IPv4 address.',
-      ),
-  // From: Cryptography
-  QuizQuestion(
-        question: 'In a digital signature, what is actually encrypted with the sender\'s private key?',
-        options: ['The entire original message', 'A hash digest of the message', 'The recipient\'s public key', 'The CA\'s root certificate'],
-        correctIndex: 1,
-        explanation: 'The message is hashed first, and that fixed-length digest is what gets signed with the private key.',
-      ),
-  // From: Threat Actors
-  QuizQuestion(
-        question: 'An insider threat is generally harder to detect through perimeter defenses because:',
-        options: [
-          'Insiders are always more skilled than external attackers',
-          'Insiders already possess legitimate access and system knowledge',
-          'Insiders never leave any evidence',
-          'Perimeter defenses do not apply to any internal traffic',
-        ],
-        correctIndex: 1,
-        explanation: 'Existing legitimate access lets insider activity blend in more easily than an external attacker forcing their way in.',
-      ),
-  // From: Capstone
-  QuizQuestion(
-        question: 'Why does effective security leadership require translating technical risk into business terms?',
-        options: [
-          'Technical terms are always classified information',
-          'Leadership makes budget decisions based on business outcomes, not raw technical severity scores',
-          'Business terms are legally required in all security reports',
-          'Technical risk and business risk are always identical',
-        ],
-        correctIndex: 1,
-        explanation: 'Leaders who control security budgets need risk framed in terms they can act on — financial, regulatory, and reputational impact.',
-      ),
-  // From: Networking
-  QuizQuestion(
-        question: 'DNS tunneling is dangerous because:',
-        options: [
-          'It breaks DNS resolution permanently',
-          'It can exfiltrate data or establish C2 channels through firewalls that permit DNS traffic',
-          'It requires physical access',
-          'It only works on Linux',
-        ],
-        correctIndex: 1,
-        explanation: 'DNS tunneling encodes data inside DNS queries which most firewalls allow by default.',
-      ),
-  // From: SOC Operations
-  QuizQuestion(
-        question: 'The Cyber Kill Chain was developed by:',
-        options: ['MITRE', 'Lockheed Martin to model the stages of a targeted intrusion', 'NIST', 'The NSA'],
-        correctIndex: 1,
-        explanation: 'Lockheed Martin developed the Kill Chain model to describe adversary intrusion stages.',
-      ),
-  // From: Alerts and Monitoring
-  QuizQuestion(
-        question: 'Why does NetFlow capture metadata instead of full packet contents?',
-        options: [
-          'Metadata is more secure by default',
-          'Full packet capture at scale is extraordinarily expensive in storage and processing, while metadata reveals traffic patterns far more affordably',
-          'NetFlow cannot technically access packet payloads',
-          'Metadata is required by law in all countries',
-        ],
-        correctIndex: 1,
-        explanation: 'Flow metadata provides affordable, broad visibility, reserving expensive full packet capture for targeted deeper investigation.',
-      ),
-  // From: Windows Security
-  QuizQuestion(
-        question: 'VLANs on a managed switch allow:',
-        options: [
-          'Faster internet speeds',
-          'Multiple isolated logical networks on a single physical switch',
-          'Automatic IP assignment',
-          'Wireless access point configuration',
-        ],
-        correctIndex: 1,
-        explanation: 'VLANs logically separate traffic on the same physical hardware for security and performance.',
-      ),
-  // From: Cybersecurity Fundamentals
-  QuizQuestion(
-        question: 'Which of the following best describes the Zero Trust principle of "adaptive identity"?',
-        options: [
-          'Granting access once at login and never re-checking it',
-          'Continuously reassessing trust using real-time signals like device, location, and behavior rather than a single static login check',
-          'Removing the need for authentication after the first login',
-          'Trusting all requests from inside the corporate network by default',
-        ],
-        correctIndex: 1,
-        explanation: 'Zero Trust continuously reevaluates trust based on real-time context rather than treating a single login as permanently sufficient.',
-      ),
-  // From: Capstone
-  QuizQuestion(
-        question: 'SASE combines SD-WAN networking capabilities with:',
-        options: [
-          'Nothing additional — SASE and SD-WAN are identical',
-          'A full suite of integrated cloud-delivered security services like firewall, secure web gateway, and Zero Trust network access',
-          'Only physical hardware appliances',
-          'A single antivirus product',
-        ],
-        correctIndex: 1,
-        explanation: 'SASE unifies SD-WAN networking with integrated security services delivered from the cloud.',
-      ),
-  // From: Networking
-  QuizQuestion(
-        question: 'WEP should never be used for Wi-Fi because:',
-        options: [
-          'It is too slow',
-          'Its encryption is cryptographically broken and easily cracked',
-          'It requires special hardware',
-          'It does not support passwords',
-        ],
-        correctIndex: 1,
-        explanation: 'WEP has known cryptographic weaknesses and can be broken in minutes.',
-      ),
-  // From: Email Security
-  QuizQuestion(
-        question: 'Why is enabling MFA specifically important for your primary email account?',
-        options: [
-          'It makes emails load faster',
-          'Email is often used to reset passwords on other accounts, making it a high-value target',
-          'It removes the need for spam filters',
-          'It automatically blocks all phishing emails',
-        ],
-        correctIndex: 1,
-        explanation: 'Because email often controls password resets elsewhere, compromising it can cascade into other accounts.',
-      ),
-  // From: Windows Security
-  QuizQuestion(
-        question: 'Event ID 4625 repeated hundreds of times from one source most likely indicates:',
-        options: [
-          'A user changing their password',
-          'A Group Policy update',
-          'A brute-force attack against an account',
-          'Antivirus updating signatures',
-        ],
-        correctIndex: 2,
-        explanation: 'Many rapid failed logon events (4625) from one source is a brute-force signature.',
-      ),
-  // From: Alerts and Monitoring
-  QuizQuestion(
-        question: 'What is a baseline in the context of monitoring?',
-        options: [
-          'The maximum possible value a metric could ever reach',
-          'A documented normal state used as a reference point to detect meaningful deviations',
-          'A type of firewall rule',
-          'A backup schedule',
-        ],
-        correctIndex: 1,
-        explanation: 'Baselines define what normal looks like so monitoring can detect meaningful deviations from it.',
-      ),
-  // From: Cybersecurity Fundamentals
-  QuizQuestion(
-        question: 'Why is 100% availability generally not a realistic or sensible target?',
-        options: [
-          'It is technically impossible to measure',
-          'Beyond a certain point, each additional "nine" of availability costs disproportionately more relative to the benefit gained',
-          'Availability does not matter for security',
-          'Most systems already achieve 100% by default',
-        ],
-        correctIndex: 1,
-        explanation: 'Organizations choose a deliberate availability target based on cost and business impact rather than chasing an unrealistic 100%.',
-      ),
-  // From: Networking
-  QuizQuestion(
-        question: 'Which network device makes forwarding decisions based on MAC addresses within the same LAN?',
-        options: ['Router', 'Switch', 'Firewall', 'IPS'],
-        correctIndex: 1,
-        explanation: 'Switches forward traffic within a LAN segment based on MAC addresses.',
-      ),
-  // From: Cybersecurity Fundamentals
-  QuizQuestion(
-        question: 'An attacker modifies a bank transfer amount without either '
-            'party knowing. Which CIA property failed?',
-        options: ['Confidentiality', 'Integrity', 'Availability', 'Authentication'],
-        correctIndex: 1,
-        explanation: 'Unauthorized modification of data is an Integrity failure.',
-      ),
-  // From: Cryptography
-  QuizQuestion(
-        question: 'OCSP stapling improves on standard OCSP by:',
-        options: [
-          'Eliminating the need for a CA entirely',
-          'Having the web server itself attach a recent signed status response to its own certificate during the TLS handshake, avoiding a separate client query to the CA',
-          'Making certificates last forever',
-          'Removing the need for a root of trust',
-        ],
-        correctIndex: 1,
-        explanation: 'OCSP stapling avoids the client needing to separately contact the CA, improving speed and reducing CA load.',
-      ),
-  // From: Social Engineering
-  QuizQuestion(
-        question: 'Which of the following is NOT one of the six motivational triggers covered in this module?',
-        options: ['Authority', 'Urgency', 'Complexity', 'Scarcity'],
-        correctIndex: 2,
-        explanation: 'The six triggers are Authority, Urgency, Social Proof, Scarcity, Likability, and Fear — Complexity is not one of them.',
-      ),
-  // From: Linux Security
-  QuizQuestion(
-        question: 'SSH key-based authentication is more secure than passwords primarily because:',
-        options: [
-          'Keys are shorter to type',
-          'The private key never travels over the network and cannot be brute-forced like a password',
-          'Keys never expire',
-          'Keys are stored in plaintext',
-        ],
-        correctIndex: 1,
-        explanation: 'The private key stays on the client and its cryptographic strength resists brute force.',
-      ),
-  // From: Networking
-  QuizQuestion(
-        question: 'BGP hijacking occurs when:',
-        options: [
-          'A router runs out of memory',
-          'An organization announces routes for IP address space it does not actually own, redirecting traffic',
-          'A firewall blocks legitimate traffic',
-          'DNS servers return incorrect IP addresses',
-        ],
-        correctIndex: 1,
-        explanation: 'BGP has no built-in ownership verification, allowing route announcements for address space the announcer does not own.',
-      ),
-  // From: Cryptography
-  QuizQuestion(
-        question: 'Key stretching (using bcrypt, scrypt, or Argon2) primarily defends against:',
-        options: [
-          'Man-in-the-middle attacks',
-          'Brute-force password guessing, by making each individual guess computationally expensive to test',
-          'DNS spoofing',
-          'Phishing emails',
-        ],
-        correctIndex: 1,
-        explanation: 'Deliberately slow hashing makes brute-forcing large numbers of password guesses impractically expensive.',
-      ),
-  // From: Email Security
-  QuizQuestion(
-        question: 'An attacker researches a target on LinkedIn before sending a targeted email. This reconnaissance is called:',
-        options: ['Phishing', 'OSINT — Open Source Intelligence gathering', 'Wardriving', 'DNS tunneling'],
-        correctIndex: 1,
-        explanation: 'Mining publicly available information for targeting is OSINT.',
-      ),
-  // From: Linux Security
-  QuizQuestion(
-        question: 'What is the key difference between DAC and MAC?',
-        options: [
-          'DAC is faster; MAC is slower',
-          'DAC lets owners set permissions on their own files while MAC enforces a system-wide policy regardless of owner wishes',
-          'MAC is only available on Windows',
-          'DAC and MAC are the same thing',
-        ],
-        correctIndex: 1,
-        explanation: 'MAC enforces a kernel-level policy that overrides what individual users/owners can configure.',
-      ),
-  // From: Security Incident Response
-  QuizQuestion(
-        question: 'In the seven-phase incident response model, what is the key distinction between Detection and Analysis?',
-        options: [
-          'They are the same phase with two names',
-          'Detection is noticing something unusual; Analysis is determining whether it is genuinely an incident and understanding its scope',
-          'Analysis always comes before Detection',
-          'Detection only applies to network traffic',
-        ],
-        correctIndex: 1,
-        explanation: 'Detection flags something worth examining; Analysis determines what it actually means and how severe it is.',
-      ),
-  // From: Threat Actors
-  QuizQuestion(
-        question: 'Why does Shadow IT usually happen, even in well-run organizations?',
-        options: [
-          'Employees are deliberately trying to cause a breach',
-          'A gap exists between what employees need to be productive and what officially sanctioned tools currently provide',
-          'IT departments encourage it',
-          'It is required by most compliance regulations',
-        ],
-        correctIndex: 1,
-        explanation: 'Shadow IT typically fills a genuine productivity gap rather than reflecting malicious intent.',
-      ),
-  // From: Cryptography
-  QuizQuestion(
-        question: 'Why should RC4 never be used in new systems?',
-        options: [
-          'It is too slow',
-          'It is a cryptographically broken stream cipher with known weaknesses',
-          'It requires too much bandwidth',
-          'It only works with IPv6',
-        ],
-        correctIndex: 1,
-        explanation: 'RC4 has known cryptographic weaknesses and is considered broken for security purposes.',
-      ),
-  // From: SOC Operations
-  QuizQuestion(
-        question: 'In the ATT&CK framework, what does a "Technique" represent?',
-        options: [
-          'The overall goal the attacker is trying to achieve',
-          'A specific method used to accomplish a tactic',
-          'A type of malware family',
-          'A vulnerability in a specific product',
-        ],
-        correctIndex: 1,
-        explanation: 'In ATT&CK, Tactics are goals (e.g. Persistence) and Techniques are the specific methods used to achieve them.',
-      ),
-  // From: Security Incident Response
-  QuizQuestion(
-        question: 'How does a red/blue team simulation differ from a tabletop exercise?',
-        options: [
-          'They are identical in every way',
-          'A red/blue simulation involves a real simulated adversary attacking live systems while the blue team must detect and respond in real time',
-          'Red/blue simulations never involve any technical systems',
-          'Tabletop exercises always involve more risk',
-        ],
-        correctIndex: 1,
-        explanation: 'Red/blue simulations test real detection tooling and response speed under genuine, unscripted pressure.',
-      ),
-  // From: SOC Operations
-  QuizQuestion(
-        question: 'Alert fatigue occurs when:',
-        options: [
-          'Too many critical incidents happen simultaneously',
-          'High volumes of low-quality alerts cause analysts to become desensitized and miss real events',
-          'The SIEM goes offline',
-          'Too few analysts are on shift',
-        ],
-        correctIndex: 1,
-        explanation: 'Alert fatigue from excessive false positives causes analysts to underreact to real threats.',
-      ),
-  // From: Alerts and Monitoring
-  QuizQuestion(
-        question: 'What is the key difference between an SNMP GET and a trap?',
-        options: [
-          'They are identical operations',
-          'GET is the manager actively requesting a value; a trap is the agent proactively notifying the manager without being asked',
-          'Traps only work with SNMPv1',
-          'GET requires no network connection',
-        ],
-        correctIndex: 1,
-        explanation: 'GET is manager-initiated polling; a trap is agent-initiated, unsolicited notification of an event.',
-      ),
-  // From: Windows Security
-  QuizQuestion(
-        question: 'Which event ID indicates the Security audit log was cleared?',
-        options: ['4624', '4688', '1102', '4720'],
-        correctIndex: 2,
-        explanation: 'Event 1102 (Security log cleared) is a major red flag that an attacker may be covering tracks.',
-      ),
-  // From: Security Incident Response
-  QuizQuestion(
-        question: 'Why does root cause analysis deliberately avoid assigning individual blame?',
-        options: [
-          'Blame is legally required to be avoided',
-          'A blame-focused process makes people defensive and less forthcoming with the honest details the analysis depends on',
-          'Blame makes the analysis faster',
-          'No incident ever has an individual cause',
-        ],
-        correctIndex: 1,
-        explanation: 'A no-blame approach encourages honesty, which is essential for accurately identifying the true root cause.',
-      ),
-  // From: SOC Operations
-  QuizQuestion(
-        question: 'During the Containment phase of incident response, why should you NOT immediately reimage the affected machine?',
-        options: [
-          'Reimaging is too slow',
-          'You need to preserve forensic evidence (memory and disk) before cleaning up',
-          'Reimaging requires vendor approval',
-          'Containment and eradication are the same phase',
-        ],
-        correctIndex: 1,
-        explanation: 'Forensic evidence in memory and on disk is destroyed by reimaging — investigate first, then eradicate.',
-      ),
-  // From: Threat Actors
-  QuizQuestion(
-        question: 'A honeyfile is best described as:',
-        options: [
-          'A real, sensitive file with extra encryption applied',
-          'A decoy file placed where an unauthorized user is likely to look, triggering an alert when accessed',
-          'A compressed archive of security logs',
-          'A file used only for regulatory compliance reporting',
-        ],
-        correctIndex: 1,
-        explanation: 'Honeyfiles contain no genuinely sensitive data — their only purpose is to trigger an alert if accessed.',
-      ),
-  // From: Windows Security
-  QuizQuestion(
-        question: 'Why should Group Policy be used for Windows hardening rather than manually configuring each machine?',
-        options: [
-          'GPO is faster to type',
-          'GPO applies settings centrally and consistently to all machines automatically',
-          'Manual config is more secure',
-          'GPO only works on servers',
-        ],
-        correctIndex: 1,
-        explanation: 'Group Policy scales hardening across thousands of machines from a single configuration point.',
-      ),
-  // From: Alerts and Monitoring
-  QuizQuestion(
-        question: 'SCAP (Security Content Automation Protocol) is primarily used to:',
-        options: [
-          'Encrypt network traffic',
-          'Standardize automated vulnerability management and compliance checking across different vendor tools',
-          'Replace the need for a SIEM',
-          'Manage Bluetooth pairing',
-        ],
-        correctIndex: 1,
-        explanation: 'SCAP lets security tools from different vendors share vulnerability and configuration data in a common format.',
-      ),
-  // From: Capstone
-  QuizQuestion(
-        question: 'What does "Repudiation" in STRIDE specifically address?',
-        options: [
-          'Data being read by unauthorized users',
-          'A user denying they performed an action, addressed through logging and digital signatures',
-          'A system becoming unavailable',
-          'An attacker impersonating another user',
-        ],
-        correctIndex: 1,
-        explanation: 'Repudiation threats are mitigated with strong audit logging and non-repudiation controls like digital signatures.',
-      ),
-  // From: Social Engineering
-  QuizQuestion(
-        question: 'An email claiming "the rest of your team has already updated their password through this link" is using which trigger?',
-        options: ['Fear', 'Social Proof', 'Scarcity', 'Authority'],
-        correctIndex: 1,
-        explanation: 'Suggesting others have already complied is Social Proof, increasing the target\'s own willingness to comply.',
-      ),
-  // From: Email Security
-  QuizQuestion(
-        question: 'Which email authentication standard adds a digital signature to verify a message wasn\'t altered in transit?',
-        options: ['SPF', 'DKIM', 'DMARC', 'VPN'],
-        correctIndex: 1,
-        explanation: 'DKIM signs outgoing messages so receivers can verify authenticity and integrity.',
-      ),
-  // From: Security Incident Response
-  QuizQuestion(
-        question: 'What is a tabletop exercise?',
-        options: [
-          'A live attack simulation against production systems',
-          'A discussion-based walkthrough of a simulated incident scenario, with no actual systems touched',
-          'A type of penetration test',
-          'A physical security audit',
-        ],
-        correctIndex: 1,
-        explanation: 'Tabletop exercises test the plan and team readiness purely through discussion, without operational risk.',
-      ),
-  // From: Email Security
-  QuizQuestion(
-        question: 'An email impersonates a company executive and asks an employee to urgently wire funds. This is an example of:',
-        options: ['DKIM failure', 'Business Email Compromise (BEC)', 'DNS spoofing', 'A firewall misconfiguration'],
-        correctIndex: 1,
-        explanation: 'BEC involves impersonating a trusted figure, often an executive, to request money or sensitive data.',
-      ),
-  // From: Email Security
-  QuizQuestion(
-        question: 'An Office document asks you to "Enable Macros" to view its content. What should you do?',
-        options: [
-          'Enable macros — it\'s just a display setting',
-          'Be suspicious; this is a common malware delivery mechanism — verify with the sender first',
-          'Save the file and resend it',
-          'Enable macros only if the document looks professional',
-        ],
-        correctIndex: 1,
-        explanation: 'Macro-enabled documents are one of the most common malware delivery methods via email.',
-      ),
-  // From: Social Engineering
-  QuizQuestion(
-        question: 'What combination makes DNS spoofing and brand impersonation especially dangerous when used together?',
-        options: [
-          'They cancel each other out',
-          'DNS spoofing redirects a victim silently, and brand impersonation makes the malicious destination appear completely legitimate',
-          'They only work on mobile devices',
-          'They require the victim to already be compromised',
-        ],
-        correctIndex: 1,
-        explanation: 'Silent redirection combined with a convincing fake brand experience can make a fraudulent site feel entirely legitimate.',
-      ),
-  // From: Cryptography
-  QuizQuestion(
-        question: 'What is the fundamental limitation of symmetric encryption?',
-        options: [
-          'It is too slow for practical use',
-          'Key distribution — securely sharing the one secret key between parties who have never communicated before',
-          'It cannot encrypt large files',
-          'It requires a Certificate Authority',
-        ],
-        correctIndex: 1,
-        explanation: 'Securely agreeing on a shared secret key without an eavesdropper intercepting it is symmetric encryption\'s core challenge.',
-      ),
-  // From: Networking
-  QuizQuestion(
-        question: 'A /26 subnet has how many usable host addresses?',
-        options: ['30', '62', '126', '254'],
-        correctIndex: 1,
-        explanation: 'A /26 leaves 6 host bits: 2^6 - 2 = 62 usable addresses.',
-      ),
-  // From: Malware
-  QuizQuestion(
-        question: 'A Trojan differs from a virus because a Trojan:',
-        options: [
-          'Requires no user interaction at all',
-          'Disguises itself as something legitimate to trick the user into installing it, rather than attaching to a host file',
-          'Only affects mobile devices',
-          'Cannot steal any data',
-        ],
-        correctIndex: 1,
-        explanation: 'A Trojan presents a false identity to gain trust; it does not attach itself to another file the way a virus does.',
-      ),
-  // From: Windows Security
-  QuizQuestion(
-        question: 'Pass-the-hash attacks use:',
-        options: [
-          'The plaintext password',
-          'The NTLM hash of a password to authenticate without knowing the password itself',
-          'A phishing email',
-          'A keylogger',
-        ],
-        correctIndex: 1,
-        explanation: 'Pass-the-hash replays a captured hash to authenticate — Credential Guard mitigates this.',
-      ),
-  // From: Linux Security
-  QuizQuestion(
-        question: 'Which SSH configuration option should be set to "no" to significantly reduce brute-force attack risk?',
-        options: ['Protocol', 'X11Forwarding', 'PasswordAuthentication', 'TCPKeepAlive'],
-        correctIndex: 2,
-        explanation: 'Disabling password authentication forces key-based login, which cannot be brute-forced in the traditional sense.',
-      ),
-  // From: Vulnerabilities and Threats
-  QuizQuestion(
-        question: 'Why does signature-based antivirus struggle against zero-day malware?',
-        options: [
-          'Signature-based antivirus is always disabled by default',
-          'A zero-day exploit has never been seen before, so no signature exists yet to match against',
-          'Zero-days only target antivirus software directly',
-          'Signatures work better against zero-days than any other malware type',
-        ],
-        correctIndex: 1,
-        explanation: 'Signature detection relies on previously cataloged patterns, which a genuinely new zero-day will not match.',
-      ),
-  // From: Malware
-  QuizQuestion(
-        question: 'A botnet\'s Command and Control (C2) infrastructure is used to:',
-        options: [
-          'Physically repair infected devices',
-          'Issue instructions simultaneously to every zombie device in the botnet',
-          'Encrypt the attacker\'s own communications only',
-          'Provide customer support to victims',
-        ],
-        correctIndex: 1,
-        explanation: 'C2 infrastructure lets an attacker coordinate action across an entire botnet simultaneously.',
-      ),
-  // From: Cybersecurity Fundamentals
-  QuizQuestion(
-        question: 'Which threat actor type is typically the most well-funded '
-            'and strategically motivated?',
-        options: ['Script kiddies', 'Hacktivists', 'Nation-state actors', 'Insiders'],
-        correctIndex: 2,
-        explanation: 'Nation-state actors have the greatest resources and long-term strategic goals.',
-      ),
-  // From: Linux Security
-  QuizQuestion(
-        question: 'Fail2Ban is used to:',
-        options: [
-          'Encrypt disk partitions',
-          'Automatically ban IPs that exceed failed login thresholds reducing brute-force noise',
-          'Configure firewall zones',
-          'Monitor DNS queries',
-        ],
-        correctIndex: 1,
-        explanation: 'Fail2Ban watches logs and blocks repeat offenders automatically.',
-      ),
-  // From: Vulnerabilities and Threats
-  QuizQuestion(
-        question: 'What did the Equifax, WannaCry, and Mirai incidents all have in common?',
-        options: [
-          'They all used entirely novel, never-before-seen techniques',
-          'They all exploited vulnerabilities that were already known, often with a patch already available but not yet applied',
-          'They all targeted only government agencies',
-          'None of them involved any vulnerability at all',
-        ],
-        correctIndex: 1,
-        explanation: 'Most major historical breaches exploited already-known vulnerabilities that simply had not been patched yet.',
-      ),
-  // From: Social Engineering
-  QuizQuestion(
-        question: 'What is shoulder surfing?',
-        options: [
-          'Searching discarded trash for documents',
-          'Directly observing someone entering a password or PIN, such as over their shoulder in public',
-          'Following someone through a secured door',
-          'Leaving an infected USB drive for someone to find',
-        ],
-        correctIndex: 1,
-        explanation: 'Shoulder surfing is direct visual observation of sensitive input like a password or PIN.',
-      ),
-  // From: Capstone
-  QuizQuestion(
-        question: 'Which firewall type is purpose-built to protect HTTP/S traffic from SQL injection and XSS?',
-        options: ['UTM', 'WAF', 'Proxy firewall', 'Kernel proxy firewall'],
-        correctIndex: 1,
-        explanation: 'A Web Application Firewall (WAF) is specifically designed to inspect and protect HTTP/S application-layer traffic.',
-      ),
-  // From: Social Engineering
-  QuizQuestion(
-        question: 'In the printer pretexting example, why did the receptionist comply so readily?',
-        options: [
-          'The request explicitly mentioned confidential financial data',
-          'The request sounded mundane and helpful, giving no obvious reason to refuse, despite its actual reconnaissance value',
-          'The receptionist was an accomplice',
-          'The company had no security policy at all',
-        ],
-        correctIndex: 1,
-        explanation: 'Low-stakes-sounding requests are exactly what make pretexting effective — the reconnaissance value is hidden behind an innocuous ask.',
-      ),
-  // From: SOC Operations
-  QuizQuestion(
-        question: 'SOAR reduces MTTR by:',
-        options: [
-          'Hiring more analysts',
-          'Automating repetitive response steps like querying threat intel, disabling accounts, and creating tickets',
-          'Blocking all alerts automatically',
-          'Replacing the SIEM',
-        ],
-        correctIndex: 1,
-        explanation: 'SOAR automation compresses manual response time significantly.',
-      ),
-  // From: Linux Security
-  QuizQuestion(
-        question: 'What does a File Integrity Monitor (FIM) tool do?',
-        options: [
-          'Encrypts important system files',
-          'Compares live system files against a cryptographic baseline to detect unexpected changes',
-          'Blocks unauthorized file downloads',
-          'Compresses log files automatically',
-        ],
-        correctIndex: 1,
-        explanation: 'FIM tools detect when important files (binaries, configs) are modified, which can indicate a compromise.',
-      ),
-  // From: Cybersecurity Fundamentals
-  QuizQuestion(
-        question: 'What is the difference between a threat and a vulnerability?',
-        options: [
-          'They mean the same thing',
-          'A threat is a weakness; a vulnerability is a source of harm',
-          'A threat is a potential source of harm; a vulnerability is a weakness that could be exploited',
-          'Vulnerabilities only apply to hardware',
-        ],
-        correctIndex: 2,
-        explanation: 'Threat = potential danger. Vulnerability = the gap that threat could exploit.',
-      ),
-  // From: Cryptography
-  QuizQuestion(
-        question: 'A collision attack against a hash function:',
-        options: [
-          'Finds two different inputs that produce the identical hash output',
-          'Decrypts encrypted data without a key',
-          'Forces a downgrade to a weaker TLS version',
-          'Steals a private key directly',
-        ],
-        correctIndex: 0,
-        explanation: 'Collision attacks undermine the integrity guarantee of hashing by finding two inputs with the same hash.',
-      ),
-  // From: Threat Actors
-  QuizQuestion(
-        question: 'Which of the following is one of the six common threat vectors covered in this lesson?',
-        options: ['Weather patterns', 'Removable devices', 'Stock market fluctuations', 'Office furniture'],
-        correctIndex: 1,
-        explanation: 'Removable devices (like USB drives) are one of the six common vectors, alongside messages, images, files, voice calls, and unsecured networks.',
-      ),
-  // From: Email Security
-  QuizQuestion(
-        question: 'Why does BEC frequently succeed even against organizations with mature technical email security?',
-        options: [
-          'BEC always uses malware that bypasses filters',
-          'BEC emails are often plain, well-written text with no malicious link or attachment for filters to catch',
-          'BEC only targets small companies',
-          'BEC requires physical access to the mail server',
-        ],
-        correctIndex: 1,
-        explanation: 'Because BEC relies on social engineering rather than technical exploits, it often has nothing for a scanner to flag.',
-      ),
-  // From: Vulnerabilities and Threats
-  QuizQuestion(
-        question: 'A malicious update supply chain attack works by:',
-        options: [
-          'Directly attacking end-user devices with no vendor involvement',
-          'Compromising a vendor\'s update infrastructure so malware is disguised as a legitimate trusted update',
-          'Only affecting hardware, never software',
-          'Requiring physical access to every target device',
-        ],
-        correctIndex: 1,
-        explanation: 'Compromising the update mechanism itself lets malware be voluntarily installed by systems trusting that vendor.',
-      ),
-  // From: Networking
-  QuizQuestion(
-        question: 'A device has an IP address starting with 172. Which class does this address belong to?',
-        options: ['Class A', 'Class B', 'Class C', 'Class D'],
-        correctIndex: 1,
-        explanation: 'Class B covers first octets 128-191, so an address starting with 172 is Class B.',
-      ),
-  // From: Cryptography
-  QuizQuestion(
-        question: 'Which symmetric algorithm is the current global standard and default choice?',
-        options: ['DES', '3DES', 'AES', 'RC4'],
-        correctIndex: 2,
-        explanation: 'AES has withstood over two decades of scrutiny with no practical full break and is the recommended default.',
-      ),
-  // From: Email Security
-  QuizQuestion(
-        question: 'Which is NOT a red flag in a phishing email?',
-        options: [
-          'Urgent pressure to act immediately',
-          'A generic greeting on a supposedly personal message',
-          'A link whose hover URL matches the displayed text',
-          'Unexpected attachment from unknown sender',
-        ],
-        correctIndex: 2,
-        explanation: 'A matching URL is actually a sign of legitimacy — the other options are classic red flags.',
-      ),
-  // From: Security Incident Response
-  QuizQuestion(
-        question: 'In the ransomware example, why was the affected network segment isolated before the team fully understood how the attacker got in?',
-        options: [
-          'Isolation is never appropriate before full understanding',
-          'Containment can and should happen before eradication is complete, to stop the spread while investigation continues',
-          'The team had already completed eradication',
-          'Isolating a segment always destroys forensic evidence',
-        ],
-        correctIndex: 1,
-        explanation: 'Containment stops the spread immediately; deeper investigation and eradication can continue afterward.',
-      ),
-  // From: Malware
-  QuizQuestion(
-        question: 'Why are DDoS attacks launched from a botnet especially difficult to block?',
-        options: [
-          'They only use one source IP address',
-          'Traffic arrives from potentially hundreds of thousands of distinct, legitimate-looking IP addresses simultaneously',
-          'They never generate enough traffic to matter',
-          'They are always encrypted',
-        ],
-        correctIndex: 1,
-        explanation: 'Distributed traffic from many real IP addresses is much harder to filter than an attack from a single identifiable source.',
-      ),
-  // From: Alerts and Monitoring
-  QuizQuestion(
-        question: 'Why should SNMPv1 and v2c be avoided today?',
-        options: [
-          'They are too fast for modern networks',
-          'They transmit the community string (functioning as a password) in plaintext',
-          'They cannot monitor routers or switches',
-          'They require SNMPv3 hardware',
-        ],
-        correctIndex: 1,
-        explanation: 'SNMPv1/v2c expose credentials in plaintext; SNMPv3 added genuine authentication and encryption.',
-      ),
-  // From: Security Incident Response
-  QuizQuestion(
-        question: 'Why should incident response testing scenarios be chosen based on an organization\'s specific threat landscape and risk profile?',
-        options: [
-          'All organizations face identical realistic threats',
-          'Testing scenarios should reflect the threat actors and motivations most realistic for that specific organization, not a generic template',
-          'Testing scenarios have no relationship to actual risk',
-          'Generic templates are always more effective',
-        ],
-        correctIndex: 1,
-        explanation: 'Testing should be informed by the organization\'s actual, realistic risk profile rather than arbitrary selection.',
-      ),
-  // From: Linux Security
-  QuizQuestion(
-        question: 'AppArmor profiles are:',
-        options: [
-          'Based on SELinux contexts',
-          'Per-application, path-based rules defining what files and capabilities each program can access',
-          'Network firewall rules',
-          'Cron job definitions',
-        ],
-        correctIndex: 1,
-        explanation: 'AppArmor confines individual applications using path-based profiles.',
-      ),
-  // From: Malware
-  QuizQuestion(
-        question: 'Which of the four ransomware best practices most directly limits how far a single compromised password can spread an attack?',
-        options: ['Regular backups', 'Software updates', 'Security awareness training', 'Multi-factor authentication'],
-        correctIndex: 3,
-        explanation: 'MFA limits how much lateral access a single compromised credential provides an attacker.',
-      ),
-  // From: SOC Operations
-  QuizQuestion(
-        question: 'A SOC shift handoff should include:',
-        options: [
-          'Only verbal summary',
-          'Written status of open incidents, pending actions, and anything unusual from the shift',
-          'A list of all employees',
-          'Only automated reports',
-        ],
-        correctIndex: 1,
-        explanation: 'Written handoffs ensure no context is lost between analyst shifts.',
-      ),
-  // From: Threat Actors
-  QuizQuestion(
-        question: 'What primarily motivates hacktivists?',
-        options: ['Financial gain', 'Political or social causes', 'Personal curiosity only', 'Government contracts'],
-        correctIndex: 1,
-        explanation: 'Hacktivists target organizations they view as opposed to their political or social cause.',
-      ),
-  // From: Vulnerabilities and Threats
-  QuizQuestion(
-        question: 'In the DVWA demonstration, entering "1\' OR \'1\'=\'1" into a vulnerable field caused:',
-        options: [
-          'The application to crash entirely',
-          'Every user record to be returned instead of just the one legitimately requested',
-          'The database to be encrypted',
-          'No effect at all',
-        ],
-        correctIndex: 1,
-        explanation: 'The injected condition is always true, causing the query to match and return every record rather than one.',
-      ),
-  // From: Capstone
-  QuizQuestion(
-        question: 'A HIDS has visibility that a NIDS positioned outside a host typically lacks because:',
-        options: [
-          'HIDS is always faster',
-          'HIDS runs directly on the endpoint and can see file changes, process execution, and decrypted activity on that specific host',
-          'NIDS cannot process any traffic at all',
-          'HIDS does not require any configuration',
-        ],
-        correctIndex: 1,
-        explanation: 'Host-based systems see endpoint-level activity, including content after decryption, that network-based systems positioned outside cannot observe.',
-      ),
-  // From: Windows Security
-  QuizQuestion(
-        question: 'The principle of least privilege on Windows most directly applies to:',
-        options: [
-          'File compression settings',
-          'Every user process and service having only the access they genuinely need',
-          'Display resolution',
-          'Power management',
-        ],
-        correctIndex: 1,
-        explanation: 'Least privilege on Windows means standard accounts for daily work, not administrator accounts.',
-      ),
-  // From: Threat Actors
-  QuizQuestion(
-        question: 'What is the most effective general strategy for managing Shadow IT?',
-        options: [
-          'A total ban on any unapproved tool with no exceptions',
-          'Fast, clear approval processes combined with visibility tools like a CASB, rather than blanket prohibition',
-          'Ignoring it entirely since it cannot be controlled',
-          'Firing any employee found using an unapproved tool',
-        ],
-        correctIndex: 1,
-        explanation: 'Blanket bans tend to push Shadow IT further underground; visibility and reasonable approval processes work better.',
-      ),
-  // From: Vulnerabilities and Threats
-  QuizQuestion(
-        question: 'A buffer overflow attack that overwrites the stack return address aims to:',
-        options: [
-          'Simply crash the program with no further effect',
-          'Redirect program execution to attacker-controlled code once the current function returns',
-          'Encrypt the program\'s memory',
-          'Disable the network interface',
-        ],
-        correctIndex: 1,
-        explanation: 'Overwriting the return address redirects execution to code of the attacker\'s choosing.',
-      ),
-  // From: Malware
-  QuizQuestion(
-        question: 'Missing logs during an investigation most strongly suggest:',
-        options: [
-          'A normal, routine log rotation',
-          'An attacker may have deliberately cleared logs to cover their tracks',
-          'The system has never been used',
-          'A hardware failure with no security implications',
-        ],
-        correctIndex: 1,
-        explanation: 'Gaps or absence of expected log entries are a common sign an attacker has tampered with logging to hide their activity.',
-      ),
-  // From: Cybersecurity Fundamentals
-  QuizQuestion(
-        question: 'Data classification policies exist to:',
-        options: [
-          'Speed up data processing',
-          'Define how data is labeled and handled based on sensitivity',
-          'Automatically encrypt all files',
-          'Replace the need for access controls',
-        ],
-        correctIndex: 1,
-        explanation: 'Data classification ensures sensitive data is identified and handled appropriately.',
-      ),
-  // From: Capstone
-  QuizQuestion(
-        question: 'NIST CSF\'s five core functions are:',
-        options: [
-          'Plan, Do, Check, Act, Improve',
-          'Identify, Protect, Detect, Respond, Recover',
-          'Prevent, Detect, Respond, Recover, Review',
-          'Assess, Plan, Implement, Monitor, Audit',
-        ],
-        correctIndex: 1,
-        explanation: 'The NIST Cybersecurity Framework organizes its guidance around these five functions covering the full security lifecycle.',
-      ),
-  // From: Capstone
-  QuizQuestion(
-        question: 'Which security maturity level involves implementing centralized logging, SIEM, and EDR across the environment?',
-        options: [
-          'Basic Hygiene',
-          'Visibility',
-          'Proactive Defense',
-          'Adaptive',
-        ],
-        correctIndex: 1,
-        explanation: 'Centralized logging, SIEM, and EDR are core Visibility-stage capabilities that enable detection before Proactive Defense work begins.',
-      ),
-  // From: Malware
-  QuizQuestion(
-        question: 'A login from one country followed, impossibly soon after, by a login from a distant location is known as:',
-        options: ['Concurrent session utilization', 'Impossible travel', 'Out-of-cycle logging', 'Resource consumption'],
-        correctIndex: 1,
-        explanation: 'Impossible travel flags logins that could not both be legitimate given the physical distance and time between them.',
-      ),
-  // From: SOC Operations
-  QuizQuestion(
-        question: 'The Lessons Learned phase of incident response exists to:',
-        options: [
-          'Assign legal blame',
-          'Feed improvements back into detection, policy, and training to prevent recurrence',
-          'Create incident reports only',
-          'Archive old logs',
-        ],
-        correctIndex: 1,
-        explanation: 'Reviewing incidents afterward closes the gaps that were exploited.',
-      ),
-  // From: Endpoint Security
-  QuizQuestion(
-        question: 'What is the key difference between an EPP and an EDR solution?',
-        options: [
-          'They are identical technologies marketed differently',
-          'EPP focuses on preventing threats before compromise, while EDR focuses on detecting and responding to threats that bypass prevention',
-          'EDR only works on mobile devices',
-          'EPP requires no installation on the endpoint',
-        ],
-        correctIndex: 1,
-        explanation: 'EPP is prevention-focused; EDR is detection-and-response-focused for threats that get past EPP.',
-      ),
-  // From: Endpoint Security
-  QuizQuestion(
-        question: 'Why is fileless malware particularly difficult for traditional antivirus to detect?',
-        options: [
-          'It always requires a USB device to spread',
-          'It executes directly in system memory using legitimate OS tools rather than installing files on disk',
-          'It only affects mobile devices',
-          'It cannot cause any actual damage',
-        ],
-        correctIndex: 1,
-        explanation: 'Fileless malware avoids leaving file-based signatures behind, which is exactly what signature-based antivirus relies on.',
-      ),
-  // From: Endpoint Security
-  QuizQuestion(
-        question: 'What is the core principle behind endpoint hardening?',
-        options: [
-          'Installing as many security tools as possible',
-          'Reducing the attack surface by removing unnecessary software, disabling unused services, and enforcing secure configurations',
-          'Replacing the need for antivirus entirely',
-          'Only applying to mobile devices',
-        ],
-        correctIndex: 1,
-        explanation: 'Hardening prevents attacks by eliminating unnecessary weaknesses, rather than only reacting once an attack starts.',
-      ),
-  // From: Endpoint Security
-  QuizQuestion(
-        question: 'What does the Zero Trust principle "Never Trust, Always Verify" mean in practice?',
-        options: [
-          'Users inside the corporate network are automatically trusted',
-          'Every access request is evaluated using multiple factors, regardless of the user\'s network location',
-          'Verification only happens once at initial login',
-          'Only external users need to be verified',
-        ],
-        correctIndex: 1,
-        explanation: 'Zero Trust rejects the old assumption that internal network location implies trustworthiness.',
-      ),
-  // From: Endpoint Security
-  QuizQuestion(
-        question: 'Why do most organizations prohibit rooted or jailbroken mobile devices from accessing enterprise resources?',
-        options: [
-          'Rooted and jailbroken devices are actually more secure',
-          'These modifications bypass built-in security controls, can install unverified software, and often fail compliance checks',
-          'Rooting and jailbreaking are illegal everywhere',
-          'These devices cannot connect to Wi-Fi at all',
-        ],
-        correctIndex: 1,
-        explanation: 'Removing manufacturer security restrictions significantly weakens a device\'s security posture.',
-      ),
-  // From: Endpoint Security
-  QuizQuestion(
-        question: 'What is the primary purpose of Just-in-Time patch and vulnerability management on endpoints?',
-        options: [
-          'To eliminate the need for backups',
-          'To continuously scan, prioritize, and remediate vulnerabilities based on actual business risk rather than patching everything with equal urgency',
-          'To replace antivirus entirely',
-          'To only apply to virtual machines',
-        ],
-        correctIndex: 1,
-        explanation: 'Risk-based patching focuses remediation effort where it matters most, rather than treating every vulnerability identically.',
-      ),
-  // From: Cryptography
-  QuizQuestion(
-        question: 'What is the key difference between encryption and hashing?',
-        options: [
-          'They are identical processes',
-          'Encryption is reversible with the correct key (providing confidentiality); hashing is a one-way process used to verify integrity',
-          'Hashing is reversible but encryption is not',
-          'Both require the exact same key management practices',
-        ],
-        correctIndex: 1,
-        explanation: 'Encryption protects confidentiality and can be decrypted; hashing verifies integrity and cannot be reversed.',
-      ),
-  // From: Cryptography
-  QuizQuestion(
-        question: 'Why is AES-GCM widely deployed in modern enterprise systems?',
-        options: [
-          'It only provides confidentiality with no other benefits',
-          'It combines the performance of Counter Mode with built-in integrity verification, providing authenticated encryption',
-          'It is the slowest available cipher mode',
-          'It eliminates the need for any encryption key',
-        ],
-        correctIndex: 1,
-        explanation: 'GCM adds authentication on top of CTR mode\'s speed, letting systems both encrypt and detect tampering in one pass.',
-      ),
-  // From: Cryptography
-  QuizQuestion(
-        question: 'What is the main advantage of hybrid encryption, as used in protocols like TLS?',
-        options: [
-          'It avoids using any asymmetric cryptography',
-          'It combines asymmetric encryption for secure key exchange with fast symmetric encryption for the actual data',
-          'It only works for email communications',
-          'It requires no cryptographic keys whatsoever',
-        ],
-        correctIndex: 1,
-        explanation: 'Hybrid encryption uses asymmetric crypto\'s secure key exchange plus symmetric crypto\'s speed for bulk data.',
-      ),
-  // From: Cryptography
-  QuizQuestion(
-        question: 'Why does the compromise of a Root Certificate Authority represent such a severe risk?',
-        options: [
-          'It only affects a single website',
-          'Because the Root CA is the foundation of trust for the entire PKI hierarchy — compromising it could invalidate every certificate issued beneath it',
-          'Root CAs have no actual security role',
-          'It only impacts internal test environments',
-        ],
-        correctIndex: 1,
-        explanation: 'Every certificate in the chain traces its trust back to the Root CA, so its compromise cascades through the entire hierarchy.',
-      ),
-  // From: Cryptography
-  QuizQuestion(
-        question: 'What distinguishes a downgrade attack from other cryptographic attacks?',
-        options: [
-          'It attempts to physically damage cryptographic hardware',
-          'It forces communicating systems to negotiate older, weaker protocols or cipher suites that are easier to exploit',
-          'It only targets hashing algorithms',
-          'It requires no network access at all',
-        ],
-        correctIndex: 1,
-        explanation: 'Downgrade attacks manipulate protocol negotiation to force weaker, more exploitable encryption.',
-      ),
-  // From: Cryptography
-  QuizQuestion(
-        question: 'Why are organizations beginning to prepare for Post-Quantum Cryptography (PQC)?',
-        options: [
-          'Quantum computing already routinely breaks all encryption today',
-          'Quantum algorithms like Shor\'s Algorithm could theoretically weaken RSA, Diffie-Hellman, and ECC in the future, so agility now reduces future migration risk',
-          'PQC is required for all symmetric encryption immediately',
-          'Quantum computing has no relevance to cryptography',
-        ],
-        correctIndex: 1,
-        explanation: 'While large-scale practical quantum attacks aren\'t here yet, organizations build cryptographic agility now to migrate smoothly when needed.',
-      ),
+    question:
+        'A mid-sized retailer\'s security team has a limited budget and must decide where to focus first. Which approach BEST reflects a risk-based security strategy?',
+    options: [
+      'Purchase the newest security tools on the market regardless of what threats the organization actually faces',
+      'Prioritize controls that protect the most critical assets against the most likely threats',
+      'Apply identical security controls uniformly to every system, regardless of its sensitivity or exposure',
+      'Wait until a breach occurs, then allocate the entire security budget to whatever caused it',
+    ], correctIndex: 1,
+    explanation:
+        'Risk-based security prioritizes protecting the most critical assets against the most likely and impactful threats, rather than spreading resources evenly or reactively.',
+  ),
+  QuizQuestion(
+    question:
+        'During a tabletop exercise, a CISO asks the team to explain why the organization maintains offsite backups in addition to encryption and access controls. Which CIA Triad objective do the backups primarily support?',
+    options: [
+      'Availability, since backups restore access after a disruptive event',
+      'Confidentiality, by preventing unauthorized users from reading the data',
+      'Integrity, by ensuring the data cannot be altered without detection',
+      'Non-repudiation, by proving which user last modified the data',
+    ], correctIndex: 0,
+    explanation:
+        'Backups and disaster recovery capabilities primarily support Availability — ensuring the organization can restore access to data and systems after an outage or attack.',
+  ),
+  QuizQuestion(
+    question:
+        'An employee receives an email claiming to be from the CFO, urgently requesting a wire transfer before end of day, with unusual phrasing and no phone call to confirm. What should the employee do FIRST?',
+    options: [
+      'Forward the email to colleagues to see if anyone else received a similar request',
+      'Reply to the email asking the CFO to confirm the request in writing',
+      'Process the transfer immediately, since the CFO\'s name appears in the sender field',
+      'Verify the request through a separate, known-good channel like a phone call',
+    ], correctIndex: 3,
+    explanation:
+        'Out-of-band verification through a trusted, independently-confirmed channel is the standard defense against BEC and similar impersonation attempts, since the email itself cannot be trusted.',
+  ),
+  QuizQuestion(
+    question:
+        'A company\'s risk register lists a vulnerability with high likelihood and high potential impact, but the cost of the recommended control exceeds the asset\'s value. Which risk treatment is MOST appropriate?',
+    options: [
+      'Implement the expensive control anyway regardless of cost-benefit analysis',
+      'Accept the risk formally and document the decision',
+      'Ignore the risk entirely and remove it from the register without further review',
+      'Transfer the entire risk to a cyber insurance policy without evaluating coverage limits',
+    ], correctIndex: 1,
+    explanation:
+        'When treatment costs exceed the risk\'s potential impact, formal risk acceptance — documented and approved by someone with the authority to do so — is the appropriate response.',
+  ),
+  QuizQuestion(
+    question:
+        'A new employee is unsure whether a specific action is covered by company policy. They check the relevant document and find it explains step-by-step how to configure VPN access. What type of document are they most likely reading?',
+    options: [
+      'A standard, since it defines a mandatory technical requirement without steps',
+      'A procedure, since it gives step-by-step instructions',
+      'A guideline, since it offers non-mandatory recommendations',
+      'A policy, since it defines high-level management expectations',
+    ], correctIndex: 1,
+    explanation:
+        'Step-by-step instructions for performing a specific task are the defining characteristic of a procedure, distinct from the higher-level policy or standard that it supports.',
+  ),
+  QuizQuestion(
+    question:
+        'Security awareness metrics show phishing simulation click rates have dropped from 22% to 9% after a redesigned training program. How should this trend BEST be interpreted?',
+    options: [
+      'As irrelevant, since click rates have no connection to actual security outcomes',
+      'As proof that phishing is no longer a risk to the organization and training can be discontinued',
+      'A leading indicator that training is improving behavior',
+      'As evidence that the organization should immediately cancel its email security tools',
+    ], correctIndex: 2,
+    explanation:
+        'A declining phishing click rate is a leading indicator of improving security awareness — useful for justifying continued investment, not a signal to stop monitoring or training.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization discovers that a critical vulnerability affecting its Internet-facing servers is being actively exploited in the wild, and a vendor patch was just released. What is the MOST appropriate next step?',
+    options: [
+      'Apply the patch through an expedited emergency change process',
+      'Take no action, since the vulnerability has not yet affected this specific organization',
+      'Wait for the next scheduled monthly patch cycle to apply the fix along with everything else',
+      'Delay patching until a full regression test suite can be completed over several weeks',
+    ], correctIndex: 0,
+    explanation:
+        'Active exploitation of a critical vulnerability warrants emergency, expedited patching with only essential validation — waiting for a routine cycle leaves the organization exposed.',
+  ),
+
+  // From: Threats, Attacks & Vulnerabilities
+  QuizQuestion(
+    question:
+        'A security analyst notices that a former employee\'s account was used to log in three days after their termination date, using credentials that were never disabled. Which control failure MOST directly enabled this?',
+    options: [
+      'Insufficient antivirus signature updates on the employee\'s former workstation',
+      'A missing or delayed offboarding process',
+      'Weak password complexity requirements enforced during account creation',
+      'A lack of encryption on the organization\'s primary database',
+    ], correctIndex: 1,
+    explanation:
+        'Active credentials belonging to a terminated employee point directly to a gap in the offboarding process, which should disable access immediately upon termination.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization discovers that a widely used open-source library embedded in its product has a newly disclosed critical vulnerability. What is the MOST appropriate immediate action?',
+    options: [
+      'Immediately shut down all products using any open-source components as a precaution',
+      'Ignore the disclosure since the organization did not write the vulnerable code itself',
+      'Assess actual exposure, then prioritize patching by exploitability',
+      'Wait for a customer to report an incident before taking any investigative action',
+    ], correctIndex: 2,
+    explanation:
+        'Third-party and supply chain vulnerabilities still require the same risk-based assessment and prioritized remediation as internally discovered ones, starting with confirming actual exposure.',
+  ),
+  QuizQuestion(
+    question:
+        'During an audit, a reviewer finds that a legacy application still uses a hardcoded administrative password that has never been changed since deployment. Which type of vulnerability does this represent?',
+    options: [
+      'A physical security vulnerability related to the server\'s location',
+      'A misconfiguration rooted in poor credential management',
+      'A zero-day vulnerability, since it was only recently discovered by the auditor',
+      'A social engineering vulnerability targeting the end users of the application',
+    ], correctIndex: 1,
+    explanation:
+        'Hardcoded, unchanging credentials are a classic configuration and secure-design failure, not a zero-day (which refers to a newly discovered flaw with no patch yet available).',
+  ),
+  QuizQuestion(
+    question:
+        'A financial services firm learns that attackers are impersonating its brand in phishing emails sent to customers, using a domain that closely resembles the real one. What is the MOST direct defensive step the firm can take?',
+    options: [
+      'Publish a public statement blaming customers for falling for the scam',
+      'Disable the firm\'s own legitimate website until the campaign stops',
+      'Register similar domains and pursue takedowns of lookalikes',
+      'Change the firm\'s brand name entirely to avoid future impersonation',
+    ], correctIndex: 2,
+    explanation:
+        'Proactively registering similar domains and pursuing takedowns of malicious lookalikes directly reduces the attack surface available for brand impersonation and typosquatting.',
+  ),
+  QuizQuestion(
+    question:
+        'An incident responder finds that a compromised workstation has an unusually large number of outbound connections to a single external IP address, occurring at regular five-minute intervals. What does this pattern MOST likely indicate?',
+    options: [
+      'Routine software update checks performed by the operating system vendor',
+      'Normal business use of a cloud storage synchronization application',
+      'Beaconing behavior consistent with malware contacting a C2 server',
+      'A benign misconfiguration in the organization\'s DNS resolver settings',
+    ], correctIndex: 2,
+    explanation:
+        'Regular, periodic outbound connections to a single external address are a classic sign of malware beaconing to a C2 server for instructions.',
+  ),
+  QuizQuestion(
+    question:
+        'A penetration tester successfully exploits a web application by submitting a manipulated input field that causes the backend database to return records the tester was never authorized to see. Which vulnerability class does this MOST likely represent?',
+    options: [
+      'A Denial-of-Service condition caused by resource exhaustion',
+      'Cross-Site Scripting (XSS), which targets other users\' browsers rather than the database',
+      'A misconfigured DNS record pointing to the wrong server',
+      'SQL Injection, where unsanitized input alters the query logic',
+    ], correctIndex: 3,
+    explanation:
+        'Manipulated input that alters what data a backend query returns is the hallmark of SQL Injection, distinct from XSS (which targets browsers) or DoS (which targets availability).',
+  ),
+
   // From: Network Security
   QuizQuestion(
-        question: 'Which OSI layer is responsible for routing and logical addressing?',
-        options: ['Data Link (Layer 2)', 'Network (Layer 3)', 'Session (Layer 5)', 'Presentation (Layer 6)'],
-        correctIndex: 1,
-        explanation: 'The Network layer (Layer 3) handles routing and logical addressing using protocols like IP and ICMP.',
-      ),
+    question:
+        'A network engineer needs to allow specific return traffic for outbound connections initiated by internal users, while blocking unsolicited inbound traffic. Which firewall capability BEST accomplishes this?',
+    options: [
+      'A switch configured with VLANs to separate departments from one another',
+      'A simple packet filter that evaluates each packet independently with no memory of prior traffic',
+      'A proxy that requires every internal user to manually approve each connection',
+      'A stateful firewall that tracks connections and allows return traffic',
+    ], correctIndex: 3,
+    explanation:
+        'Stateful firewalls track the state of active connections, automatically allowing return traffic for sessions the internal network legitimately initiated — something basic packet filters cannot do.',
+  ),
+  QuizQuestion(
+    question:
+        'An administrator investigating a customer-reported outage confirms that all backend servers are healthy and reachable directly by IP address, but the public domain name fails to resolve to the correct server. What is the MOST likely root cause?',
+    options: [
+      'An incorrect or outdated DNS record',
+      'A firewall rule blocking all inbound traffic to the network',
+      'An expired TLS certificate on the load balancer',
+      'A hardware failure on the backend application servers themselves',
+    ], correctIndex: 0,
+    explanation:
+        'Servers being healthy when reached directly by IP, combined with failed domain resolution, points squarely at a DNS misconfiguration rather than a server, firewall, or certificate issue.',
+  ),
+  QuizQuestion(
+    question:
+        'A company wants remote employees to securely reach internal file shares without exposing those shares directly to the Internet. Which solution BEST satisfies this requirement?',
+    options: [
+      'Emailing files individually to remote employees upon request',
+      'Publishing the file share\'s IP address directly on the public Internet with a strong password',
+      'Disabling remote access entirely and requiring all employees to work on-site',
+      'Requiring a VPN connection before accessing internal resources',
+    ], correctIndex: 3,
+    explanation:
+        'A VPN creates an encrypted tunnel into the internal network, letting remote employees reach internal resources securely without ever exposing those resources directly to the Internet.',
+  ),
+  QuizQuestion(
+    question:
+        'Security monitoring detects an internal router suddenly announcing routes for a large block of public IP address space that belongs to another organization, causing traffic destined for that organization to arrive at the wrong network. What is this scenario describing?',
+    options: [
+      'BGP hijacking, redirecting traffic via unauthorized route announcements',
+      'A standard, expected behavior of Border Gateway Protocol (BGP) route advertisement',
+      'Normal load-balancing behavior between two data centers',
+      'A routine DNS cache refresh occurring across the Internet',
+    ], correctIndex: 0,
+    explanation:
+        'Announcing routes for IP space an organization does not own, redirecting traffic away from its rightful destination, is the definition of BGP hijacking.',
+  ),
+  QuizQuestion(
+    question:
+        'A security team wants to detect a compromised host attempting to exfiltrate data by hiding it inside seemingly normal DNS queries. Which control BEST addresses this specific technique?',
+    options: [
+      'A physical access control system restricting entry to the server room',
+      'DNS traffic monitoring tuned to flag unusual query patterns',
+      'A password complexity policy applied to all user accounts',
+      'Standard antivirus signature scanning on individual endpoint files',
+    ], correctIndex: 1,
+    explanation:
+        'DNS tunneling hides data inside DNS queries and responses, so detecting it requires monitoring DNS traffic patterns specifically, rather than file-based or physical controls.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization\'s wireless network still uses WEP encryption because it was configured over a decade ago and never revisited. What is the MOST appropriate next step?',
+    options: [
+      'Leave WEP in place, since it has worked without incident so far',
+      'Increase the WEP key length while keeping the same underlying protocol',
+      'Migrate to WPA2 or WPA3',
+      'Disable wireless networking entirely rather than address the encryption weakness',
+    ], correctIndex: 2,
+    explanation:
+        'WEP\'s encryption is cryptographically broken and easily cracked regardless of key length, so the only sound remediation is migrating to WPA2 or WPA3.',
+  ),
+
+  // From: Identity Access Management
+  QuizQuestion(
+    question:
+        'A help desk technician receives a call from someone claiming to be a traveling executive who has lost access to their account and urgently needs a password reset over the phone. What should the technician do FIRST?',
+    options: [
+      'Transfer the call to voicemail and take no further action',
+      'Verify the caller\'s identity through an established process first',
+      'Ask the caller to email their password so it can be confirmed against records',
+      'Reset the password immediately, since the caller sounds urgent and mentions the executive\'s name',
+    ], correctIndex: 1,
+    explanation:
+        'Help desk identity verification procedures exist specifically to prevent social engineering attacks like this one — urgency and a plausible story are not substitutes for verified identity.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization wants to reduce the risk of a compromised password leading to full account takeover, without significantly disrupting the daily login experience for most users. Which control BEST balances these goals?',
+    options: [
+      'Requiring users to change their password every seven days regardless of any indication of compromise',
+      'Sharing a single administrative account among all users to simplify management',
+      'Removing password requirements entirely and relying only on usernames',
+      'Enforcing MFA so a stolen password alone is not enough',
+    ], correctIndex: 3,
+    explanation:
+        'MFA directly addresses the risk of password compromise by requiring a second independent factor, without the disruption and diminishing security value of excessively frequent password changes.',
+  ),
+  QuizQuestion(
+    question:
+        'An employee moves from the Finance department to Human Resources. Their old Finance system access remains active for months afterward, alongside their new HR permissions. What process failure does this represent?',
+    options: [
+      'A failure in the organization\'s password complexity policy',
+      'A failure in the "Joiner" stage of the identity lifecycle, since the employee was never properly onboarded',
+      'A failure in the \'Mover\' stage — old access was never removed',
+      'A failure in Multi-Factor Authentication enrollment',
+    ], correctIndex: 2,
+    explanation:
+        'The Mover stage of the Joiner-Mover-Leaver lifecycle should both grant new role-based access AND remove access tied to the employee\'s previous role — this scenario shows that removal step failing.',
+  ),
+  QuizQuestion(
+    question:
+        'A security team notices that dozens of user accounts each received exactly one or two failed login attempts using the same common password, spread across a short time window from a single external IP address. What does this pattern MOST likely indicate?',
+    options: [
+      'A brute-force attack focused intensely on a single high-value account',
+      'A routine, automated password expiration reminder from the identity system',
+      'Normal user error from employees forgetting their own passwords',
+      'A password spray attack staying under lockout thresholds',
+    ], correctIndex: 3,
+    explanation:
+        'Spreading a small number of attempts across many accounts, rather than concentrating many attempts on one account, is the defining pattern of a password spray attack evading lockout policies.',
+  ),
+  QuizQuestion(
+    question:
+        'A company wants employees to authenticate once each morning and then move seamlessly between Microsoft 365, Salesforce, and an internal HR portal without logging in again. Which capability BEST satisfies this requirement?',
+    options: [
+      'Single Sign-On integrated with a centralized Identity Provider',
+      'Disabling authentication entirely for internal network users',
+      'Requiring a separate, unique password for each individual application',
+      'Emailing a shared password to all employees each Monday morning',
+    ], correctIndex: 0,
+    explanation:
+        'SSO backed by a centralized Identity Provider is precisely the capability that lets a user authenticate once and move between multiple trusted applications without repeated logins.',
+  ),
+  QuizQuestion(
+    question:
+        'An auditor reviewing access logs finds that a service account with database administrator privileges has not had its password rotated in over three years and is used interactively by several human employees. What is the GREATEST concern this raises?',
+    options: [
+      'Shared, long-lived privileged credentials with no individual attribution',
+      'The account uses a database engine that is no longer the organization\'s preferred vendor',
+      'The account naming convention does not follow the organization\'s style guide',
+      'The account\'s icon in the admin console has not been updated recently',
+    ], correctIndex: 0,
+    explanation:
+        'Shared privileged credentials that never rotate create serious accountability and compromise risks — no individual attribution is possible, and a single leak compromises access indefinitely.',
+  ),
+
+  // From: Cryptography
+  QuizQuestion(
+    question:
+        'A developer is choosing how to store user passwords in a new application\'s database. Which approach provides the STRONGEST protection if the database is later stolen?',
+    options: [
+      'Encrypt passwords using a symmetric key stored in the same database',
+      'Store only the first four characters of each password to save space',
+      'Store passwords in plaintext for simplicity, since the database itself is access-controlled',
+      'Store passwords with a salted, slow hash like bcrypt or Argon2',
+    ], correctIndex: 3,
+    explanation:
+        'Salted, deliberately slow hashing algorithms like bcrypt or Argon2 make offline cracking of stolen password data computationally expensive, unlike plaintext, reversible encryption, or truncation.',
+  ),
+  QuizQuestion(
+    question:
+        'A security architect is evaluating whether to keep using RSA-2048 for a new system expected to protect data for the next twenty years. What is the PRIMARY reason they should also plan for cryptographic agility?',
+    options: [
+      'Cryptographic agility is a concept that only applies to symmetric algorithms, never to asymmetric ones like RSA',
+      'RSA-2048 is considered a purely theoretical algorithm that cannot actually be implemented in practice',
+      'RSA-2048 already fails to meet every current industry security recommendation in active use today',
+      'Future quantum computing could weaken RSA, so agility reduces migration risk',
+    ], correctIndex: 3,
+    explanation:
+        'Cryptographic agility ensures systems can adopt stronger algorithms as needed — increasingly important given the theoretical future risk quantum computing poses to algorithms like RSA.',
+  ),
+  QuizQuestion(
+    question:
+        'A company\'s TLS configuration still allows very old, weak cipher suites for compatibility with a handful of legacy clients. A security assessment flags this as a downgrade attack risk. What is the MOST appropriate remediation?',
+    options: [
+      'Disable weak legacy ciphers and enforce a minimum modern TLS version',
+      'Increase the weak cipher\'s key length while keeping the same underlying broken algorithm',
+      'Leave the configuration unchanged, since removing old ciphers might inconvenience a small number of users',
+      'Disable TLS entirely and revert to unencrypted HTTP for all connections',
+    ], correctIndex: 0,
+    explanation:
+        'Removing weak, legacy cipher suites and enforcing modern TLS closes the downgrade-attack window; legacy client compatibility should be solved separately, not by weakening the whole system.',
+  ),
+  QuizQuestion(
+    question:
+        'A financial institution needs to protect stored credit card numbers while still allowing customer service representatives to see the last four digits for verification purposes. Which technique is BEST suited to this specific requirement?',
+    options: [
+      'Full-disk encryption of the database server\'s underlying storage volume',
+      'Tokenization, replacing the number with a non-reversible masked token',
+      'Deleting the credit card numbers entirely after each transaction',
+      'Storing the numbers in plaintext but restricting network access to the database server',
+    ], correctIndex: 1,
+    explanation:
+        'Tokenization is specifically designed for this use case — protecting the sensitive value while preserving a masked or partial representation usable for routine verification.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization discovers that its internal Certificate Authority\'s private key may have been exposed during a server compromise. What is the SEVERITY and MOST appropriate response?',
+    options: [
+      'Severe — the CA is the trust foundation for every certificate beneath it',
+      'Low severity — this only requires rebuilding the single compromised server and rotating its local credentials',
+      'No action needed, since Certificate Authorities are inherently immune to any form of meaningful compromise',
+      'Moderate severity — only certificates issued within the most recent 24-hour window require review',
+    ], correctIndex: 0,
+    explanation:
+        'Because a CA is the root of trust for everything it has signed, a compromised CA private key potentially invalidates every certificate in that hierarchy, requiring organization-wide revocation and reissuance.',
+  ),
+  QuizQuestion(
+    question:
+        'A web application team wants to ensure that even if a server\'s long-term private key is compromised in the future, previously captured encrypted sessions cannot be retroactively decrypted. Which property should their TLS configuration provide?',
+    options: [
+      'A longer-lived, static session key reused across all connections for efficiency',
+      'Perfect Forward Secrecy, using unique session keys per connection',
+      'Storing session keys in a shared file accessible to all application servers',
+      'Disabling encryption for static content to improve page load speed',
+    ], correctIndex: 1,
+    explanation:
+        'Perfect Forward Secrecy specifically protects past sessions from future key compromise by using unique, discarded session keys rather than a long-term key for every connection.',
+  ),
+
+  // From: Secure Protocols
+  QuizQuestion(
+    question:
+        'A systems administrator is deciding between password-based and public-key SSH authentication for a fleet of production Linux servers. Which factor makes public-key authentication the stronger choice?',
+    options: [
+      'Public keys are easier for administrators to memorize than passwords',
+      'Public-key authentication removes the need for any access logging',
+      'Public-key authentication is faster to configure than setting a password',
+      'The private key never leaves the client and resists brute-force',
+    ], correctIndex: 3,
+    explanation:
+        'Because the private key never traverses the network and resists brute-force in a way passwords do not, public-key SSH authentication provides materially stronger security.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization\'s SIEM is producing inconsistent timelines when correlating events from multiple servers during an incident investigation. Investigators later discover the servers\' clocks were never synchronized. What should have prevented this?',
+    options: [
+      'Disabling logging on lower-priority systems to reduce data volume',
+      'Increasing the storage capacity allocated to the SIEM platform',
+      'Enforcing consistent time synchronization across systems using NTP',
+      'Requiring stronger password policies on the affected servers',
+    ], correctIndex: 2,
+    explanation:
+        'Without synchronized clocks via NTP, timestamps across systems cannot be reliably correlated, making incident timelines difficult or impossible to reconstruct accurately.',
+  ),
+  QuizQuestion(
+    question:
+        'Two internal microservices need to mutually verify each other\'s identity before exchanging sensitive data, since either service could potentially be spoofed on the internal network. Which configuration BEST addresses this requirement?',
+    options: [
+      'Relying solely on network segmentation with no certificate-based authentication at all',
+      'Disabling encryption between the two services since they are both internal',
+      'Mutual TLS, requiring both services to authenticate each other',
+      'Standard one-way TLS, where only one service presents a certificate to the other',
+    ], correctIndex: 2,
+    explanation:
+        'Mutual TLS specifically requires both parties to present and validate certificates, addressing the risk that either service — not just an external client — could be spoofed.',
+  ),
+  QuizQuestion(
+    question:
+        'A security engineer is designing email authentication for a company domain and wants to specifically detect if a message\'s content was altered in transit, not just confirm the sending server was authorized. Which mechanism addresses THIS specific requirement?',
+    options: [
+      'A firewall rule blocking inbound SMTP traffic from unknown sources',
+      'SPF, which authorizes which mail servers may send on behalf of the domain',
+      'DKIM, verifying the message content has not been altered',
+      'A VPN tunnel between the sending and receiving mail servers',
+    ], correctIndex: 2,
+    explanation:
+        'DKIM specifically adds a digital signature to detect message tampering, distinct from SPF, which only verifies the sending server\'s authorization, not content integrity.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization needs to transfer sensitive files to a partner over an encrypted channel, and wants the solution to build directly on their existing SSH infrastructure rather than requiring a separate TLS certificate deployment. Which protocol BEST fits this requirement?',
+    options: [
+      'Plain FTP, since encryption can be added at a later stage if needed',
+      'FTPS, which layers TLS encryption on top of the traditional FTP protocol',
+      'SFTP, using existing SSH infrastructure for encrypted transfer',
+      'HTTP, relying on the receiving server to encrypt the file after upload',
+    ], correctIndex: 2,
+    explanation:
+        'SFTP builds on SSH, so an organization already using SSH infrastructure can adopt it without deploying separate TLS certificates the way FTPS would require.',
+  ),
+  QuizQuestion(
+    question:
+        'A network team is upgrading their monitoring infrastructure and discovers that several devices still use SNMPv1 with community strings transmitted across the network. What is the PRIMARY security concern this raises?',
+    options: [
+      'Community strings act as passwords but travel in plaintext',
+      'SNMPv1 cannot technically communicate with routers or switches',
+      'SNMPv1 is too slow to support modern network monitoring requirements',
+      'SNMPv1 requires specialized hardware unavailable to most organizations',
+    ], correctIndex: 0,
+    explanation:
+        'SNMPv1\'s community strings act as passwords but travel in plaintext, meaning anyone able to observe network traffic can capture and reuse them — the core reason to migrate to SNMPv3.',
+  ),
+
+  // From: Endpoint Security
+  QuizQuestion(
+    question:
+        'A user reports their laptop is running slowly, but antivirus scans return no detections. Deeper analysis reveals PowerShell repeatedly executing encoded commands directly in memory, with nothing written to disk. Why did traditional antivirus MISS this activity?',
+    options: [
+      'The malware is fileless, running in memory using OS tools',
+      'The laptop\'s hardware is too old and underpowered to run modern antivirus software correctly',
+      'Fileless malware is a category of threat that only ever affects mobile operating systems, not laptops',
+      'Antivirus software was outdated and simply required a routine signature database update to catch it',
+    ], correctIndex: 0,
+    explanation:
+        'Fileless malware evades traditional signature-based detection precisely because it runs in memory using legitimate tools, never dropping a file for antivirus to scan.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization wants to reduce its endpoint attack surface before deploying new laptops to employees. Which action BEST supports this goal?',
+    options: [
+      'Remove unnecessary software and apply secure baseline configurations',
+      'Install as many additional third-party security tools as possible on every device',
+      'Grant every user local administrator rights so they can self-manage their own security',
+      'Leave default vendor configurations unchanged to avoid compatibility issues',
+    ], correctIndex: 0,
+    explanation:
+        'Endpoint hardening is about removing what is unnecessary and applying secure baselines — not stacking on more tools or leaving risky defaults and broad privileges in place.',
+  ),
+  QuizQuestion(
+    question:
+        'A mobile device management (MDM) policy blocks enrollment for any device found to be rooted or jailbroken. An employee argues their rooted phone is actually MORE secure since they customized its security settings themselves. Why does the organization\'s policy remain justified?',
+    options: [
+      'MDM software is only compatible with devices running factory default settings',
+      'Rooting or jailbreaking a personal device is universally illegal',
+      'Rooted and jailbroken devices are always physically incapable of connecting to corporate Wi-Fi',
+      'These bypass manufacturer security controls and allow unverified software',
+    ], correctIndex: 3,
+    explanation:
+        'Rooting or jailbreaking removes manufacturer security protections and can allow unverified software, regardless of how the user has otherwise configured the device — the underlying control layer is compromised.',
+  ),
+  QuizQuestion(
+    question:
+        'A company\'s vulnerability management team is deciding between patching every identified vulnerability on a fixed monthly schedule versus prioritizing remediation based on exploitability and business impact. Which approach BEST reflects mature vulnerability management?',
+    options: [
+      'Apply patches in a random order to spread testing effort evenly across the entire environment',
+      'Patch strictly in order of discovery date, addressing the oldest vulnerabilities first regardless of severity',
+      'Prioritize by actual business risk, not a fixed schedule',
+      'Only patch vulnerabilities that have already resulted in a confirmed, documented breach at the organization',
+    ], correctIndex: 2,
+    explanation:
+        'Risk-based, Just-in-Time patch and vulnerability management focuses remediation on what actually matters most to the business, rather than a rigid, severity-blind schedule.',
+  ),
+  QuizQuestion(
+    question:
+        'A remote employee\'s laptop begins accepting network connections from an unfamiliar internal IP address while they are working from a coffee shop, despite the organization enforcing Zero Trust principles. What should happen NEXT under a properly implemented Zero Trust model?',
+    options: [
+      'The laptop is granted full internal network trust once, and never re-evaluated for the remainder of the session',
+      'The connection is automatically trusted since the laptop is a corporate-managed device',
+      'Zero Trust does not apply to remote or off-network devices',
+      'The request is evaluated on real-time signals, regardless of network origin',
+    ], correctIndex: 3,
+    explanation:
+        'Zero Trust continuously evaluates every access request using multiple signals rather than assuming trust based on prior verification or the device\'s ownership status alone.',
+  ),
+
+  // From: Identity Federation & SSO
+  QuizQuestion(
+    question:
+        'A company integrates Salesforce with its internal Identity Provider so employees no longer need separate Salesforce credentials. During login, Salesforce redirects the user to the IdP, then receives a signed response confirming their identity. What must Salesforce verify before granting access?',
+    options: [
+      'Nothing further — the fact that a redirect occurred is treated as sufficient proof of authentication',
+      'Only the requesting user\'s IP address, checked once at the moment the request is made',
+      'Only the physical geographic location where the Identity Provider\'s servers happen to be hosted',
+      'The digital signature, certificate validity, expiration, and trusted IdP',
+    ], correctIndex: 3,
+    explanation:
+        'Before trusting a SAML assertion, the Service Provider must validate its signature, certificate, expiration, and issuing IdP — skipping this would let a forged assertion grant unauthorized access.',
+  ),
+  QuizQuestion(
+    question:
+        'A mobile app needs to access a user\'s cloud photo storage to enable a printing feature, without ever seeing or storing the user\'s actual cloud account password. Which approach BEST satisfies this requirement?',
+    options: [
+      'Store the user\'s password in the app\'s local database for convenience',
+      'Use OAuth 2.0 for a scoped token, without exposing the password',
+      'Require the user to manually download and re-upload each photo instead of connecting the accounts',
+      'Ask the user to type their cloud storage password directly into the printing app',
+    ], correctIndex: 1,
+    explanation:
+        'OAuth 2.0 exists exactly for this scenario — granting a third-party app limited, revocable access without ever exposing the user\'s actual credentials to that app.',
+  ),
+  QuizQuestion(
+    question:
+        'A security team notices a user account authenticate successfully from Bengaluru at 9:00 AM, then authenticate again from a different country just 35 minutes later. What should this trigger under a properly configured identity protection system?',
+    options: [
+      'A high-risk \'impossible travel\' flag, prompting extra verification',
+      'A permanent block on all future logins from any location',
+      'Automatic account deletion without any further investigation',
+      'No action, since successful authentication always indicates legitimate access',
+    ], correctIndex: 0,
+    explanation:
+        'Two geographically distant successful logins within a timeframe that rules out legitimate travel is a textbook impossible-travel signal, warranting risk-based additional verification.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization is migrating from an on-premises Active Directory environment to a hybrid model that also supports modern cloud applications using OAuth 2.0 and SAML. Which component is BEST suited to handle the new cloud-facing authentication requirements?',
+    options: [
+      'Disabling cloud application access entirely until a future, unscheduled major infrastructure overhaul occurs',
+      'Active Directory Domain Services alone, since it already fully handles every modern authentication requirement',
+      'A cloud identity platform like Microsoft Entra ID, supporting modern protocols',
+      'A shared spreadsheet listing every employee\'s current password for quick reference during migration',
+    ], correctIndex: 2,
+    explanation:
+        'Cloud identity platforms like Microsoft Entra ID are purpose-built to support modern protocols such as OAuth 2.0 and SAML, complementing on-premises AD DS in a hybrid identity model.',
+  ),
+  QuizQuestion(
+    question:
+        'After a security review, an organization decides to invest significant additional protection specifically around its Identity Provider infrastructure, even though it already has strong protections on individual applications. What justifies this extra investment?',
+    options: [
+      'Extra protection on the IdP is purely a cosmetic, low-priority improvement',
+      'The IdP is the central trust authority for every connected app',
+      'The Identity Provider has no more significance than any single connected application',
+      'Identity Providers are inherently immune to compromise and require no special protection',
+    ], correctIndex: 1,
+    explanation:
+        'Because every Service Provider trusts the IdP\'s authentication decisions, a compromised IdP could grant an attacker access to every connected application — justifying its outsized protection priority.',
+  ),
+
+  // From: Application Security
+  QuizQuestion(
+    question:
+        'A developer is reviewing code that builds SQL queries by directly concatenating user-submitted form input into the query string. A security reviewer flags this immediately. What is the BEST remediation?',
+    options: [
+      'Rename the input field to make its purpose less obvious to potential attackers',
+      'Use parameterized queries so input is always treated as data',
+      'Add a client-side JavaScript validation check and consider the issue resolved',
+      'Increase the database server\'s memory allocation to handle malformed queries more gracefully',
+    ], correctIndex: 1,
+    explanation:
+        'Parameterized queries fundamentally separate user input from query logic, closing off SQL Injection at the root — client-side validation alone can always be bypassed.',
+  ),
+  QuizQuestion(
+    question:
+        'A web application displays user-submitted comments on a public page without any output encoding. A tester submits a comment containing a script tag, and it executes in other visitors\' browsers when the page loads. Which vulnerability does this demonstrate, and what is the core fix?',
+    options: [
+      'A misconfigured firewall rule; the fix is to update network access control lists',
+      'SQL Injection; the fix is to use parameterized database queries',
+      'Stored XSS; fix with proper output encoding before rendering',
+      'A Denial-of-Service vulnerability; the fix is to add rate limiting',
+    ], correctIndex: 2,
+    explanation:
+        'Untrusted content that executes as script in other users\' browsers when rendered is stored XSS, and the correct fix is context-appropriate output encoding, not a firewall or SQL-layer change.',
+  ),
+  QuizQuestion(
+    question:
+        'A financial application currently authenticates users only when they first log in, keeping the session valid for eight hours regardless of what happens afterward. A security assessment recommends re-evaluating sessions if the user\'s device becomes non-compliant partway through the day. Which capability addresses this recommendation?',
+    options: [
+      'Continuous Access Evaluation, reassessing sessions in near real time',
+      'Requiring the same password to be re-entered every ten minutes with no other changes',
+      'Removing session expiration entirely so users never need to re-authenticate',
+      'Increasing the session timeout to twelve hours for user convenience',
+    ], correctIndex: 0,
+    explanation:
+        'Continuous Access Evaluation is designed exactly for this scenario — reassessing an active session in near real time when device compliance or risk changes, rather than trusting a session blindly until it naturally expires.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization\'s public API currently has no limit on how many requests a single client can make per minute. During a security review, this is flagged as a risk. Which control BEST addresses the concern?',
+    options: [
+      'Removing authentication requirements to simplify the API for legitimate users',
+      'Publishing the API\'s internal source code publicly for transparency',
+      'Implementing rate limiting on requests per client',
+      'Disabling the API entirely rather than adding any additional controls',
+    ], correctIndex: 2,
+    explanation:
+        'Rate limiting directly addresses the risk of abuse, automated attacks, and resource exhaustion by capping how many requests a single client can make in a given window.',
+  ),
+  QuizQuestion(
+    question:
+        'A code review finds that an application logs the exact database error message, including table names and a partial SQL query, directly back to the end user whenever a request fails. What is the PRIMARY security concern, and what should replace this behavior?',
+    options: [
+      'The underlying database engine itself should simply be replaced with a different vendor to resolve this problem',
+      'The application should stop logging errors altogether, removing all logging to sidestep the issue completely',
+      'No real concern exists here; detailed error messages simply help end users troubleshoot their own failed requests independently',
+      'Errors leak internal detail; show generic messages, log full detail server-side',
+    ], correctIndex: 3,
+    explanation:
+        'Detailed error messages exposed to end users hand attackers a roadmap of internal structure; the fix is generic user-facing messages paired with full detail captured only in secure server-side logs.',
+  ),
+
+  // From: Cloud Security
+  QuizQuestion(
+    question:
+        'A company migrates its database to a major cloud provider\'s Infrastructure-as-a-Service (IaaS) offering. A month later, a misconfigured storage bucket exposes customer data publicly. The provider states the underlying infrastructure was never breached. Under the Shared Responsibility Model, who is MOST accountable for this specific incident?',
+    options: [
+      'Neither party bears responsibility, since configuration mistakes are considered an unavoidable cost of cloud adoption',
+      'The cloud provider, since responsibility for all cloud security rests entirely with them regardless of service model',
+      'The customer, since securing their own deployed configuration is their responsibility',
+      'A third-party auditor, even though none was ever formally engaged to review this specific deployment',
+    ], correctIndex: 2,
+    explanation:
+        'Under IaaS, the provider secures the underlying infrastructure, but the customer remains responsible for securely configuring what they deploy — including storage bucket permissions.',
+  ),
+  QuizQuestion(
+    question:
+        'A DevOps team uses Infrastructure as Code (IaC) templates to provision hundreds of virtual machines automatically. One template contains a hardcoded default password. What is the MOST significant risk this specific practice introduces?',
+    options: [
+      'Reduced compatibility between the template and the cloud provider\'s billing dashboard interface',
+      'The flawed template replicates the same vulnerability at scale',
+      'Modestly increased cloud storage costs attributable to the larger size of the IaC template file itself',
+      'Slightly slower deployment times compared to provisioning each virtual machine manually one at a time',
+    ], correctIndex: 1,
+    explanation:
+        'Because IaC templates are reused repeatedly, a single flawed template — like one containing hardcoded credentials — replicates that same security weakness across every deployment made from it.',
+  ),
+  QuizQuestion(
+    question:
+        'A security team wants centralized visibility and consistent policy enforcement across dozens of unsanctioned SaaS applications employees have started using without formal approval. Which tool category is BEST suited to this specific need?',
+    options: [
+      'A traditional network firewall focused on perimeter traffic filtering',
+      'An antivirus solution installed on individual endpoint devices',
+      'A CASB, providing visibility and access control across SaaS apps',
+      'A physical access control system for the corporate office building',
+    ], correctIndex: 2,
+    explanation:
+        'A CASB is specifically designed to give organizations visibility and consistent policy enforcement across the many SaaS applications employees use, including unsanctioned "Shadow IT" tools.',
+  ),
+  QuizQuestion(
+    question:
+        'A company needs to migrate a legacy application to the cloud quickly, with minimal code changes, accepting that some existing technical debt will carry over for now. Which cloud migration strategy BEST matches this priority?',
+    options: [
+      'Rehosting (\'Lift and Shift\'), moving the app with minimal changes',
+      'Retiring the application entirely rather than migrating it',
+      'Rebuilding the application from scratch using an entirely new technology stack',
+      'Refactoring, which redesigns the application to use cloud-native services from the start',
+    ], correctIndex: 0,
+    explanation:
+        'Rehosting prioritizes migration speed by moving an application largely as-is, which matches this scenario\'s priorities better than Refactoring\'s slower, more thorough redesign approach.',
+  ),
+  QuizQuestion(
+    question:
+        'A security architect wants to distinguish between checking whether a cloud environment\'s configuration follows best practices versus actively protecting the workloads running within it from runtime threats. Which two tool categories map to these respective goals?',
+    options: [
+      'IAM for configuration security; DLP for protecting workloads during runtime',
+      'CASB for configuration security; SIEM for protecting workloads during runtime',
+      'WAF for configuration security; VPN for protecting workloads during runtime',
+      'CSPM for configuration; CWPP for runtime workload protection',
+    ], correctIndex: 3,
+    explanation:
+        'CSPM (Cloud Security Posture Management) focuses on configuration correctness, while CWPP (Cloud Workload Protection Platform) focuses on protecting the running workload itself — complementary, distinct functions.',
+  ),
+
+  // From: Security Operations
+  QuizQuestion(
+    question:
+        'A SOC analyst is reviewing a high volume of low-severity alerts and begins routinely dismissing them without careful review, given the sheer daily volume. One dismissed alert later turns out to have been an early indicator of a real breach. What underlying problem does this scenario illustrate?',
+    options: [
+      'Alert fatigue, where high alert volume causes analysts to miss real threats',
+      'The SIEM platform experienced a hardware failure that day',
+      'An intentional decision by leadership to ignore all low-severity alerts',
+      'A firewall misconfiguration unrelated to alert handling',
+    ], correctIndex: 0,
+    explanation:
+        'This is a textbook case of alert fatigue — excessive low-quality alerts desensitize analysts over time, increasing the risk that a genuine early warning gets missed.',
+  ),
+  QuizQuestion(
+    question:
+        'A SOC is evaluating tools to reduce the average time it takes to respond to common, repetitive alert types, such as disabling a compromised account or blocking a known-malicious IP. Which capability is BEST suited to this goal?',
+    options: [
+      'Replacing the SIEM platform entirely with a different vendor',
+      'Disabling alerting for the affected alert categories to reduce analyst workload',
+      'Hiring additional analysts without changing any existing tooling or process',
+      'A SOAR platform automating repetitive response steps',
+    ], correctIndex: 3,
+    explanation:
+        'SOAR platforms specifically reduce Mean Time to Respond by automating well-understood, repetitive response actions — exactly the kind of task described here.',
+  ),
+  QuizQuestion(
+    question:
+        'During threat hunting, an analyst notices Microsoft Word spawning PowerShell, which then makes an outbound network connection to an unfamiliar IP address. Individually, each event might be explainable, but together they form a concerning pattern. What SOC capability makes this kind of pattern visible?',
+    options: [
+      'Manually reviewing each individual log source in isolation, without correlating it against any other source',
+      'Disabling logging on lower-priority systems to reduce the overall volume of data analysts must review',
+      'Relying solely on traditional antivirus signature matches, with no behavioral analysis applied at all',
+      'Alert correlation, linking events across sources into a pattern',
+    ], correctIndex: 3,
+    explanation:
+        'Correlating events across sources — a suspicious process spawning another, followed by an unusual network connection — is what reveals a coherent attack chain that no single event would show alone.',
+  ),
+  QuizQuestion(
+    question:
+        'A newly hired SOC analyst asks why the team proactively searches for indicators of compromise instead of waiting for the SIEM to generate alerts. What is the BEST explanation?',
+    options: [
+      'It proactively searches for techniques an automated alert hasn\'t caught yet',
+      'Threat hunting is performed exclusively by external auditors, never internal staff',
+      'Threat hunting exists only to satisfy a compliance checkbox with no genuine security value',
+      'Proactive searching is unnecessary since automated detection catches every possible threat',
+    ], correctIndex: 0,
+    explanation:
+        'Threat hunting exists precisely because automated detection has gaps — proactively searching can surface sophisticated techniques that haven\'t yet generated a signature-based or rule-based alert.',
+  ),
+  QuizQuestion(
+    question:
+        'A SOC manager notices detection rules have not been updated in over a year, despite the threat landscape evolving significantly during that time. What discipline is MOST directly responsible for keeping detection logic current?',
+    options: [
+      'Detection engineering, which maintains rules against current threats',
+      'Facilities management, which is responsible for maintaining the office\'s climate control systems',
+      'Payroll administration, which is responsible for processing the SOC analysts\' regular compensation',
+      'Physical security, which is responsible for managing employee badge access to the building',
+    ], correctIndex: 0,
+    explanation:
+        'Detection engineering is specifically responsible for building and continuously updating detection rules to reflect current attack techniques, threat intelligence, and organizational risk.',
+  ),
+
+  // From: Incident Response
+  QuizQuestion(
+    question:
+        'During a ransomware incident, the response team isolates the affected network segment before fully understanding how the attacker initially gained access. A junior analyst questions why they didn\'t wait for complete understanding first. What is the BEST justification for isolating early?',
+    options: [
+      'Isolation is never appropriate until the investigation is fully complete',
+      'The team had already finished eradicating the threat by that point',
+      'Containment can happen before eradication finishes, to stop the spread',
+      'Isolating a network segment always destroys any forensic evidence that could otherwise be recovered',
+    ], correctIndex: 2,
+    explanation:
+        'Containment is designed to limit damage while investigation continues — waiting for full understanding before containing an active incident would allow unnecessary additional spread.',
+  ),
+  QuizQuestion(
+    question:
+        'After containing a security incident, the response team wants to reimage the affected server immediately to restore service. The lead investigator objects and insists on capturing a memory and disk image first. Why is this objection justified?',
+    options: [
+      'Reimaging requires vendor approval that has not yet been obtained',
+      'Reimaging always takes significantly longer than capturing forensic evidence first',
+      'Forensic evidence must be preserved before reimaging destroys it',
+      'Containment and Eradication are actually considered the same phase, so no order matters',
+    ], correctIndex: 2,
+    explanation:
+        'Reimaging a system destroys the very evidence — memory contents, disk state — needed to fully understand the incident, which is why forensic preservation must happen before cleanup.',
+  ),
+  QuizQuestion(
+    question:
+        'After resolving a significant incident, leadership asks why the team is spending time on a formal "Lessons Learned" review instead of moving directly to the next priority. What is the BEST justification for this step?',
+    options: [
+      'The step is treated as a purely ceremonial, box-checking requirement with no genuine practical value',
+      'Lessons Learned exists primarily as a formal mechanism to assign blame to specific responsible individuals',
+      'It feeds improvements back into detection, policy, and training',
+      'Lessons Learned is only considered relevant for incidents that resulted in measurable financial loss',
+    ], correctIndex: 2,
+    explanation:
+        'Lessons Learned exists to translate what was discovered during response into concrete improvements — closing gaps in detection, policy, and training that contributed to the incident in the first place.',
+  ),
+  QuizQuestion(
+    question:
+        'A CISO is designing tabletop exercise scenarios for the upcoming year and must choose between generic industry templates versus scenarios built around the organization\'s specific threat landscape. Which choice BEST prepares the response team?',
+    options: [
+      'Scenarios focused exclusively on natural disasters regardless of the organization\'s actual threat landscape',
+      'No scenario planning at all, relying entirely on improvisation during a real incident',
+      'Generic, off-the-shelf templates, since all organizations face identical realistic threats',
+      'Scenarios tailored to the organization\'s own specific threat profile',
+    ], correctIndex: 3,
+    explanation:
+        'Testing scenarios should reflect the threat actors and motivations most realistic for that specific organization — a generic template may prepare the team for the wrong kind of incident entirely.',
+  ),
+  QuizQuestion(
+    question:
+        'A root cause analysis following an incident deliberately avoids singling out any one employee for blame, even though a specific misconfiguration by one team member contributed to the breach. Why does this approach typically produce a MORE useful investigation?',
+    options: [
+      'Skipping the search for fault simply allows the investigation to finish faster with no other benefit',
+      'Blame makes people defensive and less forthcoming with honest detail',
+      'Every incident, without exception, lacks any single identifiable contributing cause',
+      'Avoiding blame is a strict legal requirement in every jurisdiction without exception',
+    ], correctIndex: 1,
+    explanation:
+        'A blame-focused process discourages honesty, since people become defensive and withhold details — a blameless approach surfaces the full, accurate picture needed to prevent recurrence.',
+  ),
+
+  // From: Governance, Risk & Compliance
+  QuizQuestion(
+    question:
+        'A risk committee identifies a vulnerability with high likelihood and high potential impact, but the cost of the recommended control significantly exceeds the value of the asset it protects. What is the MOST appropriate, defensible course of action?',
+    options: [
+      'Transfer the entire risk to an insurance policy without first reviewing its actual coverage terms',
+      'Formally accept the risk, with documented, authorized approval',
+      'Silently ignore the risk and remove it from the register without any formal decision',
+      'Implement the expensive control regardless of cost, since any risk reduction is automatically worthwhile',
+    ], correctIndex: 1,
+    explanation:
+        'When mitigation costs exceed the risk\'s value, formal risk acceptance — documented and properly authorized — is the defensible response, unlike silently ignoring it or spending disproportionately.',
+  ),
+  QuizQuestion(
+    question:
+        'An auditor reviewing a security control that "works well in practice" cannot find any supporting documentation showing it was ever formally tested or reviewed. How will this likely be treated in a formal audit?',
+    options: [
+      'A finding, since auditors can only certify verifiable evidence',
+      'As a passing control, since real-world effectiveness is all that matters',
+      'As irrelevant, since documentation has no bearing on audit outcomes',
+      'As an automatic pass, since undocumented controls are assumed to be effective by default',
+    ], correctIndex: 0,
+    explanation:
+        'Auditors certify based on verifiable evidence — a control that genuinely works but lacks supporting documentation is typically treated the same as one that cannot be confirmed at all.',
+  ),
+  QuizQuestion(
+    question:
+        'A company\'s compliance team wants to reduce the burden of preparing separate audit evidence for ISO/IEC 27001, SOC 2, and an internal security framework each year. Which approach BEST addresses this efficiently?',
+    options: [
+      'Ignore two of the three frameworks and focus exclusively on the one leadership considers most important',
+      'Map overlapping controls so one piece of evidence satisfies all three',
+      'Postpone all audits indefinitely until a simpler regulatory environment emerges',
+      'Hire three completely separate compliance teams, one dedicated to each individual framework',
+    ], correctIndex: 1,
+    explanation:
+        'Controls mapping (harmonization) lets a single piece of evidence satisfy multiple overlapping framework requirements at once, significantly reducing duplicated audit preparation effort.',
+  ),
+  QuizQuestion(
+    question:
+        'A vendor was thoroughly vetted and approved two years ago, but has not been reassessed since. A new security incident at that vendor raises concerns. What does this scenario BEST illustrate about Third-Party Risk Management?',
+    options: [
+      'Vendor reassessment is purely optional busywork with no real security value',
+      'Vendor risk is static once the initial contract is signed and never needs revisiting',
+      'Third-party risk only matters during the initial procurement decision, not afterward',
+      'A vendor\'s posture can change, so periodic reassessment is essential',
+    ], correctIndex: 3,
+    explanation:
+        'This scenario illustrates exactly why ongoing reassessment matters — a vendor\'s security posture is not fixed at onboarding, and can meaningfully change over the life of the relationship.',
+  ),
+  QuizQuestion(
+    question:
+        'A CISO must present quarterly cybersecurity metrics to the board, most of whom have limited technical background. Which approach to reporting will be MOST effective?',
+    options: [
+      'Presenting raw technical statistics, such as firewall log counts, without translating them into business context',
+      'Skipping formal board reporting entirely, treating cybersecurity as a purely operational, non-strategic matter',
+      'Translating technical risk into business terms and needed decisions',
+      'Presenting the identical, unmodified technical report originally prepared for the engineering team',
+    ], correctIndex: 2,
+    explanation:
+        'Effective board reporting translates technical risk into business language and clear decisions needed, since board members are typically not equipped to act on raw technical statistics alone.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization is deciding how to classify a newly created spreadsheet containing unreleased financial projections and executive compensation details. Which classification level is MOST appropriate, and why?',
+    options: [
+      'No classification is needed, since the document is only a spreadsheet rather than a formal report',
+      'Internal, treating it the same as routine meeting notes with no special handling',
+      'Confidential or Restricted, given the harm from unauthorized disclosure',
+      'Public, since financial information is generally not considered sensitive',
+    ], correctIndex: 2,
+    explanation:
+        'Unreleased financial and compensation data represents exactly the kind of sensitive information that warrants Confidential or Restricted classification, given the potential harm from unauthorized disclosure.',
+  ),
+
+  // From: Social Engineering
+  QuizQuestion(
+    question:
+        'An employee receives a call from someone claiming to be from IT support, stating that "the rest of the department has already completed" a supposed security update and pressuring the employee to do the same immediately. Which social engineering trigger is being used?',
+    options: [
+      'Social Proof, implying others have already complied',
+      'Fear, threatening a negative consequence for non-compliance',
+      'Scarcity, implying the offer is limited or about to run out',
+      'Authority, invoking a position of power or expertise',
+    ], correctIndex: 0,
+    explanation:
+        'Claiming "everyone else has already done this" leverages Social Proof — the tendency to comply because others reportedly already have, rather than authority, scarcity, or fear specifically.',
+  ),
+  QuizQuestion(
+    question:
+        'A receptionist allows an unfamiliar person carrying a large box labeled "IT Equipment Delivery" to walk directly into a secured server room without checking credentials, assuming the person is a legitimate vendor. What social engineering technique does this MOST likely represent?',
+    options: [
+      'Vishing, which specifically relies on a phone call',
+      'Phishing, which specifically relies on deceptive electronic messages',
+      'DNS spoofing, which specifically manipulates domain name resolution',
+      'Pretexting combined with tailgating to bypass access controls',
+    ], correctIndex: 3,
+    explanation:
+        'A fabricated, plausible scenario ("I\'m delivering IT equipment") combined with physically following someone into a secured area describes pretexting and tailgating working together.',
+  ),
+
+  // From: Malware
+  QuizQuestion(
+    question:
+        'An investigator discovers that a compromised server\'s security logs from the past week are completely missing, despite logging having been enabled and functioning normally before that. What does this MOST strongly suggest?',
+    options: [
+      'Clear evidence that the server has never actually been used by anyone',
+      'A hardware failure entirely unrelated to any security concern',
+      'An attacker may have deliberately cleared logs to cover their tracks',
+      'A normal, routine, scheduled log rotation that happened to occur during this exact window',
+    ], correctIndex: 2,
+    explanation:
+        'Logs that were functioning normally and then suddenly vanish, especially during a period under investigation, strongly suggest deliberate tampering to cover an attacker\'s tracks.',
+  ),
+  QuizQuestion(
+    question:
+        'A DDoS attack against a company\'s website generates traffic from what appears to be hundreds of thousands of distinct, legitimate-looking residential IP addresses simultaneously. Why does this make the attack especially difficult to block using simple IP-based filtering?',
+    options: [
+      'Because the traffic generated in this specific type of attack is always fully encrypted end-to-end, rendering its volume irrelevant',
+      'Because all of the attack traffic in this scenario actually originates from one single, easily identifiable source IP address',
+      'The huge number of legitimate-looking source IPs defeats simple filtering',
+      'Because botnet-driven attacks of this particular type never generate sufficient traffic volume to cause any real, lasting disruption',
+    ], correctIndex: 2,
+    explanation:
+        'A botnet-driven DDoS spreads traffic across enormous numbers of distinct, legitimate-looking source addresses, making naive IP-based blocking ineffective at distinguishing attackers from real users.',
+  ),
+
+// Additional scenario-based questions, batch 2 — written with short,
+// single-clause options from the start (all four options roughly
+// comparable length, no embedded justification clauses) to avoid the
+// length-bias pattern found in earlier batches.
+
+  // From: Cybersecurity Fundamentals
+  QuizQuestion(
+    question:
+        'A startup with no dedicated security staff asks which single control would most improve their security posture right now. What should you recommend FIRST?',
+    options: [
+      'Hire a full-time penetration testing team',
+      'Purchase a next-generation firewall appliance',
+      'Migrate all systems to a new cloud provider',
+      'Enable Multi-Factor Authentication on all accounts',
+    ], correctIndex: 3,
+    explanation:
+        'MFA is the highest-impact, lowest-cost control most organizations can deploy quickly, directly blocking the majority of account-takeover attempts.',
+  ),
+  QuizQuestion(
+    question:
+        'An executive asks why the company needs both preventive and detective controls instead of just very strong preventive controls. What is the BEST answer?',
+    options: [
+      'Preventive controls are only required by regulation',
+      'No preventive control is guaranteed to stop every attack',
+      'Detective controls replace the need for prevention entirely',
+      'Detective controls are always cheaper to implement',
+    ], correctIndex: 1,
+    explanation:
+        'Because no preventive control is perfect, detective controls exist to catch what prevention misses — the two work together, not as substitutes.',
+  ),
+  QuizQuestion(
+    question:
+        'A manager asks why the security team insists on a formal change management process for a "simple" configuration change. What is the BEST justification?',
+    options: [
+      'Change management is only a legal requirement',
+      'Even simple changes can have unintended consequences',
+      'It slows down attackers during an active breach',
+      'It replaces the need for testing entirely',
+    ], correctIndex: 1,
+    explanation:
+        'Change management exists because even small changes can have unforeseen side effects; a documented review process catches these before they cause outages.',
+  ),
+
+  // From: Threats, Attacks & Vulnerabilities
+  QuizQuestion(
+    question:
+        'A vulnerability scan flags a critical finding on a server that is not exposed to the Internet and has no known active exploit. How should this be prioritized relative to a medium-severity finding on an Internet-facing server?',
+    options: [
+      'Based on actual exposure and exploitability, not severity alone',
+      'The critical finding always takes priority regardless of context',
+      'The medium finding can be ignored since it is lower severity',
+      'Neither finding needs remediation until a breach occurs',
+    ], correctIndex: 0,
+    explanation:
+        'Prioritization should weigh real-world exposure and exploitability alongside raw severity — an exposed medium finding can pose more actual risk than an isolated critical one.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization\'s threat model assumes attackers are mostly opportunistic. A new project handles data of interest to a specific nation-state. What should change?',
+    options: [
+      'Nothing changes, since all attackers are treated the same',
+      'Only physical security controls need to be reviewed',
+      'The project should ignore nation-state threats entirely',
+      'The threat model should be updated to reflect this new risk',
+    ], correctIndex: 3,
+    explanation:
+        'Threat modeling should reflect the actual adversaries relevant to specific data or systems — a nation-state-level target needs a correspondingly updated threat model.',
+  ),
+  QuizQuestion(
+    question:
+        'A company\'s attack surface grows significantly after acquiring a smaller company with unknown security practices. What should happen FIRST?',
+    options: [
+      'Immediately merge both networks with no review',
+      'Conduct a security assessment of the acquired environment',
+      'Assume the acquired company\'s security is adequate',
+      'Wait one year before evaluating any security risk',
+    ], correctIndex: 1,
+    explanation:
+        'Mergers and acquisitions should trigger a security assessment of the acquired environment before integration, since its actual security posture is unknown.',
+  ),
+  QuizQuestion(
+    question:
+        'A vulnerability management report shows the same critical finding recurring every month despite being marked "resolved." What does this MOST likely indicate?',
+    options: [
+      'The finding is a false positive that can be ignored',
+      'The vulnerability scanner itself must be broken',
+      'The remediation is not actually being verified after closure',
+      'Recurring findings always indicate active exploitation',
+    ], correctIndex: 2,
+    explanation:
+        'A finding that keeps recurring after being marked resolved usually points to a verification gap — remediation was claimed but never actually confirmed.',
+  ),
+
   // From: Network Security
   QuizQuestion(
-        question: 'Why does the TCP/IP model have only four layers compared to the OSI model\'s seven?',
-        options: [
-          'TCP/IP is a purely theoretical model with no real-world use',
-          'TCP/IP is the practical implementation actually used by the Internet, consolidating some OSI functions into fewer, more implementation-focused layers',
-          'The OSI model was developed after TCP/IP and added unnecessary layers',
-          'TCP/IP cannot support routing',
-        ],
-        correctIndex: 1,
-        explanation: 'TCP/IP is the practical, real-world protocol suite; OSI is a more granular conceptual reference model used mainly for teaching and troubleshooting.',
-      ),
+    question:
+        'A network segmentation project aims to limit how far an attacker can move if one workstation is compromised. Which architecture change BEST supports this goal?',
+    options: [
+      'Allowing unrestricted communication between all departments',
+      'Placing every device on a single flat network for simplicity',
+      'Dividing the network into isolated zones with restricted access between them',
+      'Disabling all internal firewalls to improve performance',
+    ], correctIndex: 2,
+    explanation:
+        'Network segmentation limits lateral movement by isolating zones and restricting traffic between them, containing a compromise to a smaller blast radius.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization wants to inspect encrypted web traffic for malware without breaking end-user certificate trust warnings. Which approach is MOST appropriate?',
+    options: [
+      'Ignore encrypted traffic since it cannot be inspected',
+      'Deploy a TLS inspection proxy with a trusted internal certificate',
+      'Disable HTTPS entirely across the corporate network',
+      'Require users to manually approve every certificate warning',
+    ], correctIndex: 1,
+    explanation:
+        'A properly deployed TLS inspection proxy, using a certificate trusted by managed devices, allows visibility into encrypted traffic without triggering warnings.',
+  ),
+  QuizQuestion(
+    question:
+        'A remote office reports intermittent connectivity, and logs show the site-to-site VPN tunnel repeatedly dropping and re-establishing. What should be investigated FIRST?',
+    options: [
+      'Whether the office needs a new physical security guard',
+      'Whether antivirus software needs a signature update',
+      'Whether the VPN\'s underlying Internet connection is unstable',
+      'Whether the office\'s users have weak passwords',
+    ], correctIndex: 2,
+    explanation:
+        'Intermittent VPN tunnel drops are most commonly caused by an unstable underlying Internet connection, which should be investigated before assuming a security compromise.',
+  ),
+  QuizQuestion(
+    question:
+        'A company wants to prevent internal users from bypassing the corporate proxy and connecting directly to the Internet. Which control BEST supports this goal?',
+    options: [
+      'Removing the proxy entirely to simplify the network',
+      'Trusting all outbound traffic from internal IP ranges by default',
+      'Relying solely on user honesty to follow policy',
+      'Firewall rules that block direct outbound traffic except through the proxy',
+    ], correctIndex: 3,
+    explanation:
+        'Enforcing outbound traffic through firewall rules that require proxy use closes the technical path for bypassing monitoring, rather than relying on policy alone.',
+  ),
+
+  // From: Malware
+  QuizQuestion(
+    question:
+        'A file downloaded from an email attachment triggers an antivirus alert, but the user has already opened it before the alert appeared. What should happen NEXT?',
+    options: [
+      'Isolate the device from the network and investigate further',
+      'Forward the file to other employees for a second opinion',
+      'Restart the computer and assume the issue is resolved',
+      'Delete the antivirus alert and continue working normally',
+    ], correctIndex: 0,
+    explanation:
+        'Once a file has already executed, isolating the device prevents further spread while the incident is properly investigated, rather than assuming the alert alone resolved anything.',
+  ),
+  QuizQuestion(
+    question:
+        'A security team notices a spike in outbound traffic to multiple unfamiliar domains from several machines simultaneously, all within the same subnet. What does this MOST likely suggest?',
+    options: [
+      'A routine software licensing check from a single vendor',
+      'Normal browsing behavior from several unrelated employees',
+      'A worm or self-propagating malware spreading across the subnet',
+      'A scheduled backup job running slightly behind normal hours',
+    ], correctIndex: 2,
+    explanation:
+        'Simultaneous unusual outbound activity from multiple machines in the same subnet is a strong indicator of self-propagating malware moving laterally.',
+  ),
+  QuizQuestion(
+    question:
+        'Ransomware encrypts a subset of files on a shared drive before being detected and contained. Backups exist but were last taken two weeks ago. What is the MOST appropriate recovery approach?',
+    options: [
+      'Pay the ransom immediately as the fastest path to recovery',
+      'Discard the backups since they are not perfectly current',
+      'Wait indefinitely for a free decryption tool to appear',
+      'Restore from backup, then assess and recreate any lost recent data',
+    ], correctIndex: 3,
+    explanation:
+        'Restoring from the most recent clean backup, then addressing the gap for data created since, is the standard recovery approach — paying ransom is discouraged and not guaranteed to work.',
+  ),
+
+  // From: Social Engineering
+  QuizQuestion(
+    question:
+        'An employee posts a detailed description of their job responsibilities and current project on a public social media profile. How could this MOST directly aid an attacker?',
+    options: [
+      'It automatically grants the attacker system access',
+      'It provides material for a convincing, targeted pretext',
+      'It only matters if the employee is in IT specifically',
+      'It has no security relevance whatsoever',
+    ], correctIndex: 1,
+    explanation:
+        'Publicly available details about a role and current projects give attackers exactly the material needed to craft a convincing, targeted pretexting or spear-phishing attempt.',
+  ),
+  QuizQuestion(
+    question:
+        'A caller claims to be from the bank\'s fraud department and asks a customer to read back a one-time code just sent to their phone. What is actually happening?',
+    options: [
+      'The bank is confirming the customer\'s phone number works',
+      'The call cannot possibly be related to any fraud attempt',
+      'The caller is trying to steal the code to complete their own login',
+      'This is a standard, legitimate identity verification step',
+    ], correctIndex: 2,
+    explanation:
+        'Legitimate institutions never ask customers to read back one-time codes; this is a real-time phishing technique to steal the code and complete the attacker\'s own login.',
+  ),
+
+  // From: Identity Access Management
+  QuizQuestion(
+    question:
+        'A new hire is granted access to every application used by their entire department on their first day, "just in case" they need it later. What principle does this violate?',
+    options: [
+      'Non-repudiation, since actions cannot be traced to a user',
+      'Least privilege, since access should match actual job needs',
+      'Defense in depth, since only one control layer exists',
+      'Separation of duties, since one person holds too many roles',
+    ], correctIndex: 1,
+    explanation:
+        'Granting broad access "just in case" rather than based on actual job requirements is a direct violation of least privilege.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization discovers dozens of unused accounts still active for contractors whose engagements ended months ago. What process gap does this MOST likely reflect?',
+    options: [
+      'Missing automated deprovisioning tied to contract end dates',
+      'Insufficient antivirus coverage on contractor devices',
+      'A misconfigured firewall rule affecting contractor access',
+      'Weak password complexity enforced on contractor accounts',
+    ], correctIndex: 0,
+    explanation:
+        'Active accounts long after a contract ends point to a missing automated deprovisioning trigger tied to contract or engagement end dates.',
+  ),
+  QuizQuestion(
+    question:
+        'A privileged account is used for both routine daily tasks and emergency administrative actions. What risk does this combination create?',
+    options: [
+      'The account automatically loses its administrative rights',
+      'No meaningful risk exists from combining these uses',
+      'Routine use increases the account\'s exposure to compromise',
+      'Emergency actions become technically impossible to perform',
+    ], correctIndex: 2,
+    explanation:
+        'Using a privileged account for routine tasks increases how often it is exposed to phishing, malware, and other compromise vectors, elevating overall risk.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization wants to grant temporary elevated access for a specific maintenance task, automatically expiring afterward. Which capability BEST supports this?',
+    options: [
+      'Just-in-Time (JIT) privileged access with automatic expiration',
+      'Permanently elevating the user\'s standing access level',
+      'Sharing the administrator password for the task\'s duration',
+      'Disabling logging during the maintenance window',
+    ], correctIndex: 0,
+    explanation:
+        'Just-in-Time privileged access grants elevated rights only for the needed window and automatically expires them, avoiding standing privileged access.',
+  ),
+
+  // From: Cryptography
+  QuizQuestion(
+    question:
+        'A developer wants to verify a downloaded software package has not been tampered with in transit. Which technique BEST accomplishes this?',
+    options: [
+      'Opening the file to see if it appears to run correctly',
+      'Comparing the file\'s cryptographic hash against the vendor\'s published value',
+      'Trusting the download since it came from a search engine result',
+      'Checking only that the file size looks approximately correct',
+    ], correctIndex: 1,
+    explanation:
+        'Comparing a cryptographic hash against the vendor\'s published value reliably detects tampering, unlike file size or simply running the file.',
+  ),
+  QuizQuestion(
+    question:
+        'An application team wants to ensure that even if their database is stolen, encrypted personal data remains unreadable without a separately managed key. Which practice supports this?',
+    options: [
+      'Using no encryption and relying solely on access controls',
+      'Encrypting the data with a key hardcoded into the application',
+      'Storing the encryption key inside the same database table',
+      'Storing encryption keys separately from the encrypted data',
+    ], correctIndex: 3,
+    explanation:
+        'Keeping encryption keys separate from the data they protect ensures that stealing the database alone does not expose the underlying plaintext.',
+  ),
+  QuizQuestion(
+    question:
+        'A team debates whether to use a well-known standard algorithm or a custom-designed encryption scheme created in-house. Which choice is generally recommended, and why?',
+    options: [
+      'The custom scheme, since attackers won\'t know how it works',
+      'Either choice is equally safe regardless of public review',
+      'Neither choice matters if the key is kept secret',
+      'The standard algorithm, since it has withstood public scrutiny',
+    ], correctIndex: 3,
+    explanation:
+        'Well-known, publicly vetted algorithms have survived extensive cryptanalysis; custom "security through obscurity" schemes frequently contain undiscovered weaknesses.',
+  ),
+  QuizQuestion(
+    question:
+        'A certificate used by a customer-facing website is set to expire in three days, and no renewal has been scheduled. What is the MOST urgent risk?',
+    options: [
+      'All employee accounts will be automatically locked out',
+      'Browsers will show trust warnings once the certificate expires',
+      'The company\'s domain name registration will be canceled',
+      'The website\'s database will become permanently corrupted',
+    ], correctIndex: 1,
+    explanation:
+        'An expired TLS certificate causes browsers to display trust warnings to visitors, damaging user trust and potentially blocking access entirely.',
+  ),
+
+  // From: Secure Protocols
+  QuizQuestion(
+    question:
+        'A company wants employees connecting from public Wi-Fi to have their traffic protected from local network eavesdropping. Which solution BEST addresses this?',
+    options: [
+      'Relying solely on antivirus software on the laptop',
+      'Trusting that public Wi-Fi networks are inherently safe',
+      'Disabling all wireless connectivity company-wide',
+      'Requiring a VPN connection before accessing company resources',
+    ], correctIndex: 3,
+    explanation:
+        'A VPN encrypts traffic end-to-end, protecting it from eavesdropping on untrusted networks like public Wi-Fi, which antivirus alone cannot address.',
+  ),
+  QuizQuestion(
+    question:
+        'An internal API endpoint currently accepts both HTTP and HTTPS connections. A security review flags this as a risk. What is the MOST appropriate fix?',
+    options: [
+      'Disable HTTPS since HTTP is simpler to troubleshoot',
+      'Add a warning banner instead of changing the configuration',
+      'Leave both enabled since internal traffic is always safe',
+      'Disable plain HTTP and require HTTPS for all connections',
+    ], correctIndex: 3,
+    explanation:
+        'Allowing plain HTTP alongside HTTPS leaves an unencrypted path available; disabling HTTP and requiring HTTPS closes that gap.',
+  ),
+  QuizQuestion(
+    question:
+        'A company wants to verify that email claiming to come from its domain was actually authorized to be sent, reducing spoofed messages reaching recipients. Which record should be configured?',
+    options: [
+      'An MX record with no authentication information',
+      'A TXT record containing the company\'s street address',
+      'An SPF record listing authorized sending mail servers',
+      'A CNAME record pointing to the company website',
+    ], correctIndex: 2,
+    explanation:
+        'SPF records explicitly list which mail servers are authorized to send on a domain\'s behalf, helping receiving servers reject spoofed messages.',
+  ),
+
+  // From: Endpoint Security
+  QuizQuestion(
+    question:
+        'An organization\'s laptops are frequently lost or stolen while traveling. Which control BEST protects data on the device even if it falls into the wrong hands?',
+    options: [
+      'Requiring a longer laptop warranty period',
+      'A sticker on the laptop reminding users to be careful',
+      'Disabling the laptop\'s built-in webcam',
+      'Full-disk encryption enabled on every laptop',
+    ], correctIndex: 3,
+    explanation:
+        'Full-disk encryption ensures that data remains unreadable without the correct credentials, protecting it even if the physical device is lost or stolen.',
+  ),
+  QuizQuestion(
+    question:
+        'A security team wants visibility into what processes are running on endpoints and the ability to isolate a compromised machine remotely. Which tool category BEST fits this need?',
+    options: [
+      'A physical door lock on the server room',
+      'A basic signature-based antivirus with no telemetry',
+      'A password manager deployed to end users',
+      'Endpoint Detection and Response (EDR)',
+    ], correctIndex: 3,
+    explanation:
+        'EDR platforms specifically provide endpoint visibility, behavioral detection, and remote response capabilities like isolating a compromised machine.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization\'s endpoints are missing critical patches for months at a time due to inconsistent manual patching. What is the MOST effective long-term fix?',
+    options: [
+      'Asking users to remember to patch their own devices',
+      'Deploying automated patch management across all endpoints',
+      'Disabling patch notifications to reduce user annoyance',
+      'Reducing the frequency of vulnerability scanning',
+    ], correctIndex: 1,
+    explanation:
+        'Automated patch management removes reliance on manual, inconsistent processes, ensuring patches are applied reliably and on schedule.',
+  ),
+
+  // From: Identity Federation & SSO
+  QuizQuestion(
+    question:
+        'A company\'s Single Sign-On portal experiences an outage. What is the LARGEST operational impact of this specific type of failure?',
+    options: [
+      'Users lose access to every connected application simultaneously',
+      'The outage has no impact on any connected application',
+      'Only one specific application becomes briefly unavailable',
+      'Users can still access everything using cached credentials',
+    ], correctIndex: 0,
+    explanation:
+        'Because SSO centralizes authentication for many applications, its outage can simultaneously block access to everything connected to it — a key reason IdP resilience matters.',
+  ),
+  QuizQuestion(
+    question:
+        'A third-party contractor needs temporary access to one internal application without receiving a full corporate identity. Which approach BEST fits this need?',
+    options: [
+      'Federated guest access scoped to just that one application',
+      'Granting the contractor unrestricted network access',
+      'Sharing an existing employee\'s login credentials',
+      'Issuing the contractor a permanent full employee account',
+    ], correctIndex: 0,
+    explanation:
+        'Federated guest access scoped narrowly to the needed application provides exactly the access required without creating unnecessary standing accounts.',
+  ),
+  QuizQuestion(
+    question:
+        'An application accepts an OAuth access token and uses it to call an API on the user\'s behalf. What should the API do before honoring any request using that token?',
+    options: [
+      'Ignore the token and rely only on the caller\'s IP address',
+      'Validate the token\'s signature, expiration, and granted scope',
+      'Accept any token regardless of its original intended scope',
+      'Trust the token automatically since it was already issued once',
+    ], correctIndex: 1,
+    explanation:
+        'APIs must independently validate a token\'s signature, expiration, and scope before honoring a request — never assume a previously issued token remains automatically trustworthy.',
+  ),
+
+  // From: Application Security
+  QuizQuestion(
+    question:
+        'A mobile app stores a user\'s authentication token in plaintext within local device storage. A security review flags this. What is the BEST remediation?',
+    options: [
+      'Remove authentication from the app entirely to avoid the issue',
+      'Continue storing it in plaintext since the device is password-locked',
+      'Store the token using the platform\'s secure credential storage',
+      'Store the token inside a publicly readable log file instead',
+    ], correctIndex: 2,
+    explanation:
+        'Platform-provided secure credential storage (like a keychain or keystore) protects sensitive tokens far better than plaintext local storage, which any malicious app could potentially read.',
+  ),
+  QuizQuestion(
+    question:
+        'A code review finds that a web application accepts file uploads with no restriction on file type or size. What is the GREATEST risk this creates?',
+    options: [
+      'The application\'s font rendering could become inconsistent',
+      'An attacker could upload and execute a malicious script file',
+      'Users might upload files with unusual color palettes',
+      'Uploaded files might display in the wrong browser tab',
+    ], correctIndex: 1,
+    explanation:
+        'Unrestricted file uploads allow attackers to upload malicious executable or script files that, if later executed by the server, can lead to full compromise.',
+  ),
+  QuizQuestion(
+    question:
+        'An application\'s login page provides different error messages for "invalid username" versus "invalid password." Why is this considered a security weakness?',
+    options: [
+      'It has no meaningful effect on account security',
+      'It lets an attacker confirm which usernames are valid accounts',
+      'It only affects users with unusually long usernames',
+      'It makes the login page load noticeably slower',
+    ], correctIndex: 1,
+    explanation:
+        'Distinct error messages let an attacker enumerate valid usernames one at a time, which is why login pages should return a generic, identical error for both cases.',
+  ),
+  QuizQuestion(
+    question:
+        'A development team wants to catch security vulnerabilities in code before it reaches production. Which practice BEST supports this goal?',
+    options: [
+      'Integrating automated security scanning into the CI/CD pipeline',
+      'Skipping code review entirely to speed up releases',
+      'Relying entirely on end users to report any issues found',
+      'Reviewing code for security only once a year',
+    ], correctIndex: 0,
+    explanation:
+        'Integrating automated security scanning directly into CI/CD catches vulnerabilities early and consistently, before code ever reaches production.',
+  ),
+
+  // From: Cloud Security
+  QuizQuestion(
+    question:
+        'A cloud storage bucket was accidentally configured for public read access, exposing internal documents for several hours before discovery. What should happen FIRST once discovered?',
+    options: [
+      'Wait for a customer complaint before taking any action',
+      'Leave the configuration unchanged pending a scheduled review',
+      'Delete the bucket entirely without investigating first',
+      'Immediately restrict access, then assess what was exposed',
+    ], correctIndex: 3,
+    explanation:
+        'The immediate priority is stopping ongoing exposure by restricting access, followed by assessing what data was exposed and to whom.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization uses multiple cloud providers and struggles to maintain consistent security policies across all of them. Which approach BEST addresses this challenge?',
+    options: [
+      'Standardizing on whichever provider is currently cheapest',
+      'A centralized cloud security posture management tool spanning providers',
+      'Ignoring the inconsistency since each provider is separate',
+      'Manually checking each provider\'s console once a year',
+    ], correctIndex: 1,
+    explanation:
+        'A centralized CSPM tool that spans multiple providers gives consistent policy visibility and enforcement across an otherwise fragmented multi-cloud environment.',
+  ),
+  QuizQuestion(
+    question:
+        'A development team provisions cloud resources directly through the console instead of using the organization\'s approved Infrastructure as Code templates. What risk does this MOST directly introduce?',
+    options: [
+      'Automatic encryption of all newly created resources',
+      'Faster deployment with no meaningful security trade-off',
+      'Configuration drift and inconsistency from the approved baseline',
+      'Elimination of the need for any future security review',
+    ], correctIndex: 2,
+    explanation:
+        'Manual provisioning outside approved IaC templates introduces configuration drift, since resources no longer consistently match the organization\'s vetted baseline.',
+  ),
+
+  // From: Security Operations
+  QuizQuestion(
+    question:
+        'A SOC dashboard shows dozens of alerts triggered by the same underlying event across multiple security tools. What capability would MOST reduce this redundant noise?',
+    options: [
+      'Manually closing duplicate alerts one at a time forever',
+      'Alert deduplication and correlation within the SIEM',
+      'Disabling alerting from all but one security tool',
+      'Increasing the number of analysts without changing tooling',
+    ], correctIndex: 1,
+    explanation:
+        'Alert deduplication and correlation logic within the SIEM groups related alerts from the same underlying event, reducing redundant noise analysts must review.',
+  ),
+  QuizQuestion(
+    question:
+        'A SOC wants to measure whether its detection capability is actually improving over time, not just whether alerts are being closed quickly. Which metric BEST supports this goal?',
+    options: [
+      'The number of analysts currently on staff',
+      'The length of the SOC\'s shift handoff documentation',
+      'True positive rate compared against known red team activity',
+      'The total number of tickets closed each week',
+    ], correctIndex: 2,
+    explanation:
+        'Comparing detection results against known red team or simulated activity directly measures whether real threats are actually being caught, not just alert volume.',
+  ),
+  QuizQuestion(
+    question:
+        'An analyst wants to understand whether a suspicious IP address has been associated with malicious activity elsewhere before deciding how urgently to respond. Which resource BEST supports this?',
+    options: [
+      'A threat intelligence feed with reputation data',
+      'A general Internet search with no verification',
+      'The organization\'s employee directory',
+      'The building\'s physical visitor log',
+    ], correctIndex: 0,
+    explanation:
+        'Threat intelligence feeds provide vetted reputation data on indicators like IP addresses, helping analysts quickly assess known-malicious activity.',
+  ),
+
+  // From: Incident Response
+  QuizQuestion(
+    question:
+        'During an active incident, the response team disagrees about who has authority to decide whether to take a production system offline. What does this reveal about the organization\'s preparedness?',
+    options: [
+      'The incident response plan lacks clear decision-making authority',
+      'This disagreement is normal and requires no follow-up',
+      'The incident itself must not be serious enough to matter',
+      'The team is simply too large to respond effectively',
+    ], correctIndex: 0,
+    explanation:
+        'Confusion over decision-making authority during an incident points to a gap in the IR plan, which should clearly define roles and escalation authority in advance.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization\'s incident response plan has not been updated since it was first written five years ago, despite significant infrastructure changes since then. What is the MOST appropriate next step?',
+    options: [
+      'Wait for the next major incident before considering updates',
+      'Continue using the plan unchanged since it worked previously',
+      'Discard incident response planning entirely as unnecessary',
+      'Review and update the plan to reflect the current environment',
+    ], correctIndex: 3,
+    explanation:
+        'Incident response plans should be reviewed and updated regularly to reflect infrastructure and organizational changes, not left static indefinitely.',
+  ),
+  QuizQuestion(
+    question:
+        'A responder wants to preserve the original state of a compromised system for potential legal proceedings while still restoring business operations quickly. What approach BEST satisfies both goals?',
+    options: [
+      'Delete the compromised system immediately to prevent further harm',
+      'Preserve the system indefinitely and never restore service',
+      'Restore operations first and skip forensic imaging entirely',
+      'Capture a forensic image, then restore operations from clean backups',
+    ], correctIndex: 3,
+    explanation:
+        'Capturing a forensic image preserves evidence for later analysis or legal proceedings, while restoring from clean backups lets operations resume quickly in parallel.',
+  ),
+
+  // From: Governance, Risk & Compliance
+  QuizQuestion(
+    question:
+        'A new regulation requires organizations to report certain data breaches within 72 hours of discovery. An incident is discovered on a Friday evening. What does this deadline require?',
+    options: [
+      'The clock only starts on the next business day',
+      'The reporting clock starts at discovery, regardless of the day',
+      'Weekend discoveries are automatically exempt from reporting',
+      'The deadline applies only to breaches discovered on weekdays',
+    ], correctIndex: 1,
+    explanation:
+        'Regulatory reporting deadlines typically start from the moment of discovery, not the next business day, making incident response readiness on weekends essential.',
+  ),
+  QuizQuestion(
+    question:
+        'A department wants to bypass the standard security review process for a new vendor because "it\'s just a small tool." What risk does this create?',
+    options: [
+      'Unvetted vendors may introduce unmanaged security or compliance risk',
+      'Skipping review always speeds up procurement with no downside',
+      'Small tools are inherently immune to any security risk',
+      'Vendor review is only required for tools costing over a set amount',
+    ], correctIndex: 0,
+    explanation:
+        'Vendor size has no bearing on the risk it may introduce — skipping review for "small" tools still leaves unmanaged data handling and security risk unassessed.',
+  ),
+  QuizQuestion(
+    question:
+        'An internal audit finds that a critical security policy exists on paper but is not actually followed by most employees in practice. What does this indicate?',
+    options: [
+      'The audit itself must be fundamentally flawed',
+      'The policy should be deleted since nobody follows it',
+      'No further action is needed since a policy document exists',
+      'A gap between documented policy and actual operational practice',
+    ], correctIndex: 3,
+    explanation:
+        'A policy that exists on paper but isn\'t followed in practice reveals a real gap between documentation and operations — one of the most common audit findings organizations face.',
+  ),
+  QuizQuestion(
+    question:
+        'A company wants to demonstrate to enterprise customers that its security controls are independently verified, without publishing sensitive internal details. Which document BEST serves this purpose?',
+    options: [
+      'A list of every employee\'s individual login credentials',
+      'The company\'s complete internal network diagram',
+      'The full source code of every internal application',
+      'A SOC 2 report shared under a non-disclosure agreement',
+    ], correctIndex: 3,
+    explanation:
+        'A SOC 2 report, shared under NDA with prospective customers, provides independently verified assurance of controls without exposing sensitive internal implementation details.',
+  ),
+
+  // From: Windows Security
+  QuizQuestion(
+    question:
+        'A Windows administrator wants to enforce consistent security settings across hundreds of domain-joined workstations without configuring each one individually. Which tool BEST fits this need?',
+    options: [
+      'Manually editing the registry on each machine one at a time',
+      'Asking each user to configure their own security settings',
+      'Group Policy applied at the domain or organizational unit level',
+      'A shared spreadsheet listing each machine\'s current settings',
+    ], correctIndex: 2,
+    explanation:
+        'Group Policy applied at the domain or OU level lets administrators centrally enforce consistent settings across many machines, avoiding manual per-device configuration.',
+  ),
+  QuizQuestion(
+    question:
+        'A Windows event log shows repeated successful logons for an administrative account at 3 AM, a time the account owner says they were not working. What should be investigated FIRST?',
+    options: [
+      'Whether the antivirus license needs renewal',
+      'Whether the account owner\'s job title needs updating',
+      'Whether the account\'s credentials may have been compromised',
+      'Whether the workstation needs a hardware upgrade',
+    ], correctIndex: 2,
+    explanation:
+        'Unexplained administrative logons at unusual hours are a strong indicator of potential credential compromise and warrant immediate investigation.',
+  ),
+
+  // From: Linux Security
+  QuizQuestion(
+    question:
+        'A Linux server allows root login directly over SSH with a password. A security review flags this immediately. What is the BEST remediation?',
+    options: [
+      'Only allow root login from a single specific IP address',
+      'Disable root SSH login and require key-based sudo access instead',
+      'Increase the root password length by a few characters',
+      'Leave the configuration unchanged since root needs full access',
+    ], correctIndex: 1,
+    explanation:
+        'Disabling direct root SSH login and requiring individual accounts with sudo access via SSH keys removes a high-value, easily-targeted attack surface.',
+  ),
+  QuizQuestion(
+    question:
+        'A Linux administrator wants to detect unauthorized changes to critical system binaries as early as possible. Which tool category BEST supports this?',
+    options: [
+      'A file integrity monitoring tool comparing files against a baseline',
+      'A disk defragmentation utility',
+      'A tool that only monitors network bandwidth usage',
+      'A basic text editor with no monitoring capability',
+    ], correctIndex: 0,
+    explanation:
+        'File integrity monitoring tools compare system files against a known-good cryptographic baseline, flagging unauthorized changes to critical binaries quickly.',
+  ),
+
+  // From: Email Security
+  QuizQuestion(
+    question:
+        'An employee receives an email with a link to "verify your account" that, when hovered over, shows a URL completely unrelated to the company\'s actual domain. What should the employee do?',
+    options: [
+      'Forward the email to a personal account for later review',
+      'Reply asking the sender to confirm the link is safe',
+      'Click the link since the email subject looked official',
+      'Avoid clicking the link and report the email as suspicious',
+    ], correctIndex: 3,
+    explanation:
+        'A hover-revealed URL that does not match the claimed sender\'s domain is a classic phishing indicator; the safest action is to avoid clicking and report it.',
+  ),
+  QuizQuestion(
+    question:
+        'A company\'s email gateway blocks an increasing number of phishing attempts each month, yet successful compromises still occasionally occur. What does this MOST likely indicate?',
+    options: [
+      'Phishing is no longer a meaningful threat to the organization',
+      'Technical filters alone cannot catch every attack; awareness still matters',
+      'Employees should stop using email entirely to avoid all risk',
+      'The email gateway must be completely non-functional',
+    ], correctIndex: 1,
+    explanation:
+        'Even effective technical filtering cannot catch every attack, especially well-crafted BEC-style messages with no malicious payload — ongoing user awareness remains essential.',
+  ),
+
+  // From: Vulnerabilities and Threats
+  QuizQuestion(
+    question:
+        'A vendor discloses a vulnerability in software your organization uses, along with a patch. Exploit code is not yet public. What is the MOST appropriate response timeline?',
+    options: [
+      'Wait until public exploit code appears before taking any action',
+      'Delay patching indefinitely until the next major release',
+      'Patch promptly using the organization\'s standard expedited process',
+      'Ignore the disclosure since no exploit currently exists',
+    ], correctIndex: 2,
+    explanation:
+        'Patching promptly, even before public exploit code appears, closes the window of opportunity — attackers often reverse-engineer patches to build exploits quickly.',
+  ),
+  QuizQuestion(
+    question:
+        'A vulnerability scan identifies an outdated software component embedded deep within a legacy application that cannot easily be updated. What is the MOST practical interim approach?',
+    options: [
+      'Ignore the finding since the application cannot be easily updated',
+      'Disable all logging related to the vulnerable component',
+      'Apply compensating controls like network isolation while planning remediation',
+      'Immediately decommission the application with no transition plan',
+    ], correctIndex: 2,
+    explanation:
+        'When immediate remediation isn\'t feasible, compensating controls like network isolation reduce risk while a longer-term remediation or replacement plan is developed.',
+  ),
+
+  // From: Alerts and Monitoring
+  QuizQuestion(
+    question:
+        'A monitoring dashboard shows a metric spiking well beyond its established baseline, but no alert fired because the threshold was set too high. What does this reveal?',
+    options: [
+      'Spikes above baseline are never actually meaningful',
+      'Thresholds should always be set as high as technically possible',
+      'The monitoring system itself must be completely broken',
+      'Alert thresholds need periodic review against actual baselines',
+    ], correctIndex: 3,
+    explanation:
+        'A missed alert due to an overly high threshold shows that thresholds need periodic review and tuning against actual observed baselines, not a one-time setup.',
+  ),
+  QuizQuestion(
+    question:
+        'A company wants to detect insider threats by identifying unusual data access patterns, such as an employee suddenly downloading far more files than their normal behavior. Which capability BEST supports this?',
+    options: [
+      'A physical badge access log with no analysis',
+      'A basic antivirus signature scanner',
+      'User and Entity Behavior Analytics (UEBA)',
+      'A firewall rule blocking all outbound traffic',
+    ], correctIndex: 2,
+    explanation:
+        'UEBA is specifically designed to detect deviations from an individual\'s normal behavioral baseline, such as sudden unusual data access patterns.',
+  ),
+
+  // From: Cybersecurity Fundamentals
+  QuizQuestion(
+    question:
+        'A company\'s security budget request is denied because leadership sees no immediate threat. What is the MOST effective way for the security team to make its case?',
+    options: [
+      'Threaten to resign if the budget is not approved',
+      'Quantify potential financial impact using risk assessment data',
+      'Repeat the same request without any new supporting evidence',
+      'Wait silently for a breach to justify the request retroactively',
+    ], correctIndex: 1,
+    explanation:
+        'Quantifying potential financial impact through risk assessment data speaks leadership\'s language and makes a far more persuasive case than repeating an unsupported request.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization treats security as solely the IT department\'s responsibility, with no involvement from other business units. What risk does this create?',
+    options: [
+      'IT will always make perfectly optimal security decisions alone',
+      'This approach guarantees faster incident response overall',
+      'Other departments become completely immune to security risk',
+      'Security decisions may not reflect actual business priorities',
+    ], correctIndex: 3,
+    explanation:
+        'Security decisions made in isolation from the business risk being misaligned with actual organizational priorities and risk tolerance.',
+  ),
+  QuizQuestion(
+    question:
+        'A security awareness program measures success purely by the number of training modules completed, regardless of behavior change. What is the LIMITATION of this metric?',
+    options: [
+      'This metric is the single best measure available',
+      'Completion rates have no relationship to training at all',
+      'Behavior change is impossible to measure in any way',
+      'Completion alone doesn\'t confirm behavior actually improved',
+    ], correctIndex: 3,
+    explanation:
+        'Completion tracks participation, not outcomes — pairing it with behavioral metrics like phishing simulation results gives a truer picture of program effectiveness.',
+  ),
+  QuizQuestion(
+    question:
+        'A CISO wants to align the security program\'s priorities directly with the organization\'s top business objectives for the year. What should happen FIRST?',
+    options: [
+      'Set security priorities entirely independent of business objectives',
+      'Copy another company\'s security roadmap without modification',
+      'Wait for an incident to reveal what priorities should be',
+      'Understand those business objectives before setting security priorities',
+    ], correctIndex: 3,
+    explanation:
+        'Security priorities should be derived from understanding actual business objectives first, ensuring the program supports rather than works against the organization\'s goals.',
+  ),
+
+  // From: Threats, Attacks & Vulnerabilities
+  QuizQuestion(
+    question:
+        'An organization\'s threat intelligence indicates a specific ransomware group has recently begun targeting its industry sector. What is the MOST appropriate response?',
+    options: [
+      'Review defenses against that group\'s known tactics and techniques',
+      'Ignore the intelligence since no attack has happened yet',
+      'Wait for a public breach report before taking any action',
+      'Assume existing defenses are already sufficient with no review',
+    ], correctIndex: 0,
+    explanation:
+        'Proactively reviewing defenses against a specific threat actor\'s known tactics, based on relevant threat intelligence, is far more effective than waiting for an actual attack.',
+  ),
+  QuizQuestion(
+    question:
+        'A penetration test report lists several findings, but the organization only has resources to fix a handful before the next test cycle. How should remediation be prioritized?',
+    options: [
+      'By actual exploitability and business impact, not just severity labels',
+      'By whichever finding is easiest to fix regardless of risk',
+      'By ignoring the report entirely until resources increase',
+      'By the alphabetical order in which findings appear in the report',
+    ], correctIndex: 0,
+    explanation:
+        'Prioritizing by real-world exploitability and business impact ensures limited remediation resources address the findings that matter most.',
+  ),
+  QuizQuestion(
+    question:
+        'A phishing simulation shows a 40% click rate among finance department employees, far higher than other departments. What should happen NEXT?',
+    options: [
+      'Provide targeted additional training for the finance department',
+      'Ignore the discrepancy since department averages don\'t matter',
+      'Punish every employee in finance regardless of individual results',
+      'Conclude the finance department is simply less intelligent',
+    ], correctIndex: 0,
+    explanation:
+        'A notably higher click rate in one department calls for targeted follow-up training addressing that group\'s specific gaps, not blanket punishment or dismissal.',
+  ),
+
   // From: Network Security
   QuizQuestion(
-        question: 'Between IPsec, SSL/TLS VPN, and WireGuard, which is specifically noted for excellent firewall traversal because it runs over the same port as ordinary HTTPS traffic?',
-        options: ['IPsec', 'SSL/TLS VPN', 'WireGuard', 'None of these traverse firewalls well'],
-        correctIndex: 1,
-        explanation: 'SSL/TLS VPN uses TCP port 443, the same port as HTTPS, letting it blend in with normal web traffic through most firewalls.',
-      ),
+    question:
+        'A company wants guest Wi-Fi visitors to have Internet access without any ability to reach internal corporate systems. Which design BEST achieves this?',
+    options: [
+      'Giving guests the same credentials used by employees',
+      'Disabling guest Wi-Fi\'s Internet access entirely',
+      'Placing guest devices on the same network as internal servers',
+      'A separate guest VLAN with no routing to the internal network',
+    ], correctIndex: 3,
+    explanation:
+        'A separate guest VLAN with no routing path to internal systems provides Internet access to visitors while fully isolating them from corporate resources.',
+  ),
+  QuizQuestion(
+    question:
+        'Network logs show a large volume of traffic on port 4444, a port not associated with any approved application. What should be investigated FIRST?',
+    options: [
+      'Whether the port number is simply a typo in the logs',
+      'Whether the traffic is likely just routine printer communication',
+      'Whether this port is reserved for the company\'s email system',
+      'Whether this traffic indicates a reverse shell or malware activity',
+    ], correctIndex: 3,
+    explanation:
+        'Port 4444 is commonly associated with reverse shells and post-exploitation tools, making unexplained traffic on it worth immediate investigation.',
+  ),
+  QuizQuestion(
+    question:
+        'A company\'s network diagram has not been updated in three years, despite numerous changes since then. Why does this matter during incident response?',
+    options: [
+      'Outdated diagrams are always more accurate than current ones',
+      'Network diagrams have no relevance to incident response at all',
+      'An outdated diagram slows down understanding the actual attack path',
+      'This only matters for regulatory paperwork, not real response',
+    ], correctIndex: 2,
+    explanation:
+        'An accurate, current network diagram helps responders quickly understand how systems connect and where an attacker might move — an outdated one slows this down significantly.',
+  ),
+
+  // From: Identity Access Management
+  QuizQuestion(
+    question:
+        'An organization wants to reduce the number of standing privileged accounts that exist at all times. Which approach BEST supports this goal?',
+    options: [
+      'Removing all logging on privileged account activity',
+      'Creating additional permanent administrator accounts',
+      'Sharing one privileged account among the entire team',
+      'Just-in-Time access granted only when actually needed',
+    ], correctIndex: 3,
+    explanation:
+        'Just-in-Time access grants elevated privileges only for the specific window needed, directly reducing the number of standing privileged accounts that exist continuously.',
+  ),
+  QuizQuestion(
+    question:
+        'A company wants to ensure no single employee can both approve and process a financial transaction alone. Which principle does this reflect?',
+    options: [
+      'Separation of duties',
+      'Least privilege',
+      'Non-repudiation',
+      'Defense in depth',
+    ], correctIndex: 0,
+    explanation:
+        'Requiring two different people to complete different steps of a sensitive process is the definition of separation of duties, reducing fraud and error risk.',
+  ),
+  QuizQuestion(
+    question:
+        'An employee\'s account shows successful logins from two different countries within minutes of each other. What is the MOST appropriate automated response?',
+    options: [
+      'Take no action since both logins technically succeeded',
+      'Flag the session as high-risk and prompt for additional verification',
+      'Permanently delete the account without any investigation',
+      'Automatically grant the account additional privileges',
+    ], correctIndex: 1,
+    explanation:
+        'Impossible-travel patterns should trigger a risk-based response like additional verification, rather than being ignored or resulting in an overly drastic action like deletion.',
+  ),
+
+  // From: Cryptography
+  QuizQuestion(
+    question:
+        'A company wants to ensure that if one encryption key is ever compromised, it does not expose data encrypted under other, different keys. Which practice supports this?',
+    options: [
+      'Storing all encryption keys in one shared plaintext file',
+      'Using unique encryption keys scoped to specific data sets',
+      'Disabling encryption for data considered low-risk',
+      'Reusing a single encryption key across every system',
+    ], correctIndex: 1,
+    explanation:
+        'Using unique, scoped encryption keys limits the blast radius of any single key compromise, unlike reusing one key across every system.',
+  ),
+  QuizQuestion(
+    question:
+        'A legacy system still uses MD5 for verifying file integrity. A security review flags this as a weakness. What is the core concern?',
+    options: [
+      'MD5 is vulnerable to collision attacks, undermining integrity checks',
+      'MD5 requires specialized hardware unavailable to most organizations',
+      'MD5 only works with files smaller than one megabyte',
+      'MD5 runs too slowly to be practical for modern systems',
+    ], correctIndex: 0,
+    explanation:
+        'MD5\'s known vulnerability to collision attacks means two different files can produce the same hash, undermining its reliability for integrity verification.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization\'s key management process has no defined process for rotating encryption keys periodically. What risk does this create over time?',
+    options: [
+      'Encrypted data automatically becomes unreadable after a year',
+      'No meaningful risk exists as long as encryption is used at all',
+      'Key rotation is only relevant for symmetric algorithms',
+      'Extended exposure if a key is ever silently compromised',
+    ], correctIndex: 3,
+    explanation:
+        'Without periodic rotation, a silently compromised key remains valid indefinitely, extending the window during which an attacker could exploit it undetected.',
+  ),
+
+  // From: Secure Protocols
+  QuizQuestion(
+    question:
+        'A company\'s internal file transfer process still relies on unencrypted FTP between two servers on the same network segment. Why is this still considered a risk?',
+    options: [
+      'Unencrypted protocols only matter for Internet-facing traffic',
+      'FTP is technically incapable of transferring files correctly',
+      'Internal network segments are always completely immune to risk',
+      'Internal traffic can still be intercepted by a compromised host',
+    ], correctIndex: 3,
+    explanation:
+        'A compromised internal host can intercept unencrypted traffic just as easily as external traffic, which is why internal-only communication still deserves encryption.',
+  ),
+  QuizQuestion(
+    question:
+        'A network administrator wants remote administrative access to network devices to be encrypted rather than sent in plaintext. Which protocol should replace Telnet for this purpose?',
+    options: [
+      'HTTP',
+      'FTP',
+      'SSH',
+      'SNMP version 1',
+    ], correctIndex: 2,
+    explanation:
+        'SSH encrypts administrative sessions end-to-end, directly replacing Telnet\'s plaintext transmission of commands and credentials.',
+  ),
+  QuizQuestion(
+    question:
+        'A company wants to confirm a certificate presented during a TLS handshake has not been revoked before it expired. Which mechanism supports this check?',
+    options: [
+      'The domain\'s registration date',
+      'The certificate\'s file size',
+      'The color of the padlock icon alone',
+      'Online Certificate Status Protocol (OCSP)',
+    ], correctIndex: 3,
+    explanation:
+        'OCSP allows real-time verification of whether a certificate has been revoked before its natural expiration, closing a gap that expiration checks alone cannot cover.',
+  ),
+
+  // From: Endpoint Security
+  QuizQuestion(
+    question:
+        'A company\'s endpoints have local administrator rights granted to every standard user account by default. What risk does this create?',
+    options: [
+      'Users become unable to run any approved application at all',
+      'Malware executed by the user inherits elevated local privileges',
+      'This setting has no meaningful impact on endpoint security',
+      'Endpoints automatically become immune to malware infection',
+    ], correctIndex: 1,
+    explanation:
+        'When standard users have local administrator rights, malware they inadvertently run also inherits those elevated privileges, increasing potential impact.',
+  ),
+  QuizQuestion(
+    question:
+        'A company wants to prevent unauthorized USB storage devices from being used to exfiltrate data from corporate laptops. Which control BEST addresses this?',
+    options: [
+      'Physically epoxying every USB port shut on all devices',
+      'A sticker on the laptop warning against USB device use',
+      'Device control policies restricting or blocking removable media',
+      'Relying solely on antivirus software with no device policy',
+    ], correctIndex: 2,
+    explanation:
+        'Device control policies enforced through endpoint management software can restrict or block removable media programmatically, without resorting to physically disabling ports.',
+  ),
+
+  // From: Cloud Security
+  QuizQuestion(
+    question:
+        'A company migrating to the cloud wants to ensure its incident response plan still applies effectively in the new environment. What should happen BEFORE migration completes?',
+    options: [
+      'Wait until after a cloud incident occurs to update the plan',
+      'Discard incident response planning since the cloud provider handles it',
+      'Update the incident response plan to reflect cloud-specific considerations',
+      'Assume the existing on-premises plan requires no changes at all',
+    ], correctIndex: 2,
+    explanation:
+        'Cloud environments introduce different considerations (shared responsibility, provider APIs, ephemeral resources) requiring the incident response plan to be updated before migration completes.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization\'s cloud environment has no automated alerting for newly created resources with overly permissive access. What is the MOST likely consequence over time?',
+    options: [
+      'No consequence exists as long as spending stays within budget',
+      'The cloud provider will automatically detect and fix every issue',
+      'Misconfigurations can persist undetected for extended periods',
+      'This gap only matters for organizations using a single cloud region',
+    ], correctIndex: 2,
+    explanation:
+        'Without automated alerting on risky new configurations, overly permissive resources can persist undetected for months, quietly expanding the attack surface.',
+  ),
+
+  // From: Governance, Risk & Compliance
+  QuizQuestion(
+    question:
+        'A risk assessment identifies a risk that has already materialized once before and caused measurable financial loss. How should this influence the current risk rating?',
+    options: [
+      'Historical occurrence should inform a higher likelihood rating',
+      'Historical data should be excluded from all future assessments',
+      'Past incidents have no bearing on the current risk assessment',
+      'The risk should automatically be rated as the lowest possible',
+    ], correctIndex: 0,
+    explanation:
+        'A risk that has already materialized provides direct evidence supporting a higher likelihood rating going forward, rather than being treated as irrelevant history.',
+  ),
+  QuizQuestion(
+    question:
+        'A compliance team discovers that a required annual access review was never actually performed, despite being marked complete in tracking records. What does this represent?',
+    options: [
+      'Evidence that annual access reviews are unnecessary overall',
+      'A finding that only affects the compliance team\'s workload',
+      'A control failure combined with inaccurate compliance reporting',
+      'A minor clerical issue with no real security implication',
+    ], correctIndex: 2,
+    explanation:
+        'A review marked complete but never performed represents both a genuine control failure and inaccurate reporting — a combination that seriously undermines audit trust.',
+  ),
+  QuizQuestion(
+    question:
+        'An organization\'s data retention policy has no defined deletion timeline, resulting in years of accumulated, unused customer data. What risk does this create?',
+    options: [
+      'Full compliance with every applicable privacy regulation',
+      'A larger pool of sensitive data exposed if a breach occurs',
+      'No meaningful risk as long as the data is technically encrypted',
+      'Improved system performance from having more historical data',
+    ], correctIndex: 1,
+    explanation:
+        'Retaining data indefinitely with no deletion timeline expands the pool of sensitive information exposed in the event of a breach, beyond what business need actually requires.',
+  ),
+
+  // From: Cybersecurity Fundamentals
+  QuizQuestion(
+    question:
+        'An organization experiences a near-miss where an attack was detected and stopped just before causing damage. How should this event BEST be treated?',
+    options: [
+      'As something to hide from leadership entirely',
+      'As proof that no further security investment is needed',
+      'As irrelevant, since no actual damage occurred',
+      'As a valuable learning opportunity, reviewed like a real incident',
+    ], correctIndex: 3,
+    explanation:
+        'Near-misses reveal real gaps that nearly caused harm and should be reviewed with the same rigor as an actual incident to prevent a future, less fortunate outcome.',
+  ),
+  QuizQuestion(
+    question:
+        'A company\'s security policy exists only as a printed document in a binder that no employee has read in years. What is the MOST direct problem this creates?',
+    options: [
+      'The binder itself poses a physical security risk',
+      'This has no practical effect since policies are rarely enforced anyway',
+      'Printed documents are inherently more secure than digital ones',
+      'Policies employees don\'t know about can\'t shape their behavior',
+    ], correctIndex: 3,
+    explanation:
+        'A policy nobody has read or internalized cannot meaningfully influence behavior — accessibility and active communication are as important as the policy\'s content itself.',
+  ),
+
+  // From: Threats, Attacks & Vulnerabilities
+  QuizQuestion(
+    question:
+        'An organization notices a sharp increase in failed login attempts against a specific application immediately after that application was mentioned in a public conference talk. What is the MOST likely connection?',
+    options: [
+      'This pattern indicates the application needs a UI redesign',
+      'The login failures must be caused by a software bug instead',
+      'Increased public attention may have drawn opportunistic attackers',
+      'Conference talks have no realistic connection to attack activity',
+    ], correctIndex: 2,
+    explanation:
+        'Public attention, including conference mentions, can draw opportunistic attackers who investigate newly-publicized targets shortly afterward.',
+  ),
+  QuizQuestion(
+    question:
+        'A company\'s attack surface includes several forgotten subdomains still pointing to decommissioned services. What risk do these specifically create?',
+    options: [
+      'Automatic renewal of the company\'s domain registration',
+      'No risk, since decommissioned services cannot be exploited',
+      'Improved website loading speed for legitimate visitors',
+      'Subdomain takeover by an attacker claiming the abandoned resource',
+    ], correctIndex: 3,
+    explanation:
+        'Forgotten subdomains pointing to decommissioned cloud resources are a common vector for subdomain takeover, where an attacker claims the abandoned resource and serves malicious content.',
+  ),
+
   // From: Network Security
   QuizQuestion(
-        question: 'What is the primary purpose of Port Address Translation (PAT)?',
-        options: [
-          'To map one private IP address to one public IP address exclusively',
-          'To allow many internal devices to share a single public IP address by using different source port numbers',
-          'To encrypt all outbound network traffic',
-          'To replace the need for a firewall entirely',
-        ],
-        correctIndex: 1,
-        explanation: 'PAT\'s many-to-one mapping via port numbers is what conserves public IPv4 addresses so efficiently.',
-      ),
-  // From: Network Security
+    question:
+        'A company\'s firewall rule set has grown to hundreds of rules over many years, with no regular review process. What risk does this create?',
+    options: [
+      'Firewall performance is entirely unaffected by rule set size',
+      'Overly permissive or forgotten rules may create unintended exposure',
+      'This has no bearing on the organization\'s actual attack surface',
+      'More rules always guarantee stronger network security overall',
+    ], correctIndex: 1,
+    explanation:
+        'Firewall rule sets that grow unreviewed over years tend to accumulate overly permissive or forgotten rules, creating unintended exposure that periodic review would catch.',
+  ),
   QuizQuestion(
-        question: 'In the real-world DNS misconfiguration scenario, what was the actual root cause of the customer-facing outage?',
-        options: [
-          'The web servers had crashed',
-          'An incorrect DNS record prevented name resolution from directing customers to the correct server, even though the servers themselves were fully operational',
-          'A DDoS attack overwhelmed the network',
-          'The load balancer was physically unplugged',
-        ],
-        correctIndex: 1,
-        explanation: 'This scenario illustrates that DNS failures can cause outages entirely independent of actual server or application health.',
-      ),
-  // From: Network Security
-  QuizQuestion(
-        question: 'What does data encapsulation accomplish as information moves down the protocol stack for transmission?',
-        options: [
-          'It permanently deletes unnecessary data',
-          'Each layer adds its own header, enabling reliable communication, routing, error detection, and interoperability between different network technologies',
-          'It only applies to wireless transmissions',
-          'It removes all security protections from the data',
-        ],
-        correctIndex: 1,
-        explanation: 'Encapsulation progressively wraps data with protocol headers at each layer, supporting reliable delivery and cross-technology interoperability.',
-      ),
-  // From: Secure Protocols
-  QuizQuestion(
-        question: 'What does Perfect Forward Secrecy (PFS) specifically protect against?',
-        options: [
-          'It prevents any encryption from ever being used',
-          'It ensures that even if a server\'s long-term private key is later compromised, previously captured encrypted sessions remain protected because they used unique, discarded session keys',
-          'It only protects data at rest, never data in transit',
-          'It eliminates the need for any certificate validation',
-        ],
-        correctIndex: 1,
-        explanation: 'PFS\'s core benefit is that a future key compromise can\'t retroactively expose past communications, since each session had its own unique, since-discarded key.',
-      ),
-  // From: Secure Protocols
-  QuizQuestion(
-        question: 'Why does SSH public key authentication provide stronger security than password authentication?',
-        options: [
-          'Because the private key is transmitted to the server during every login',
-          'Because the private key never leaves the client device — the server verifies ownership without the key ever being transmitted',
-          'Because public key authentication requires no verification at all',
-          'Because passwords are actually more secure than key pairs',
-        ],
-        correctIndex: 1,
-        explanation: 'The administrator proves possession of the private key without ever transmitting it, unlike passwords which must be sent during authentication.',
-      ),
-  // From: Secure Protocols
-  QuizQuestion(
-        question: 'How does DKIM differ from SPF in what it actually verifies?',
-        options: [
-          'They verify exactly the same thing',
-          'SPF verifies the sending server is authorized; DKIM verifies the message itself hasn\'t been altered using a digital signature',
-          'DKIM only works with POP3, not SMTP',
-          'SPF verifies message content while DKIM verifies the server',
-        ],
-        correctIndex: 1,
-        explanation: 'SPF is about server authorization; DKIM is about message integrity via a cryptographic signature — genuinely different checks that complement each other.',
-      ),
-  // From: Secure Protocols
-  QuizQuestion(
-        question: 'What is the key difference between SFTP and FTPS?',
-        options: [
-          'They are identical protocols with different names',
-          'SFTP uses the SSH protocol for encryption, while FTPS adds TLS encryption on top of the traditional FTP protocol',
-          'FTPS uses SSH, while SFTP uses TLS',
-          'Neither protocol provides any encryption',
-        ],
-        correctIndex: 1,
-        explanation: 'SFTP is SSH-based file transfer; FTPS is traditional FTP with TLS added — different underlying mechanisms achieving similar security goals.',
-      ),
-  // From: Secure Protocols
-  QuizQuestion(
-        question: 'Why is accurate time synchronization (NTP) critical for security operations?',
-        options: [
-          'It has no real impact on security investigations',
-          'Without synchronized timestamps, investigators and SIEM platforms may struggle to correctly reconstruct or correlate the sequence of events during a security incident',
-          'NTP is only used for scheduling meetings',
-          'Time synchronization only matters for billing purposes',
-        ],
-        correctIndex: 1,
-        explanation: 'Consistent timestamps across devices are essential for accurately reconstructing attack timelines and correlating related events.',
-      ),
-  // From: Secure Protocols
-  QuizQuestion(
-        question: 'What does Mutual TLS (mTLS) require that standard TLS does not?',
-        options: [
-          'Only the server needs to present a certificate, exactly like standard TLS',
-          'Both the client AND the server must authenticate each other using digital certificates',
-          'Neither party needs any certificate at all',
-          'mTLS eliminates the need for encryption entirely',
-        ],
-        correctIndex: 1,
-        explanation: 'Standard TLS authenticates only the server; mTLS adds client-side certificate authentication, reducing impersonation risk for sensitive integrations.',
-      ),
-  // From: Secure Protocols
-  QuizQuestion(
-        question: 'What is SSL stripping specifically designed to do?',
-        options: [
-          'Strengthen an HTTPS connection with additional encryption',
-          'Attempt to downgrade or replace an HTTPS connection with an unencrypted HTTP connection, exposing data that would otherwise be protected',
-          'Automatically renew expired certificates',
-          'Permanently disable a user\'s Internet connection',
-        ],
-        correctIndex: 1,
-        explanation: 'SSL stripping specifically targets the HTTPS-to-HTTP downgrade path, which HSTS is specifically designed to prevent.',
-      ),
-  // From: Secure Protocols
-  QuizQuestion(
-        question: 'What is the primary security benefit of SNMPv3 over SNMPv1 and SNMPv2c?',
-        options: [
-          'SNMPv3 removes all security features for faster performance',
-          'SNMPv3 introduces user authentication, message integrity, and encryption of management traffic',
-          'SNMPv3 only works with community strings, just like v1 and v2c',
-          'SNMPv3 is identical in security to SNMPv1',
-        ],
-        correctIndex: 1,
-        explanation: 'SNMPv3 is specifically recommended because it addresses the security weaknesses present in earlier, less secure versions.',
-      ),
-  // From: Cloud Security
-  QuizQuestion(
-        question: 'What is the fundamental principle of the Shared Responsibility Model?',
-        options: [
-          'The cloud provider is responsible for absolutely everything, including customer data',
-          'The provider secures the cloud infrastructure, while the customer secures what they deploy and manage within the cloud',
-          'The customer is solely responsible for physical data center security',
-          'Security responsibility disappears once data moves to the cloud',
-        ],
-        correctIndex: 1,
-        explanation: 'This is one of the most commonly misunderstood concepts in cloud security — the provider and customer each own distinct parts of the security responsibility.',
-      ),
-  // From: Cloud Security
-  QuizQuestion(
-        question: 'As organizations move from IaaS to PaaS to SaaS, what happens to the division of responsibility?',
-        options: [
-          'The customer takes on more and more responsibility',
-          'The cloud provider assumes greater responsibility for managing the environment',
-          'Responsibility remains exactly the same across all three models',
-          'The customer becomes responsible for the physical infrastructure',
-        ],
-        correctIndex: 1,
-        explanation: 'IaaS gives customers the most control (and responsibility); SaaS shifts nearly all infrastructure and platform responsibility to the provider.',
-      ),
-  // From: Cloud Security
-  QuizQuestion(
-        question: 'What is the key difference between RBAC and ABAC?',
-        options: [
-          'They are identical access control models',
-          'RBAC grants permissions based on predefined roles; ABAC makes access decisions using multiple attributes like department, device compliance, location, and time of day',
-          'ABAC is simpler to administer than RBAC',
-          'RBAC is commonly used in Zero Trust architectures, not ABAC',
-        ],
-        correctIndex: 1,
-        explanation: 'ABAC provides more dynamic, context-aware access decisions using multiple attributes, while RBAC relies on simpler, predefined role assignments.',
-      ),
-  // From: Cloud Security
-  QuizQuestion(
-        question: 'How does Tokenization differ from encryption in protecting sensitive data like credit card numbers?',
-        options: [
-          'They are functionally identical',
-          'Tokenization replaces sensitive data with a non-reversible token mapped in a secure database, rather than relying on a mathematically reversible decryption key',
-          'Tokenization requires a decryption key just like encryption',
-          'Tokenization is only used for encrypting entire databases',
-        ],
-        correctIndex: 1,
-        explanation: 'Tokenized data has no mathematical relationship to the original value — an attacker who steals it has nothing to decrypt, unlike stolen ciphertext.',
-      ),
-  // From: Cloud Security
-  QuizQuestion(
-        question: 'What is the key difference between CSPM and CWPP?',
-        options: [
-          'They are identical tools with different names',
-          'CSPM focuses on cloud configuration security (misconfigurations), while CWPP focuses on protecting the workloads themselves during runtime',
-          'CWPP only evaluates compliance, never actual workload threats',
-          'CSPM protects containers while CWPP protects storage accounts',
-        ],
-        correctIndex: 1,
-        explanation: 'CSPM is about getting the configuration right; CWPP is about protecting the running workload itself — complementary, not overlapping, functions.',
-      ),
-  // From: Cloud Security
-  QuizQuestion(
-        question: 'What does a Cloud Access Security Broker (CASB) provide?',
-        options: [
-          'Nothing related to SaaS application security',
-          'A policy enforcement point between users and cloud applications, providing visibility, access control, DLP, and consistent security across multiple SaaS services',
-          'CASB only works for a single cloud application',
-          'CASB replaces the need for any encryption',
-        ],
-        correctIndex: 1,
-        explanation: 'CASB gives organizations centralized visibility and control across the many different SaaS applications employees actually use.',
-      ),
-  // From: Cloud Security
-  QuizQuestion(
-        question: 'What is the key difference between Rehosting ("Lift and Shift") and Refactoring during cloud migration?',
-        options: [
-          'They are identical migration strategies',
-          'Rehosting moves applications with minimal changes (fast but may carry over existing weaknesses); Refactoring redesigns applications to use cloud-native services (more effort, better long-term scalability)',
-          'Refactoring is always faster than Rehosting',
-          'Rehosting always produces better long-term results than Refactoring',
-        ],
-        correctIndex: 1,
-        explanation: 'Rehosting prioritizes migration speed; Refactoring prioritizes long-term cloud-native benefits at the cost of greater upfront effort.',
-      ),
-  // From: Cloud Security
-  QuizQuestion(
-        question: 'What security risks does Infrastructure as Code (IaC) specifically introduce if not properly managed?',
-        options: [
-          'IaC introduces no security risks whatsoever',
-          'Insecure default configurations, hardcoded credentials, excessive permissions, and unreviewed configuration changes — all of which get replicated at scale through automation',
-          'IaC only affects a single server at a time, limiting any risk',
-          'IaC eliminates the possibility of misconfiguration entirely',
-        ],
-        correctIndex: 1,
-        explanation: 'Because IaC templates are reused repeatedly, a single flawed template can replicate a security weakness across many deployments.',
-      ),
+    question:
+        'An organization wants to detect when an internal device begins scanning other internal systems, a behavior consistent with lateral movement. Which capability BEST supports this?',
+    options: [
+      'A physical security camera in the server room',
+      'A firewall rule that only inspects inbound Internet traffic',
+      'Internal network traffic monitoring with anomaly detection',
+      'A password policy requiring quarterly password changes',
+    ], correctIndex: 2,
+    explanation:
+        'Internal network monitoring tuned for anomalous behavior, like a device scanning others, can catch lateral movement that perimeter-only controls would miss entirely.',
+  ),
+
   // From: Identity Access Management
   QuizQuestion(
-        question: 'What are the four pillars of IAM, commonly abbreviated as IAAA?',
-        options: [
-          'Installation, Access, Audit, Authorization',
-          'Identification, Authentication, Authorization, Accounting',
-          'Identity, Authorization, Access, Alerting',
-          'Inspection, Authentication, Approval, Archiving',
-        ],
-        correctIndex: 1,
-        explanation: 'IAM is built on four fundamental concepts: Identification, Authentication, Authorization, and Accounting (Auditing).',
-      ),
-  // From: Identity Access Management
+    question:
+        'A company grants every new employee identical access regardless of their specific role, then relies on the employee to request removal of anything unneeded. What is the core problem with this approach?',
+    options: [
+      'It ensures every employee is maximally productive from day one',
+      'It inverts least privilege by defaulting to excessive access',
+      'It is the industry-standard best practice for provisioning',
+      'It has no meaningful downside since access can be requested later',
+    ], correctIndex: 1,
+    explanation:
+        'Defaulting to broad access and relying on employees to request removal inverts least privilege — access should default to the minimum needed, then expand as justified.',
+  ),
   QuizQuestion(
-        question: 'What happens during the "Move" stage of the Joiner-Mover-Leaver (JML) identity lifecycle?',
-        options: [
-          'A new user account is created for the first time',
-          'Old permissions are removed and new permissions are assigned based on the employee\'s new role',
-          'The account is permanently deleted',
-          'Devices are recovered and email is archived',
-        ],
-        correctIndex: 1,
-        explanation: 'During the Move stage, an employee changes departments — old permissions are removed and new permissions are assigned based on the new role.',
-      ),
-  // From: Identity Access Management
+    question:
+        'An organization\'s access review process asks managers to simply confirm a list of names without reviewing what specific access each person actually has. What limitation does this create?',
+    options: [
+      'This approach guarantees perfectly accurate access at all times',
+      'This process fully satisfies any meaningful audit requirement',
+      'Managers are always fully aware of every system permission',
+      'The review may rubber-stamp excessive access without real scrutiny',
+    ], correctIndex: 3,
+    explanation:
+        'A review that only confirms names, not actual granted permissions, risks becoming a rubber-stamp exercise that fails to catch genuinely excessive access.',
+  ),
+
+  // From: Cryptography
   QuizQuestion(
-        question: 'A hardware security key (such as a FIDO2 key) is an example of which authentication factor?',
-        options: [
-          'Something you know',
-          'Something you have',
-          'Something you are',
-          'Something you do',
-        ],
-        correctIndex: 1,
-        explanation: 'A hardware security key requires the user to physically possess a device, making it a "something you have" (possession) factor.',
-      ),
-  // From: Identity Access Management
+    question:
+        'A company encrypts data at rest but transmits it between internal services without encryption, reasoning that the internal network is "trusted." What risk does this overlook?',
+    options: [
+      'An attacker who breaches the perimeter can then read traffic freely',
+      'Encryption in transit only matters for Internet-facing traffic',
+      'Internal networks are mathematically incapable of being compromised',
+      'This approach fully satisfies the intent of defense in depth',
+    ], correctIndex: 0,
+    explanation:
+        'Trusting the internal network alone assumes the perimeter will never be breached; once an attacker gets inside, unencrypted internal traffic becomes freely readable.',
+  ),
   QuizQuestion(
-        question: 'Between "P@ssw0rd!" and "BlueTiger!RunsAcross7Mountains," which is the passphrase, and why is it generally preferred?',
-        options: [
-          'P@ssw0rd! is the passphrase because it is shorter',
-          'BlueTiger!RunsAcross7Mountains is the passphrase — it is longer, easier to remember, and more resistant to brute-force attacks',
-          'Both are equally secure passwords',
-          'Neither example is a valid passphrase',
-        ],
-        correctIndex: 1,
-        explanation: 'A passphrase is a longer sequence of words that is easier to remember and generally more resistant to brute-force attacks than a short, complex password.',
-      ),
-  // From: Identity Access Management
+    question:
+        'A company wants new employees to understand why they should never paste production encryption keys into a chat application for convenience. What is the core risk being addressed?',
+    options: [
+      'This concern only applies to keys longer than 256 bits',
+      'Chat platforms and their logs may not be adequately secured',
+      'Pasting keys into chat has no bearing on their confidentiality',
+      'Chat applications are technically unable to transmit text data',
+    ], correctIndex: 1,
+    explanation:
+        'Chat platforms often retain message history and may not be designed to protect highly sensitive secrets, creating unnecessary exposure for production encryption keys.',
+  ),
+
+  // From: Secure Protocols
   QuizQuestion(
-        question: 'Which of the following is listed as a benefit of passwordless authentication?',
-        options: [
-          'It eliminates the need for any device compliance checks',
-          'Reduced phishing risk and fewer password reset requests',
-          'It requires no hardware of any kind',
-          'It is only compatible with legacy on-premises systems',
-        ],
-        correctIndex: 1,
-        explanation: 'Passwordless authentication reduces phishing risk, improves user experience, reduces password reset requests, and strengthens overall security.',
-      ),
-  // From: Identity Access Management
+    question:
+        'A company\'s internal DNS server accepts recursive queries from any device on the Internet, not just internal clients. What risk does this create?',
+    options: [
+      'This setting only affects the server\'s own internal performance',
+      'This configuration improves DNS resolution speed for everyone',
+      'Open recursive DNS servers pose no meaningful security risk',
+      'The server could be abused in a DNS amplification attack',
+    ], correctIndex: 3,
+    explanation:
+        'Open recursive DNS resolvers are commonly abused by attackers to amplify traffic in DDoS attacks against third parties, making restricting recursion to internal clients important.',
+  ),
   QuizQuestion(
-        question: 'Why does Multi-Factor Authentication (MFA) make it significantly harder for an attacker to gain unauthorized access after stealing a password?',
-        options: [
-          'MFA automatically resets the stolen password',
-          'The attacker is unlikely to also possess the required second, independent authentication factor',
-          'MFA blocks all network traffic from unknown IP addresses',
-          'MFA disables the user account permanently after any login attempt',
-        ],
-        correctIndex: 1,
-        explanation: 'Even with a stolen password, an attacker is unlikely to have access to the required second independent authentication factor, which is what makes MFA effective.',
-      ),
-  // From: Identity Access Management
+    question:
+        'A remote access solution allows connections using outdated, deprecated VPN protocols alongside modern ones for backward compatibility. What is the associated risk?',
+    options: [
+      'This configuration has no bearing on the connection\'s actual security',
+      'Attackers may deliberately force a downgrade to the weaker protocol',
+      'Backward compatibility eliminates any need for protocol review',
+      'Deprecated protocols always perform faster than modern alternatives',
+    ], correctIndex: 1,
+    explanation:
+        'Allowing deprecated protocols alongside modern ones creates a downgrade risk, where an attacker forces the weaker, exploitable protocol to be used instead.',
+  ),
+
+  // From: Endpoint Security
   QuizQuestion(
-        question: 'Why are SMS-based One-Time Passwords (OTPs) considered a weaker MFA method compared to authenticator apps or hardware security keys?',
-        options: [
-          'SMS OTPs never actually get delivered to the user',
-          'SMS-based OTPs can be vulnerable to SIM-swapping attacks',
-          'SMS OTPs require expensive hardware to use',
-          'SMS OTPs are not compatible with mobile phones',
-        ],
-        correctIndex: 1,
-        explanation: 'SMS-based OTPs can be vulnerable to SIM-swapping attacks, which is why best practice favors authenticator apps or hardware security keys instead.',
-      ),
-  // From: Identity Access Management
+    question:
+        'A security team wants to know not just whether an endpoint is currently infected, but what happened in the minutes leading up to an alert. Which capability BEST supports this?',
+    options: [
+      'A spreadsheet manually updated by the help desk team',
+      'A firewall log showing only blocked network connections',
+      'EDR with detailed process and behavioral timeline recording',
+      'A basic antivirus product with signature scanning only',
+    ], correctIndex: 2,
+    explanation:
+        'EDR platforms record detailed process and behavioral timelines, letting analysts reconstruct exactly what happened leading up to an alert, not just the alert itself.',
+  ),
   QuizQuestion(
-        question: 'In the IAAA model, which pillar is responsible for recording login times, files accessed, and failed login attempts?',
-        options: [
-          'Identification',
-          'Authentication',
-          'Authorization',
-          'Accounting',
-        ],
-        correctIndex: 3,
-        explanation: 'Accounting (Auditing) records user activities such as login/logout time, files accessed, administrative actions, and failed login attempts for security and compliance purposes.',
-      ),
-  // From: Identity Federation and SSO
+    question:
+        'A company\'s endpoint policy allows employees to disable antivirus temporarily "for troubleshooting" with no approval or logging. What risk does this create?',
+    options: [
+      'No risk exists as long as the employee re-enables it later',
+      'Faster application performance with no meaningful downside',
+      'This capability is required for all modern operating systems',
+      'A window where malware could run completely undetected',
+    ], correctIndex: 3,
+    explanation:
+        'Allowing antivirus to be disabled without approval or logging creates an unmonitored window where malware could execute and persist completely undetected.',
+  ),
+
+  // From: Identity Federation & SSO
   QuizQuestion(
-        question: 'What is the fundamental relationship between Single Sign-On (SSO) and Identity Federation?',
-        options: [
-          'They are unrelated technologies with no connection',
-          'Federation establishes trust between security domains, while SSO provides the seamless single-login experience built on top of that trust',
-          'SSO always requires passwords to be shared between every application',
-          'Federation only works within a single organization',
-        ],
-        correctIndex: 1,
-        explanation: 'Identity federation establishes trust between different organizations or security domains, while SSO provides a seamless authentication experience once that trust exists.',
-      ),
-  // From: Identity Federation and SSO
+    question:
+        'A company federates with a partner organization\'s Identity Provider to allow cross-organization collaboration. What must the company continuously verify about this trust relationship?',
+    options: [
+      'That the partnership agreement includes a marketing clause',
+      'Only that the partner\'s logo displays correctly on the login page',
+      'Nothing further, since federation is a one-time setup',
+      'That the partner\'s security posture remains acceptable over time',
+    ], correctIndex: 3,
+    explanation:
+        'Federated trust extends an organization\'s security perimeter to include the partner\'s IdP, making it necessary to continuously verify the partner\'s security posture remains acceptable.',
+  ),
   QuizQuestion(
-        question: 'In a SAML authentication flow, what does the Service Provider verify when it receives a returned assertion?',
-        options: [
-          'Nothing — assertions are trusted automatically',
-          'Digital signature, certificate validity, assertion expiration, trusted Identity Provider, and audience restrictions',
-          'Only the user\'s IP address',
-          'The physical location of the Identity Provider\'s servers',
-        ],
-        correctIndex: 1,
-        explanation: 'Before granting access, the Service Provider validates the digital signature, certificate validity, assertion expiration, trusted IdP, and audience restrictions.',
-      ),
-  // From: Identity Federation and SSO
+    question:
+        'An application accepts a long-lived API token with no expiration, used by an automated integration. What risk does the lack of expiration introduce?',
+    options: [
+      'Long-lived tokens are always more secure than short-lived ones',
+      'Automated integrations are inherently immune to token leakage',
+      'This setup has no meaningful security implication at all',
+      'A leaked token remains valid indefinitely until manually revoked',
+    ], correctIndex: 3,
+    explanation:
+        'A token with no expiration remains usable indefinitely if leaked, unlike a short-lived token that naturally limits the exposure window even after compromise.',
+  ),
+
+  // From: Application Security
   QuizQuestion(
-        question: 'Which protocol would be most appropriate for a mobile app that needs delegated access to a user\'s cloud storage without ever seeing their password?',
-        options: [
-          'Kerberos',
-          'OAuth 2.0',
-          'LDAP',
-          'Group Policy',
-        ],
-        correctIndex: 1,
-        explanation: 'OAuth 2.0 is designed exactly for this scenario — an application gains limited, delegated access to a resource via an access token, without ever handling the user\'s password.',
-      ),
-  // From: Identity Federation and SSO
+    question:
+        'A web application allows users to directly reference internal file paths through a URL parameter with no validation. What vulnerability class does this MOST likely enable?',
+    options: [
+      'Path traversal, allowing access to unauthorized files',
+      'A Denial-of-Service condition from resource exhaustion',
+      'DNS cache poisoning affecting the application\'s domain',
+      'Cross-Site Scripting, targeting other users\' browsers',
+    ], correctIndex: 0,
+    explanation:
+        'Unvalidated file path parameters are the classic setup for path traversal attacks, where an attacker manipulates the path to access files outside the intended directory.',
+  ),
   QuizQuestion(
-        question: 'What is a "password spray attack" specifically designed to evade?',
-        options: [
-          'Encryption at rest',
-          'Account lockout policies tuned to detect many failed attempts against a single account',
-          'Firewall rules',
-          'DNS filtering',
-        ],
-        correctIndex: 1,
-        explanation: 'By trying only a few common passwords against many different accounts, password spraying stays under lockout thresholds designed to catch repeated attempts against one account.',
-      ),
-  // From: Identity Federation and SSO
+    question:
+        'A development team hardcodes a database password directly into application source code, which is later pushed to a public repository. What is the MOST urgent remediation?',
+    options: [
+      'Make the repository private without changing the credential',
+      'Wait to see if anyone actually uses the exposed credential',
+      'Simply delete the latest commit and consider the issue resolved',
+      'Rotate the exposed credential immediately and remove it from history',
+    ], correctIndex: 3,
+    explanation:
+        'Once a credential is exposed publicly, it must be treated as compromised — rotating it immediately (and scrubbing it from history) is the only reliable remediation.',
+  ),
+
+  // From: Cloud Security
   QuizQuestion(
-        question: 'What does UEBA (User and Entity Behavior Analytics) use to detect a potentially compromised account?',
-        options: [
-          'A static list of banned passwords only',
-          'Behavioral baselines built from historical activity, flagging significant deviations as anomalous',
-          'Manual review of every login attempt by IT staff',
-          'The user\'s job title alone',
-        ],
-        correctIndex: 1,
-        explanation: 'UEBA builds a behavioral baseline for each user and flags significant deviations — such as a login from an unusual location at an unusual time — as anomalous.',
-      ),
-  // From: Identity Federation and SSO
+    question:
+        'A company\'s cloud spending has grown significantly, and the security team suspects unused, forgotten resources may be part of the cause. What additional risk do these unused resources typically carry?',
+    options: [
+      'Automatic cost savings with no associated security trade-off',
+      'No meaningful risk beyond the extra billing cost',
+      'Guaranteed compliance with all applicable regulations',
+      'Unpatched, unmonitored systems that expand the attack surface',
+    ], correctIndex: 3,
+    explanation:
+        'Forgotten cloud resources are often unpatched and unmonitored, quietly expanding the attack surface well beyond just representing wasted spend.',
+  ),
   QuizQuestion(
-        question: 'What does Continuous Access Evaluation (CAE) allow that traditional token-based access does not?',
-        options: [
-          'Tokens that never expire under any circumstances',
-          'Near real-time reassessment of an active session when a significant security event occurs, rather than waiting for the token to expire',
-          'Elimination of the need for any authentication token',
-          'Automatic approval of all access requests',
-        ],
-        correctIndex: 1,
-        explanation: 'CAE lets applications and identity providers reassess access immediately when events like account disablement or high risk are detected, instead of waiting for the token\'s natural expiration.',
-      ),
-  // From: Identity Federation and SSO
+    question:
+        'An organization\'s cloud identity roles grant broad "administrator" access to dozens of automated service accounts, none of which need most of those permissions. What should be done?',
+    options: [
+      'Remove all permissions entirely, breaking every automated process',
+      'Scope each service account\'s permissions to only what it needs',
+      'Leave the broad access in place since automation is trusted by default',
+      'Grant even broader access to simplify future troubleshooting',
+    ], correctIndex: 1,
+    explanation:
+        'Service accounts should follow least privilege just like human accounts — scoping permissions to only what automation genuinely needs reduces the impact of any single compromised credential.',
+  ),
+
+  // From: Security Operations
   QuizQuestion(
-        question: 'What is the primary difference between Active Directory Domain Services (AD DS) and Microsoft Entra ID?',
-        options: [
-          'They are the same product marketed under two names',
-          'AD DS is an on-premises directory using Kerberos/NTLM, while Microsoft Entra ID is cloud-based and supports modern protocols like OAuth 2.0 and SAML',
-          'Entra ID only works for printer management',
-          'AD DS cannot issue Kerberos tickets',
-        ],
-        correctIndex: 1,
-        explanation: 'AD DS is Microsoft\'s on-premises directory service using Kerberos/NTLM authentication, while Microsoft Entra ID is a cloud-native identity platform supporting modern authentication protocols.',
-      ),
-  // From: Identity Federation and SSO
+    question:
+        'A SOC wants new analysts to ramp up quickly on how to investigate common alert types. Which resource BEST supports this goal?',
+    options: [
+      'Relying entirely on informal, undocumented tribal knowledge',
+      'No documentation at all, learning purely through trial and error',
+      'Documented playbooks for common alert and incident types',
+      'A single company-wide meeting held once per year',
+    ], correctIndex: 2,
+    explanation:
+        'Documented playbooks give new analysts a consistent, repeatable reference for investigating common alert types, dramatically shortening ramp-up time versus relying on tribal knowledge.',
+  ),
   QuizQuestion(
-        question: 'Why is the Identity Provider (IdP) considered a particularly high-value target for attackers in an SSO architecture?',
-        options: [
-          'The IdP has no special importance compared to other systems',
-          'Because it is the central trust authority — compromising it could grant access to every connected application',
-          'The IdP only stores cosmetic user preferences',
-          'Attackers cannot target identity infrastructure',
-        ],
-        correctIndex: 1,
-        explanation: 'Since every Service Provider trusts the IdP\'s authentication decisions, compromising the IdP could give an attacker access to every application connected through it.',
-      ),
+    question:
+        'A SOC manager notices that analysts consistently take much longer to triage alerts during night shifts compared to day shifts. What should be investigated FIRST?',
+    options: [
+      'Whether night shift staffing or tooling access differs meaningfully',
+      'Whether the SIEM platform only functions during daytime hours',
+      'Whether alerts generated at night are inherently less important',
+      'Whether night shift analysts are simply less capable overall',
+    ], correctIndex: 0,
+    explanation:
+        'Consistent performance gaps between shifts usually point to structural differences — staffing levels, tooling access, or escalation paths — rather than individual analyst capability.',
+  ),
+
+  // From: Incident Response
+  QuizQuestion(
+    question:
+        'A company\'s incident response plan lists external contacts, but the phone numbers and emails have not been verified in over a year. Why does this matter during an actual incident?',
+    options: [
+      'This detail has no real bearing on incident response speed',
+      'Outdated contact information could delay critical communications',
+      'Contact information never actually changes once documented',
+      'External contacts are never actually needed during a real incident',
+    ], correctIndex: 1,
+    explanation:
+        'Outdated contact information for external partners like legal counsel, forensics firms, or regulators can cause critical delays exactly when speed matters most.',
+  ),
+  QuizQuestion(
+    question:
+        'During incident response, the team discovers evidence suggesting the attacker may still have active access to a different, currently unaffected system. What should happen NEXT?',
+    options: [
+      'Investigate and contain that system before considering the incident closed',
+      'Close the incident since only the originally affected system matters',
+      'Ignore the new evidence since it wasn\'t part of the initial scope',
+      'Wait for a scheduled review meeting before taking any action',
+    ], correctIndex: 0,
+    explanation:
+        'Evidence of potential ongoing access elsewhere must be investigated and contained before considering an incident resolved — closing prematurely risks leaving the attacker active.',
+  ),
+
+  // From: Governance, Risk & Compliance
+  QuizQuestion(
+    question:
+        'A company operates in multiple countries with different data protection laws. How should its privacy program approach this complexity?',
+    options: [
+      'Apply only the laws of the country where headquarters is located',
+      'Wait for a regulator to specify requirements after an investigation',
+      'Ignore jurisdictional differences since privacy laws are all identical',
+      'Map applicable requirements per jurisdiction and design accordingly',
+    ], correctIndex: 3,
+    explanation:
+        'Operating across jurisdictions with different privacy laws requires mapping applicable requirements per region and designing the program to meet the most relevant, or most stringent, obligations.',
+  ),
+  QuizQuestion(
+    question:
+        'A company\'s board asks whether the organization is "secure enough." What is the MOST accurate and useful way to frame an answer?',
+    options: [
+      'With a simple yes or no answer and no further context',
+      'By deferring the question entirely to the IT help desk',
+      'By stating that no organization can ever be considered secure',
+      'In terms of current risk levels relative to defined risk appetite',
+    ], correctIndex: 3,
+    explanation:
+        'Framing security posture relative to a defined risk appetite gives the board a genuinely useful, actionable answer rather than an oversimplified yes or no.',
+  ),
+
+  // From: Malware
+  QuizQuestion(
+    question:
+        'An organization\'s antivirus quarantines a file, but the same malware family reappears on the same machine days later. What does this MOST likely indicate?',
+    options: [
+      'A persistence mechanism the initial cleanup did not remove',
+      'Malware reinfection is always random and unrelated to persistence',
+      'The antivirus software must be completely non-functional',
+      'The user simply reinstalled the same file voluntarily',
+    ], correctIndex: 0,
+    explanation:
+        'Recurring infections of the same malware family after cleanup often point to an undiscovered persistence mechanism, such as a scheduled task or registry entry, that reinstalls it.',
+  ),
+  QuizQuestion(
+    question:
+        'A company\'s backup strategy stores backups on a network drive that is always connected and accessible from production systems. What risk does ransomware pose to this setup?',
+    options: [
+      'This configuration guarantees the fastest possible recovery',
+      'Network-based backups cannot technically be reached by ransomware',
+      'Ransomware could encrypt the backups along with production data',
+      'Always-connected backups are immune to any form of malware',
+    ], correctIndex: 2,
+    explanation:
+        'Backups that remain constantly connected and accessible are just as vulnerable to ransomware encryption as production data — offline or immutable backups avoid this risk.',
+  ),
+
+  // From: Social Engineering
+  QuizQuestion(
+    question:
+        'An attacker calls an employee pretending to be a survey researcher, asking seemingly harmless questions about internal tools and processes. What is this technique called?',
+    options: [
+      'DNS spoofing, redirecting network traffic',
+      'SQL Injection, manipulating a database query',
+      'Ransomware, encrypting data until payment is made',
+      'Pretexting, using a fabricated scenario to extract information',
+    ], correctIndex: 3,
+    explanation:
+        'Using a fabricated, plausible cover story — like posing as a researcher — to extract seemingly harmless information is a classic pretexting technique.',
+  ),
+
+  // From: Vulnerabilities and Threats
+  QuizQuestion(
+    question:
+        'A vulnerability scanner reports a finding that turns out, after investigation, to not actually exist on the target system. What is this type of result called?',
+    options: [
+      'A false negative',
+      'A compensating control',
+      'A zero-day vulnerability',
+      'A false positive',
+    ], correctIndex: 3,
+    explanation:
+        'A finding reported by a scanner that does not actually exist on investigation is a false positive, distinct from a false negative (a real issue the scanner misses entirely).',
+  ),
+  QuizQuestion(
+    question:
+        'A legacy system can no longer receive security patches because the vendor discontinued support years ago. What is the MOST appropriate interim strategy while planning replacement?',
+    options: [
+      'Isolate the system and closely monitor it for suspicious activity',
+      'Ignore the risk since replacement is planned eventually',
+      'Connect the system directly to the Internet for convenience',
+      'Disable all logging on the unsupported system',
+    ], correctIndex: 0,
+    explanation:
+        'Isolating an unsupported, unpatchable system and closely monitoring it reduces risk while a proper replacement is planned, rather than leaving it exposed or unmonitored.',
+  ),
+
+  // From: Alerts and Monitoring
+  QuizQuestion(
+    question:
+        'A company\'s log retention policy keeps only seven days of logs due to storage cost concerns. Why might this be insufficient during a real investigation?',
+    options: [
+      'Some attacks go undetected for weeks before discovery',
+      'Log retention length has no bearing on investigation quality',
+      'Seven days is always more than enough for any investigation',
+      'Attackers are only ever active during the most recent week',
+    ], correctIndex: 0,
+    explanation:
+        'Many real-world breaches go undetected for weeks or months, meaning short retention windows can destroy the very logs needed to reconstruct what actually happened.',
+  ),
+  QuizQuestion(
+    question:
+        'A monitoring platform generates the same alert every day for a known, accepted risk that the business has formally chosen not to remediate. What should be done with this alert?',
+    options: [
+      'Leave it firing daily indefinitely with no change at all',
+      'Disable the entire monitoring platform to stop the noise',
+      'Delete all historical records of the alert ever existing',
+      'Tune or suppress it with documentation of the accepted risk',
+    ], correctIndex: 3,
+    explanation:
+        'A documented, formally accepted risk should have its alert tuned or suppressed with clear documentation, rather than left to generate daily noise that contributes to alert fatigue.',
+  ),
+
+  // From: Windows Security
+  QuizQuestion(
+    question:
+        'A Windows domain has not enforced a minimum password length in years, and many accounts still use short, weak passwords. What is the MOST effective immediate improvement?',
+    options: [
+      'Only address the issue for accounts with administrator privileges',
+      'Wait for users to voluntarily choose stronger passwords on their own',
+      'Update the domain password policy and require MFA where possible',
+      'Remove password requirements entirely to simplify support tickets',
+    ], correctIndex: 2,
+    explanation:
+        'Updating the domain-wide password policy combined with MFA addresses the weakness systematically, rather than hoping users voluntarily improve their own password choices.',
+  ),
+
+  // From: Linux Security
+  QuizQuestion(
+    question:
+        'A Linux server has several services running under the root account that don\'t actually require root privileges to function. What risk does this create?',
+    options: [
+      'Root-owned services are inherently immune to compromise',
+      'This configuration has no bearing on the system\'s security',
+      'Running services as root always improves system performance',
+      'A compromise of any one service could grant full root access',
+    ], correctIndex: 3,
+    explanation:
+        'Services running as root inherit full system privileges — compromising any one of them could give an attacker complete control, which dedicated service accounts would prevent.',
+  ),
+
+  // From: Email Security
+  QuizQuestion(
+    question:
+        'A company\'s email system allows external senders to spoof internal domain addresses with no rejection. What DNS-based control would MOST directly help stop this?',
+    options: [
+      'Removing the domain\'s MX record from DNS',
+      'Increasing the mailbox storage quota for all users',
+      'Disabling the company\'s spam filter entirely',
+      'A DMARC policy instructing receivers to reject failing messages',
+    ], correctIndex: 3,
+    explanation:
+        'A properly configured DMARC policy tells receiving mail servers what to do with messages that fail SPF or DKIM checks, directly helping reject spoofed messages claiming the domain.',
+  ),
+
+  // From: Cloud Security
+  QuizQuestion(
+    question:
+        'A company\'s cloud environment has multi-factor authentication enabled for the console, but API keys with equivalent access require no additional verification. What gap does this represent?',
+    options: [
+      'A configuration that only matters for very small organizations',
+      'A bypass path around MFA through less-protected API credentials',
+      'A fully closed security model with no meaningful gaps',
+      'An improvement, since API keys are inherently more secure than MFA',
+    ], correctIndex: 1,
+    explanation:
+        'If API keys grant equivalent access without the same verification as console logins, they become an unprotected bypass path around the MFA protecting the primary login method.',
+  ),
 ];

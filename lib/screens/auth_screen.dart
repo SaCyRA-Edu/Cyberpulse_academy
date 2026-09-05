@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/auth_service.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -15,6 +17,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _legalNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
@@ -22,6 +25,7 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _legalNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -40,6 +44,25 @@ class _AuthScreenState extends State<AuthScreen> {
           password: _passwordController.text,
           displayName: _nameController.text.trim(),
         );
+        // Saved directly here (rather than through AuthService, whose
+        // exact registerWithEmail internals aren't something this
+        // change should assume/guess at) so the certificate can later
+        // read it back without ever asking the user again. This is a
+        // one-time capture, deliberately separate from "Full Name"
+        // above — that one drives casual in-app greetings, this one
+        // is what actually appears on the printed certificate.
+        final uid = FirebaseAuth.instance.currentUser?.uid;
+        if (uid != null) {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(uid)
+              .collection('progress')
+              .doc('summary')
+              .set(
+            {'legalName': _legalNameController.text.trim()},
+            SetOptions(merge: true),
+          );
+        }
       } else {
         await AuthService.signInWithEmail(
           email: _emailController.text.trim(),
@@ -62,20 +85,6 @@ class _AuthScreenState extends State<AuthScreen> {
     });
     try {
       await AuthService.signInWithGoogle();
-    } catch (e) {
-      setState(() => _error = AuthService.friendlyError(e));
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _handleFacebookSignIn() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    try {
-      await AuthService.signInWithFacebook();
     } catch (e) {
       setState(() => _error = AuthService.friendlyError(e));
     } finally {
@@ -159,6 +168,14 @@ class _AuthScreenState extends State<AuthScreen> {
                         label: 'Full Name',
                         icon: Icons.person_outline,
                         validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter your name' : null,
+                      ),
+                      const SizedBox(height: 12),
+                      _AuthTextField(
+                        controller: _legalNameController,
+                        label: 'Full Legal Name (as per Government ID)',
+                        icon: Icons.badge_outlined,
+                        helperText: 'Used only for your certificate — spell it exactly as on your ID',
+                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter your full legal name' : null,
                       ),
                       const SizedBox(height: 12),
                     ],
@@ -247,20 +264,6 @@ class _AuthScreenState extends State<AuthScreen> {
                         label: const Text('Continue with Google', style: TextStyle(fontSize: 15)),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      height: 50,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF1877F2),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                        onPressed: _loading ? null : _handleFacebookSignIn,
-                        icon: const Icon(Icons.facebook, size: 22),
-                        label: const Text('Continue with Facebook', style: TextStyle(fontSize: 15)),
-                      ),
-                    ),
 
                     const SizedBox(height: 24),
                     Center(
@@ -301,6 +304,7 @@ class _AuthTextField extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final Widget? suffixIcon;
+  final String? helperText;
   final String? Function(String?)? validator;
 
   const _AuthTextField({
@@ -310,6 +314,7 @@ class _AuthTextField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType,
     this.suffixIcon,
+    this.helperText,
     this.validator,
   });
 
@@ -326,6 +331,9 @@ class _AuthTextField extends StatelessWidget {
         labelStyle: const TextStyle(color: Colors.white60),
         prefixIcon: Icon(icon, color: Colors.white54),
         suffixIcon: suffixIcon,
+        helperText: helperText,
+        helperMaxLines: 2,
+        helperStyle: const TextStyle(color: Colors.white54, fontSize: 11),
         filled: true,
         fillColor: Colors.white.withValues(alpha: 0.06),
         border: OutlineInputBorder(

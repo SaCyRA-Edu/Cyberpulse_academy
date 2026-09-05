@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 // ═══════════════════════════════════════════════════════════════════════
 // Diagram specification — attached to a LessonSection to render a visual
@@ -1629,6 +1631,32 @@ class GenericDataTableDiagram extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// Storage URL resolution — images now live in Firebase Storage instead
+// of being bundled into the app (moved out to shrink the APK). Every
+// `assetPath` string already written throughout the lesson content
+// files (e.g. 'assets/images/fundamentals/cia_triad.jpg') is reused
+// as-is as the Storage object path — no content files needed to
+// change, only this rendering layer.
+//
+// Resolved download URLs are cached in memory per app session, so the
+// same image doesn't trigger a repeated Storage metadata lookup every
+// time its widget rebuilds. CachedNetworkImage (used below) separately
+// handles the actual image bytes with its own persistent disk cache,
+// so a returning user doesn't re-download images they've already seen.
+// ═══════════════════════════════════════════════════════════════════════
+
+class _StorageImageUrlCache {
+  static final Map<String, Future<String>> _cache = {};
+
+  static Future<String> resolve(String storagePath) {
+    return _cache.putIfAbsent(
+      storagePath,
+      () => FirebaseStorage.instance.ref(storagePath).getDownloadURL(),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // Zoomable Asset Image — shows a small zoom-in button over the thumbnail;
 // tapping it opens a full-screen pinch-to-zoom viewer with +/- controls
 // ═══════════════════════════════════════════════════════════════════════
@@ -1644,18 +1672,43 @@ class ZoomableAssetImage extends StatelessWidget {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(10),
-          child: Image.asset(
-            assetPath,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) => Container(
-              padding: const EdgeInsets.all(20),
-              child: const Text(
-                'Image could not be loaded — check that the asset path is '
-                'declared correctly in pubspec.yaml.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.red, fontSize: 12),
-              ),
-            ),
+          child: FutureBuilder<String>(
+            future: _StorageImageUrlCache.resolve(assetPath),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Padding(
+                  padding: EdgeInsets.all(40),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+              if (snapshot.hasError || !snapshot.hasData) {
+                return Container(
+                  padding: const EdgeInsets.all(20),
+                  child: const Text(
+                    'Image could not be loaded — check your internet '
+                    'connection and try again.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.red, fontSize: 12),
+                  ),
+                );
+              }
+              return CachedNetworkImage(
+                imageUrl: snapshot.data!,
+                fit: BoxFit.contain,
+                placeholder: (context, url) => const Padding(
+                  padding: EdgeInsets.all(40),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  padding: const EdgeInsets.all(20),
+                  child: const Text(
+                    'Image could not be loaded.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.red, fontSize: 12),
+                  ),
+                ),
+              );
+            },
           ),
         ),
         Positioned(
@@ -1758,7 +1811,26 @@ class _ZoomableImagePageState extends State<_ZoomableImagePage> {
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
-                  child: Image.asset(widget.assetPath, fit: BoxFit.contain),
+                  child: FutureBuilder<String>(
+                    future: _StorageImageUrlCache.resolve(widget.assetPath),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        );
+                      }
+                      return CachedNetworkImage(
+                        imageUrl: snapshot.data!,
+                        fit: BoxFit.contain,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        ),
+                        errorWidget: (context, url, error) => const Center(
+                          child: Icon(Icons.broken_image, color: Colors.white54, size: 48),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ),

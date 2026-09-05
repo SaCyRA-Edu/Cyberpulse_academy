@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Required for Razorpay Checkout (and any other network access) -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
-        android:label="cyberpulse_academy"
+        android:label="CyberPulse"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -40,6 +42,23 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- Required so url_launcher can open mailto: links (the lesson
+             feedback button) and https/http links on Android 11+, which
+             restricts package visibility unless explicitly declared here.
+             Without this, launchUrl() silently fails even when a mail
+             app or browser genuinely is installed. -->
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="mailto" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
         </intent>
     </queries>
 </manifest>
