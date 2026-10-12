@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import '../services/progress_service.dart';
 import 'admin_puzzle_screen.dart';
 import 'puzzle_leaderboard_screen.dart';
@@ -85,6 +86,21 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       {'puzzleSubscribed': true},
       SetOptions(merge: true),
     );
+    // Best-effort: subscribe to the topic publishDailyPuzzle sends to,
+    // so opted-in users get alerted when a new puzzle goes live.
+    // Notification permission itself is now requested once at app
+    // startup (see main.dart) rather than here — previously, someone
+    // who never opted into puzzles was never even asked for
+    // notification permission at all. Wrapped so a failure here
+    // (notifications genuinely unavailable on this device) never
+    // blocks the actual opt-in itself, which is the part that matters
+    // most.
+    try {
+      await FirebaseMessaging.instance.subscribeToTopic('daily_puzzle');
+    } catch (_) {
+      // Notification setup failed — the user is still opted into
+      // puzzles either way, just without a push alert.
+    }
     setState(() => _subscribed = true);
   }
 
@@ -131,6 +147,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           correct: data['correct'] == true,
           pointsEarned: data['pointsEarned'] as int? ?? 0,
           wasBonus: data['wasBonus'] == true,
+          correctAnswer: data['correctAnswer'],
         );
         _alreadyAttemptedToday = true;
       });
@@ -239,7 +256,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                 title: Text(options[i]),
                 value: i,
                 groupValue: _mcqSelectedIndex,
-                onChanged: _subscribed && !_alreadyAttemptedToday ? (v) => setState(() => _mcqSelectedIndex = v) : null,
+                onChanged: _subscribed && !_alreadyAttemptedToday && !_submitting ? (v) => setState(() => _mcqSelectedIndex = v) : null,
               ),
           ],
         ),
@@ -263,7 +280,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                 contentPadding: EdgeInsets.zero,
                 title: Text(flag),
                 value: _selectedFlags.contains(flag),
-                onChanged: _subscribed && !_alreadyAttemptedToday
+                onChanged: _subscribed && !_alreadyAttemptedToday && !_submitting
                     ? (checked) => setState(() {
                           if (checked == true) {
                             _selectedFlags.add(flag);
@@ -282,7 +299,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   Widget _buildMatchingBody() {
     final terms = List<String>.from(_question?['terms'] ?? []);
     final definitions = List<String>.from(_question?['definitions'] ?? []);
-    final canInteract = _subscribed && !_alreadyAttemptedToday;
+    final canInteract = _subscribed && !_alreadyAttemptedToday && !_submitting;
 
     return Card(
       child: Padding(
@@ -351,7 +368,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   }
 
   Widget _buildSequenceBody() {
-    final canInteract = _subscribed && !_alreadyAttemptedToday;
+    final canInteract = _subscribed && !_alreadyAttemptedToday && !_submitting;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -436,11 +453,45 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
             if (r.correct) ...[
               const SizedBox(height: 4),
               Text('+${r.pointsEarned} points${r.wasBonus ? ' (early bonus!)' : ''}'),
+            ] else if (r.correctAnswer != null) ...[
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Correct answer:', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
+              ),
+              const SizedBox(height: 4),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(_formatCorrectAnswer(r.correctAnswer), style: const TextStyle(fontSize: 13.5)),
+              ),
             ],
           ],
         ),
       ),
     );
+  }
+
+  /// The correct-answer shape differs by puzzle type (a plain string for
+  /// mcq, a list of flag strings for spotMistake, a list of term/definition
+  /// maps for matching, an ordered list of strings for sequence) — this
+  /// renders each shape as a short, readable line rather than a raw
+  /// Dart-object toString().
+  String _formatCorrectAnswer(dynamic correctAnswer) {
+    switch (_type) {
+      case 'mcq':
+        return correctAnswer.toString();
+      case 'spotMistake':
+        return (correctAnswer as List).map((e) => e.toString()).join(', ');
+      case 'matching':
+        return (correctAnswer as List)
+            .map((e) => '${(e as Map)['term']} → ${e['definition']}')
+            .join('\n');
+      case 'sequence':
+        final items = (correctAnswer as List).map((e) => e.toString()).toList();
+        return items.asMap().entries.map((entry) => '${entry.key + 1}. ${entry.value}').join('\n');
+      default:
+        return correctAnswer.toString();
+    }
   }
 }
 
@@ -448,5 +499,6 @@ class _SubmitResult {
   final bool correct;
   final int pointsEarned;
   final bool wasBonus;
-  _SubmitResult({required this.correct, required this.pointsEarned, required this.wasBonus});
+  final dynamic correctAnswer;
+  _SubmitResult({required this.correct, required this.pointsEarned, required this.wasBonus, this.correctAnswer});
 }

@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -8,6 +9,7 @@ import '../services/notes_service.dart';
 import '../services/progress_service.dart';
 import '../services/voice_preference_service.dart';
 import '../services/tts_voice_check_service.dart';
+import '../services/chat_overlay_visibility.dart';
 import '../widgets/watermark.dart';
 import '../widgets/diagrams.dart';
 import 'podcast_data.dart';
@@ -61,12 +63,29 @@ class _LessonScreenState extends State<LessonScreen> {
     if (quiz != null) {
       final shuffled = List<QuizQuestion>.from(quiz)..shuffle(Random());
       _activeQuiz = shuffled.take(_quizLength).toList();
+      // Only hide the chat icon for actual quiz lessons, not regular
+      // reading — the chatbot floating over a self-check quiz is the
+      // same look-up-the-answer problem as the certification exam,
+      // just lower stakes. It stays visible for reading content,
+      // where it can genuinely help someone understand a concept.
+      ChatOverlayVisibility.hidden.value = true;
     } else {
       _activeQuiz = [];
     }
     _selectedAnswers = List.filled(_activeQuiz.length, -1);
 
-    ProgressService.markLessonViewed('${widget.moduleTitle}::${widget.lesson.title}');
+    // Reading/audio lessons have no other clear "completion" moment
+    // besides opening them, so marking viewed here on initState is
+    // correct for those. Quiz lessons are different — marking viewed
+    // here too meant answering just the FIRST question (or even just
+    // opening the screen) already showed the lesson as completed on
+    // the chapter list, before the quiz was actually finished. For
+    // quiz lessons, the actual markLessonViewed call now happens down
+    // in the answer-selection handler, gated on _allAnswered — see
+    // there for why.
+    if (quiz == null) {
+      ProgressService.markLessonViewed('${widget.moduleTitle}::${widget.lesson.title}');
+    }
     ProgressService.hasFullAccess().then((value) {
       if (mounted) setState(() => _hasFullAccess = value);
     });
@@ -313,6 +332,10 @@ class _LessonScreenState extends State<LessonScreen> {
   void dispose() {
     _tts.stop();
     _notesController.dispose();
+    // Always restore visibility on the way out — safe to do even for
+    // a reading lesson that never hid it in the first place, since
+    // setting an already-false value back to false is a no-op.
+    ChatOverlayVisibility.hidden.value = false;
     super.dispose();
   }
 
@@ -523,7 +546,36 @@ class _LessonScreenState extends State<LessonScreen> {
           for (final section in lesson.sections) _buildSection(section),
           _buildNotesSection(),
           _buildFeedbackSection(),
+          _buildBackToLessonsButton(),
         ],
+      ),
+    );
+  }
+
+  /// A simple, explicit way back to the lesson list at the end of a
+  /// lesson's content — rather than relying on the system/app-bar back
+  /// button alone. Works correctly regardless of which screen pushed
+  /// this one (a core curriculum chapter's lesson list, or the SOC
+  /// Fundamentals list under The Pulse), since it's just a pop.
+  ///
+  /// The extra bottom padding here (MediaQuery's bottom safe-area
+  /// inset, with a small minimum even when that's zero) matters
+  /// specifically because this button sits at the very end of a
+  /// SingleChildScrollView, not directly in the Scaffold's body — on
+  /// devices with a gesture nav bar, without this the button rendered
+  /// partially behind that system UI instead of clearing it.
+  Widget _buildBackToLessonsButton() {
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 12, 0, bottomInset > 0 ? bottomInset + 8 : 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.arrow_back, size: 18),
+          label: const Text('Back to Lessons'),
+        ),
       ),
     );
   }
@@ -618,11 +670,13 @@ class _LessonScreenState extends State<LessonScreen> {
                 style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
             ),
-          if (section.body != null)
+          if (section.body != null && !section.isTemplate)
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: Text(section.body!, style: const TextStyle(fontSize: 18, height: 1.4)),
+              child: LinkedText(section.body!, style: const TextStyle(fontSize: 18, height: 1.4)),
             ),
+          if (section.body != null && section.isTemplate)
+            _buildTemplateBody(section.body!),
           if (section.bullets != null)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -630,10 +684,57 @@ class _LessonScreenState extends State<LessonScreen> {
                 for (final bullet in section.bullets!)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 6),
-                    child: Text('•  $bullet', style: const TextStyle(fontSize: 18, height: 1.4)),
+                    child: LinkedText('•  $bullet', style: const TextStyle(fontSize: 18, height: 1.4)),
                   ),
               ],
             ),
+        ],
+      ),
+    );
+  }
+
+  /// Renders a sample-document section (a filled Initial Report, RCA,
+  /// KB article, or communication template) in a visually distinct
+  /// "document" style — monospace font, boxed background, a small
+  /// label at the top — so it reads clearly as a reference document
+  /// to skim, not as regular lesson prose to read straight through.
+  Widget _buildTemplateBody(String body) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF4F1E8),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.brown.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.description_outlined, size: 16, color: Colors.brown.shade400),
+              const SizedBox(width: 6),
+              Text(
+                'SAMPLE DOCUMENT',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.brown.shade400,
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: 20),
+          Text(
+            body,
+            style: const TextStyle(
+              fontSize: 14.5,
+              height: 1.5,
+              fontFamily: 'monospace',
+            ),
+          ),
         ],
       ),
     );
@@ -876,7 +977,11 @@ class _LessonScreenState extends State<LessonScreen> {
                     style: FilledButton.styleFrom(
                       backgroundColor: _allAnswered ? Colors.green.shade700 : null,
                     ),
-                    child: Text(_allAnswered ? 'Retake (New Questions)' : 'Answer All to Retake'),
+                    child: Text(
+                      _allAnswered ? 'Retake' : 'Finish to Retake',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
                 IconButton(
@@ -922,6 +1027,11 @@ class _LessonScreenState extends State<LessonScreen> {
               });
               if (_allAnswered && !_quizCompletionRecorded) {
                 _quizCompletionRecorded = true;
+                // This is the actual completion moment for a quiz
+                // lesson — every question has now been answered, not
+                // just the first one. See the initState comment above
+                // for why this isn't done there for quiz lessons.
+                ProgressService.markLessonViewed('${widget.moduleTitle}::${widget.lesson.title}');
                 if (_score >= (_activeQuiz.length * 0.8).ceil()) {
                   ProgressService.markTopicQuizPassed(widget.moduleTitle);
                 }
@@ -1089,6 +1199,84 @@ class _VoiceOptionCard extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+
+/// Text that turns web addresses into tappable links. Matches http(s) URLs
+/// and bare domains such as urlscan.io. Placeholder ".example" addresses used
+/// in teaching samples are never made tappable.
+class LinkedText extends StatefulWidget {
+  final String text;
+  final TextStyle style;
+  const LinkedText(this.text, {super.key, required this.style});
+
+  @override
+  State<LinkedText> createState() => _LinkedTextState();
+}
+
+class _LinkedTextState extends State<LinkedText> {
+  final List<TapGestureRecognizer> _recognizers = [];
+  static final RegExp _urlRe = RegExp(
+    r'(https?://[^\s<>"]+|\b(?:[a-z0-9-]+\.)+(?:io|com|org|net|ai|app|dev|sh)(?:/[^\s<>"]*)?)',
+    caseSensitive: false,
+  );
+
+  @override
+  void dispose() {
+    for (final r in _recognizers) {
+      r.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    for (final r in _recognizers) {
+      r.dispose();
+    }
+    _recognizers.clear();
+    final spans = <InlineSpan>[];
+    var last = 0;
+    for (final m in _urlRe.allMatches(widget.text)) {
+      var url = m.group(0)!;
+      var end = m.end;
+      while (url.isNotEmpty && '.,;:)'.contains(url[url.length - 1])) {
+        url = url.substring(0, url.length - 1);
+        end--;
+      }
+      if (url.contains('.example') || url.contains('@')) continue;
+      if (m.start > last) {
+        spans.add(TextSpan(text: widget.text.substring(last, m.start)));
+      }
+      final target = url.startsWith('http') ? url : 'https://$url';
+      final rec = TapGestureRecognizer()
+        ..onTap = () async {
+          await launchUrl(Uri.parse(target),
+              mode: LaunchMode.externalApplication);
+        };
+      _recognizers.add(rec);
+      spans.add(TextSpan(
+        text: url,
+        style: const TextStyle(
+          color: Color(0xFF4FC3F7),
+          decoration: TextDecoration.underline,
+        ),
+        recognizer: rec,
+      ));
+      last = end;
+    }
+    if (last < widget.text.length) {
+      spans.add(TextSpan(text: widget.text.substring(last)));
+    }
+    return RichText(
+      text: TextSpan(
+        style: widget.style.copyWith(
+            color: widget.style.color ??
+                DefaultTextStyle.of(context).style.color),
+        children: spans,
       ),
     );
   }

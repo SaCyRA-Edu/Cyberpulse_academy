@@ -460,16 +460,20 @@ class _CertificateScreenState extends State<CertificateScreen> {
 /// is what makes the certificate look genuinely signed, rather than
 /// just stating a name in plain text.
 ///
-/// Fetched from Firebase Storage (path: Signatures/authorized_signature.png)
-/// rather than bundled into the app, so it can be swapped out anytime
-/// (a different authorized person, an updated signature) just by
-/// replacing the file in Storage — no app rebuild or store
-/// resubmission needed.
+/// Randomly picks one of two signatures on file in Firebase Storage
+/// (Signatures/authorized_signature.png and
+/// Signatures/authorized_signature_2.png) — a small human touch so
+/// certificates don't all look mechanically identical. The choice is
+/// made once and cached for the rest of the app session (same pattern
+/// as the URL caching below it), so a user reopening the same
+/// certificate during one session always sees the same signature
+/// rather than it flickering between the two on every rebuild.
 class _AuthoritySignatureBlock extends StatelessWidget {
   final String authorizedName;
   const _AuthoritySignatureBlock({required this.authorizedName});
 
   static Future<String>? _cachedUrl;
+  static final math.Random _random = math.Random();
 
   static Future<String> _resolveUrl() {
     // Only cache a SUCCESSFUL resolution — caching the raw Future
@@ -481,7 +485,14 @@ class _AuthoritySignatureBlock extends StatelessWidget {
     // was fixed. This version only writes to the cache once a real
     // URL has actually come back.
     if (_cachedUrl != null) return _cachedUrl!;
-    final future = FirebaseStorage.instance.ref('Signatures/authorized_signature.png').getDownloadURL();
+    // Picked once per app session (not per certificate view) so the
+    // signature stays consistent if the same certificate is reopened
+    // during that session, while still varying genuinely across
+    // different sessions/users.
+    final path = _random.nextBool()
+        ? 'Signatures/authorized_signature.png'
+        : 'Signatures/authorized_signature_2.png';
+    final future = FirebaseStorage.instance.ref(path).getDownloadURL();
     future.then((url) => _cachedUrl = Future.value(url));
     return future;
   }

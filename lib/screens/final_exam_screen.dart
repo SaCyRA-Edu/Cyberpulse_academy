@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'certificate_screen.dart';
 import 'final_exam_taking_screen.dart';
 import 'retake_paywall_screen.dart';
 import '../services/retake_eligibility.dart';
@@ -176,22 +175,6 @@ class _FinalExamStartScreenState extends State<FinalExamStartScreen> {
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
-              ),
-              // TEMPORARY — remove before release. Lets you preview the
-              // certificate screen (and confirm the logo renders) without
-              // needing to actually pass the full exam.
-              const SizedBox(height: 12),
-              TextButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const CertificateScreen(scorePercentage: 92.0),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.bug_report, size: 16),
-                label: const Text('Debug: Preview Certificate'),
               ),
             ],
           ),

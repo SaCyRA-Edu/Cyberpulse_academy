@@ -32,6 +32,7 @@ enum DiagramType {
   siemSources,
   assetImage,
   dataTable,
+  socWorkflow,
 }
 
 class DiagramSpec {
@@ -136,6 +137,9 @@ class DiagramView extends StatelessWidget {
           headers: spec.tableHeaders ?? const [],
           rows: spec.tableRows ?? const [],
         );
+        break;
+      case DiagramType.socWorkflow:
+        diagram = const SocWorkflowDiagram();
         break;
     }
 
@@ -508,6 +512,87 @@ class ProcessFlowDiagram extends StatelessWidget {
       ],
     );
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// SOC Workflow — the 7-stage incident response flow, richer than the
+// generic ProcessFlowDiagram: color-coded per stage (escalating warm,
+// then resolving to green), a matching icon, and a short description
+// under each stage name.
+// ═══════════════════════════════════════════════════════════════════════
+
+class SocWorkflowDiagram extends StatelessWidget {
+  const SocWorkflowDiagram({super.key});
+
+  static const List<_SocStage> _stages = [
+    _SocStage("Detection", "Something surfaces the alert", Icons.notifications_active, Color(0xFF1565C0)),
+    _SocStage("Triage", "First pass — what is this?", Icons.filter_alt, Color(0xFF00838F)),
+    _SocStage("Classify", "How serious could this be?", Icons.label_important, Color(0xFF7B1FA2)),
+    _SocStage("Investigate", "Dig in — FP or TP?", Icons.search, Color(0xFFEF6C00)),
+    _SocStage("Contain", "Stop it from getting worse", Icons.shield, Color(0xFFD84315)),
+    _SocStage("Eradicate", "Remove the actual cause", Icons.cleaning_services, Color(0xFFC62828)),
+    _SocStage("Report", "Write it up, tell the right people", Icons.description, Color(0xFF2E7D32)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        for (var i = 0; i < _stages.length; i++) ...[
+          _buildStageRow(_stages[i], i + 1),
+          if (i != _stages.length - 1)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Icon(Icons.arrow_downward, color: Colors.grey.shade400, size: 18),
+            ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildStageRow(_SocStage stage, int number) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: stage.color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: stage.color.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(color: stage.color, shape: BoxShape.circle),
+            alignment: Alignment.center,
+            child: Icon(stage.icon, color: Colors.white, size: 18),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "$number. ${stage.title}",
+                  style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: stage.color),
+                ),
+                Text(stage.description, style: const TextStyle(fontSize: 11.5, color: Colors.black54)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SocStage {
+  final String title;
+  final String description;
+  final IconData icon;
+  final Color color;
+  const _SocStage(this.title, this.description, this.icon, this.color);
 }
 
 class _StepBubble extends StatelessWidget {

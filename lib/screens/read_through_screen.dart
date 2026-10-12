@@ -5,131 +5,71 @@ import '../services/progress_service.dart';
 import 'topic_detail_screen.dart';
 import 'paywall_screen.dart';
 
+/// Progress state for a single chapter, derived from how many of its
+/// lessons are in the viewed-lessons set — drives which of the 3
+/// colors below a chapter's card uses.
+enum _ChapterProgress { untouched, inProgress, completed }
+
+_ChapterProgress _progressFor(TopicEntry entry, Set<String> viewedLessons) {
+  final module = entry.module;
+  if (module.lessons.isEmpty) return _ChapterProgress.untouched;
+  final viewedCount = module.lessons
+      .where((l) => viewedLessons.contains('${module.title}::${l.title}'))
+      .length;
+  if (viewedCount == 0) return _ChapterProgress.untouched;
+  if (viewedCount >= module.lessons.length) return _ChapterProgress.completed;
+  return _ChapterProgress.inProgress;
+}
+
+/// Exactly 3 colors total, one per progress state — deliberately
+/// replacing what used to be a distinct color per chapter (21 of them
+/// across core + bonus chapters), which made the chapter list feel
+/// visually noisy rather than meaningful. Color now communicates
+/// progress, which is more useful at a glance than chapter identity —
+/// the icon (kept per-chapter, see _moduleIcons below) still gives
+/// each chapter its own visual identity without adding color noise.
+const Map<_ChapterProgress, List<Color>> _progressGradients = {
+  _ChapterProgress.untouched: [Color(0xFFBDBDBD), Color(0xFFE0E0E0)],
+  _ChapterProgress.inProgress: [Color(0xFF1565C0), Color(0xFF42A5F5)],
+  _ChapterProgress.completed: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+};
+
 class _ModuleTheme {
-  final List<Color> gradient;
   final IconData icon;
   final IconData bgIcon; // large decorative background icon
-  const _ModuleTheme(this.gradient, this.icon, this.bgIcon);
+  const _ModuleTheme(this.icon, this.bgIcon);
 }
 
 const Map<String, _ModuleTheme> _moduleThemes = {
-  // ── Core Curriculum — Chapters 1–13, each with a distinct color ────────
-  'Chapter 1: Cybersecurity Fundamentals': _ModuleTheme(
-    [Color(0xFF1565C0), Color(0xFF42A5F5)],
-    Icons.security,
-    Icons.shield,
-  ),
-  'Chapter 2: Threats, Attacks & Vulnerabilities': _ModuleTheme(
-    [Color(0xFFC62828), Color(0xFFEF5350)],
-    Icons.gpp_maybe,
-    Icons.warning_amber,
-  ),
-  'Chapter 3: Network Security': _ModuleTheme(
-    [Color(0xFF2E7D32), Color(0xFF66BB6A)],
-    Icons.router,
-    Icons.lan,
-  ),
-  'Chapter 4: Identity Access Management': _ModuleTheme(
-    [Color(0xFF283593), Color(0xFF7986CB)],
-    Icons.badge,
-    Icons.fingerprint,
-  ),
-  'Chapter 5: Cryptography': _ModuleTheme(
-    [Color(0xFF00695C), Color(0xFF4DB6AC)],
-    Icons.enhanced_encryption,
-    Icons.key,
-  ),
-  'Chapter 6: Secure Protocols': _ModuleTheme(
-    [Color(0xFF00838F), Color(0xFF4DD0E1)],
-    Icons.lock,
-    Icons.https,
-  ),
-  'Chapter 7: Endpoint Security': _ModuleTheme(
-    [Color(0xFFEF6C00), Color(0xFFFFB74D)],
-    Icons.laptop_chromebook,
-    Icons.devices,
-  ),
-  'Chapter 8: Identity Federation & SSO': _ModuleTheme(
-    [Color(0xFF4527A0), Color(0xFF9575CD)],
-    Icons.hub,
-    Icons.link,
-  ),
-  'Chapter 9: Application Security': _ModuleTheme(
-    [Color(0xFF4E342E), Color(0xFFA1887F)],
-    Icons.web,
-    Icons.integration_instructions,
-  ),
-  'Chapter 10: Cloud Security': _ModuleTheme(
-    [Color(0xFF0277BD), Color(0xFF4FC3F7)],
-    Icons.cloud,
-    Icons.cloud_queue,
-  ),
-  'Chapter 11: Security Operations': _ModuleTheme(
-    [Color(0xFF1A237E), Color(0xFF5C6BC0)],
-    Icons.visibility,
-    Icons.radar,
-  ),
-  'Chapter 12: Incident Response': _ModuleTheme(
-    [Color(0xFFAD1457), Color(0xFFF06292)],
-    Icons.emergency,
-    Icons.local_fire_department,
-  ),
-  'Chapter 13: Governance, Risk & Compliance': _ModuleTheme(
-    [Color(0xFFF9A825), Color(0xFFFFD54F)],
-    Icons.gavel,
-    Icons.fact_check,
-  ),
+  // ── Core Curriculum — Chapters 1–13 — icon only now, color comes
+  // from progress state instead (see _progressGradients above) ──────
+  'Chapter 1: Cybersecurity Fundamentals': _ModuleTheme(Icons.security, Icons.shield),
+  'Chapter 2: Threats, Attacks & Vulnerabilities': _ModuleTheme(Icons.gpp_maybe, Icons.warning_amber),
+  'Chapter 3: Network Security': _ModuleTheme(Icons.router, Icons.lan),
+  'Chapter 4: Identity Access Management': _ModuleTheme(Icons.badge, Icons.fingerprint),
+  'Chapter 5: Cryptography': _ModuleTheme(Icons.enhanced_encryption, Icons.key),
+  'Chapter 6: Secure Protocols': _ModuleTheme(Icons.lock, Icons.https),
+  'Chapter 7: Endpoint Security': _ModuleTheme(Icons.laptop_chromebook, Icons.devices),
+  'Chapter 8: Identity Federation & SSO': _ModuleTheme(Icons.hub, Icons.link),
+  'Chapter 9: Application Security': _ModuleTheme(Icons.web, Icons.integration_instructions),
+  'Chapter 10: Cloud Security': _ModuleTheme(Icons.cloud, Icons.cloud_queue),
+  'Chapter 11: Security Operations': _ModuleTheme(Icons.visibility, Icons.radar),
+  'Chapter 12: Incident Response': _ModuleTheme(Icons.emergency, Icons.local_fire_department),
+  'Chapter 13: Governance, Risk & Compliance': _ModuleTheme(Icons.gavel, Icons.fact_check),
 
   // ── Bonus Chapters — supplementary modules outside the numbered sequence ──
-  'Social Engineering': _ModuleTheme(
-    [Color(0xFF6A1B9A), Color(0xFFBA68C8)],
-    Icons.psychology_alt,
-    Icons.record_voice_over,
-  ),
-  'Malware': _ModuleTheme(
-    [Color(0xFF212121), Color(0xFF757575)],
-    Icons.coronavirus,
-    Icons.bug_report,
-  ),
-  'Vulnerabilities and Threats': _ModuleTheme(
-    [Color(0xFFBF360C), Color(0xFFFF8A65)],
-    Icons.bug_report,
-    Icons.warning_amber,
-  ),
-  'Alerts and Monitoring': _ModuleTheme(
-    [Color(0xFF0288D1), Color(0xFF81D4FA)],
-    Icons.notifications_active,
-    Icons.monitor_heart,
-  ),
-  'Email Security': _ModuleTheme(
-    [Color(0xFF00838F), Color(0xFF80DEEA)],
-    Icons.email,
-    Icons.mark_email_read,
-  ),
-  'Windows Security': _ModuleTheme(
-    [Color(0xFF0277BD), Color(0xFF29B6F6)],
-    Icons.desktop_windows,
-    Icons.computer,
-  ),
-  'Linux Security': _ModuleTheme(
-    [Color(0xFFBF360C), Color(0xFFFFAB91)],
-    Icons.terminal,
-    Icons.code,
-  ),
-  'Capstone: Applied Defense': _ModuleTheme(
-    [Color(0xFFF57F17), Color(0xFFFFD54F)],
-    Icons.workspace_premium,
-    Icons.military_tech,
-  ),
+  'Social Engineering': _ModuleTheme(Icons.psychology_alt, Icons.record_voice_over),
+  'Malware': _ModuleTheme(Icons.coronavirus, Icons.bug_report),
+  'Vulnerabilities and Threats': _ModuleTheme(Icons.bug_report, Icons.warning_amber),
+  'Alerts and Monitoring': _ModuleTheme(Icons.notifications_active, Icons.monitor_heart),
+  'Email Security': _ModuleTheme(Icons.email, Icons.mark_email_read),
+  'Windows Security': _ModuleTheme(Icons.desktop_windows, Icons.computer),
+  'Linux Security': _ModuleTheme(Icons.terminal, Icons.code),
+  'Capstone: Applied Defense': _ModuleTheme(Icons.workspace_premium, Icons.military_tech),
 };
 
 _ModuleTheme _themeFor(String title) =>
-    _moduleThemes[title] ??
-    const _ModuleTheme(
-      [Color(0xFF37474F), Color(0xFF78909C)],
-      Icons.book,
-      Icons.book,
-    );
+    _moduleThemes[title] ?? const _ModuleTheme(Icons.book, Icons.book);
 
 // ── Watermark painter ─────────────────────────────────────────────────────
 class _WatermarkPainter extends CustomPainter {
@@ -192,6 +132,7 @@ class ReadThroughScreen extends StatefulWidget {
 
 class _ReadThroughScreenState extends State<ReadThroughScreen> {
   Map<int, double?> _bestScoresByLevel = {};
+  Set<String> _viewedLessons = {};
   bool _hasFullAccess = false;
   bool _loading = true;
 
@@ -207,9 +148,11 @@ class _ReadThroughScreenState extends State<ReadThroughScreen> {
       scores[entry.levelIndex] = await ProgressService.getBestScore(entry.levelIndex);
     }
     final hasFullAccess = await ProgressService.hasFullAccess();
+    final viewedLessons = await ProgressService.getViewedLessons();
     setState(() {
       _bestScoresByLevel = scores;
       _hasFullAccess = hasFullAccess;
+      _viewedLessons = viewedLessons;
       _loading = false;
     });
   }
@@ -251,6 +194,7 @@ class _ReadThroughScreenState extends State<ReadThroughScreen> {
                           entry: entry,
                           bestScore: _bestScoresByLevel[entry.levelIndex],
                           locked: !_canAccess(entry.module.title),
+                          viewedLessons: _viewedLessons,
                           onTap: () async {
                             if (!_canAccess(entry.module.title)) {
                               _showPaywall(lockedItemTitle: entry.module.title);
@@ -287,6 +231,7 @@ class _ReadThroughScreenState extends State<ReadThroughScreen> {
                                 builder: (_) => _BonusChaptersScreen(
                                   bestScoresByLevel: _bestScoresByLevel,
                                   hasFullAccess: _hasFullAccess,
+                                  viewedLessons: _viewedLessons,
                                 ),
                               ),
                             );
@@ -306,8 +251,9 @@ class _ReadThroughScreenState extends State<ReadThroughScreen> {
 class _BonusChaptersScreen extends StatelessWidget {
   final Map<int, double?> bestScoresByLevel;
   final bool hasFullAccess;
+  final Set<String> viewedLessons;
 
-  const _BonusChaptersScreen({required this.bestScoresByLevel, required this.hasFullAccess});
+  const _BonusChaptersScreen({required this.bestScoresByLevel, required this.hasFullAccess, required this.viewedLessons});
 
   Future<void> _showPaywall(BuildContext context, String lockedItemTitle) async {
     await Navigator.push<bool>(
@@ -373,6 +319,7 @@ class _BonusChaptersScreen extends StatelessWidget {
                   entry: entry,
                   bestScore: bestScoresByLevel[entry.levelIndex],
                   locked: !hasFullAccess,
+                  viewedLessons: viewedLessons,
                   onTap: () async {
                     if (!hasFullAccess) {
                       await _showPaywall(context, entry.module.title);
@@ -398,12 +345,14 @@ class _TopicCard extends StatelessWidget {
   final TopicEntry entry;
   final double? bestScore;
   final bool locked;
+  final Set<String> viewedLessons;
   final VoidCallback onTap;
 
   const _TopicCard({
     required this.entry,
     required this.bestScore,
     this.locked = false,
+    required this.viewedLessons,
     required this.onTap,
   });
 
@@ -411,6 +360,8 @@ class _TopicCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final module = entry.module;
     final theme = _themeFor(module.title);
+    final progress = _progressFor(entry, viewedLessons);
+    final gradient = _progressGradients[progress]!;
 
     return GestureDetector(
       onTap: onTap,
@@ -420,7 +371,7 @@ class _TopicCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: theme.gradient.first.withValues(alpha: 0.35),
+              color: gradient.first.withValues(alpha: 0.35),
               blurRadius: 12,
               offset: const Offset(0, 5),
             ),
@@ -440,7 +391,7 @@ class _TopicCard extends StatelessWidget {
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: theme.gradient,
+                            colors: gradient,
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
@@ -521,21 +472,21 @@ class _TopicCard extends StatelessWidget {
                 child: Row(
                   children: [
                     Icon(Icons.menu_book,
-                        size: 16, color: theme.gradient.first),
+                        size: 16, color: gradient.first),
                     const SizedBox(width: 6),
                     Text(
                       '${module.lessonCount} lessons',
                       style: TextStyle(
-                          fontSize: 13, color: theme.gradient.first),
+                          fontSize: 13, color: gradient.first),
                     ),
                     const SizedBox(width: 16),
                     Icon(Icons.headphones,
-                        size: 16, color: theme.gradient.first),
+                        size: 16, color: gradient.first),
                     const SizedBox(width: 4),
                     Text(
                       'Audio included',
                       style: TextStyle(
-                          fontSize: 13, color: theme.gradient.first),
+                          fontSize: 13, color: gradient.first),
                     ),
                     const Spacer(),
                     if (locked)

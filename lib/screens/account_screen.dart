@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../services/auth_service.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -10,6 +11,13 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
   bool _signingOut = false;
+
+  Future<void> _openSupportLink() async {
+    final uri = Uri.parse('https://sacyra.com/support');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
 
   Future<void> _handleSignOut() async {
     final confirmed = await showDialog<bool>(
@@ -93,6 +101,16 @@ class _AccountScreenState extends State<AccountScreen> {
                   value: _formatDate(user?.metadata.creationTime),
                 ),
               ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.help_outline, color: Colors.indigo),
+              title: const Text('FAQs, Support & Help', style: TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: const Text('Get answers or reach our team', style: TextStyle(fontSize: 12.5)),
+              trailing: const Icon(Icons.open_in_new, size: 18),
+              onTap: _openSupportLink,
             ),
           ),
           const SizedBox(height: 24),

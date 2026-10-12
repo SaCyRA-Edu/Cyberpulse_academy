@@ -1,10 +1,18 @@
 import { onCall, onRequest, HttpsError } from "firebase-functions/v2/https";
+import { onCallGenkit } from "firebase-functions/v2/https";
+// onCallGenkit only exists in newer firebase-functions versions —
+// confirmed absent in 6.0.1, present in 7.4.0. This project's
+// package.json will need firebase-functions bumped to at least the
+// version that introduces it before this deploys successfully.
 import { setGlobalOptions } from "firebase-functions/v2";
 import { defineSecret } from "firebase-functions/params";
 import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import * as crypto from "crypto";
 import Razorpay from "razorpay";
+import * as nodemailer from "nodemailer";
+import { genkit, z } from "genkit";
+import { googleAI } from "@genkit-ai/googleai";
 
 admin.initializeApp();
 setGlobalOptions({ maxInstances: 10 });
@@ -13,6 +21,22 @@ const db = admin.firestore();
 
 const RAZORPAY_KEY_ID = defineSecret("RAZORPAY_KEY_ID");
 const RAZORPAY_KEY_SECRET = defineSecret("RAZORPAY_KEY_SECRET");
+
+// Moved up from further down in the file (originally declared next to
+// sendInactivityReminders) — verifyWebRazorpayPayment needs these too,
+// and top-level const declarations are evaluated in file order, so
+// referencing them before this point would throw "used before
+// initialization" at module load time, not just at call time.
+//
+// Set once via:
+//   firebase functions:secrets:set GMAIL_OAUTH_CLIENT_ID
+//   firebase functions:secrets:set GMAIL_OAUTH_CLIENT_SECRET
+//   firebase functions:secrets:set GMAIL_OAUTH_REFRESH_TOKEN
+const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
+const GMAIL_OAUTH_CLIENT_ID = defineSecret("GMAIL_OAUTH_CLIENT_ID");
+const GMAIL_OAUTH_CLIENT_SECRET = defineSecret("GMAIL_OAUTH_CLIENT_SECRET");
+const GMAIL_OAUTH_REFRESH_TOKEN = defineSecret("GMAIL_OAUTH_REFRESH_TOKEN");
+const SENDER_EMAIL = "sacyra.edu@sacyra.com";
 
 const FALLBACK_PRICE_PAISE = 49900; // ₹499.00
 const CURRENCY = "INR";
@@ -244,7 +268,7 @@ export const createWebRazorpayOrder = onRequest(
 );
 
 export const verifyWebRazorpayPayment = onRequest(
-  { secrets: [RAZORPAY_KEY_SECRET], cors: ALLOWED_WEB_ORIGINS },
+  { secrets: [RAZORPAY_KEY_SECRET, GMAIL_OAUTH_CLIENT_ID, GMAIL_OAUTH_CLIENT_SECRET, GMAIL_OAUTH_REFRESH_TOKEN], cors: ALLOWED_WEB_ORIGINS },
   async (req, res) => {
     if (req.method !== "POST") {
       res.status(405).json({ error: "Method not allowed." });
@@ -314,7 +338,50 @@ export const verifyWebRazorpayPayment = onRequest(
     );
     await pendingOrderDoc.ref.delete();
 
-    res.status(200).json({ success: true });
+    const purchaseDate = new Date().toLocaleString("en-IN", {
+      dateStyle: "long",
+      timeStyle: "short",
+      timeZone: "Asia/Kolkata",
+    });
+
+    // Best-effort: send a receipt email. Wrapped separately from the
+    // purchase recording above — a failure sending this email must
+    // never undo or block the actual purchase, which has already
+    // succeeded by this point.
+    try {
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          type: "OAuth2",
+          user: SENDER_EMAIL,
+          clientId: GMAIL_OAUTH_CLIENT_ID.value(),
+          clientSecret: GMAIL_OAUTH_CLIENT_SECRET.value(),
+          refreshToken: GMAIL_OAUTH_REFRESH_TOKEN.value(),
+        },
+      });
+
+      await transporter.sendMail({
+        from: `"CyberPulse Academy" <${SENDER_EMAIL}>`,
+        to: email,
+        subject: "Your CyberPulse Academy Full Access purchase — receipt",
+        text: `Thank you for purchasing Full Access to CyberPulse Academy!
+
+Order ID: ${orderId}
+Payment ID: ${paymentId}
+Date: ${purchaseDate}
+
+Full Access is now active on your account (${email}) — open the app
+and tap "Refresh access" if it doesn't unlock automatically.
+
+Keep this email as your receipt for this purchase.
+
+Questions? Reply to this email or reach us at sacyra.edu@sacyra.com.`,
+      });
+    } catch (err) {
+      console.error(`verifyWebRazorpayPayment: failed to send receipt email: ${err}`);
+    }
+
+    res.status(200).json({ success: true, orderId, paymentId, purchaseDate });
   }
 );
 
@@ -503,11 +570,12 @@ export const submitExam = onCall(async (request) => {
   });
 });
 import { onSchedule } from "firebase-functions/v2/scheduler";
-import * as nodemailer from "nodemailer";
+import { onDocumentCreated } from "firebase-functions/v2/firestore";
 
-// admin.initializeApp() and const db are already declared once, at the
-// top of this file from the Razorpay/exam work — deliberately not
-// redeclared here.
+// admin.initializeApp(), const db, nodemailer, and the GMAIL_OAUTH_*
+// secrets + SENDER_EMAIL are already declared once, at the top of
+// this file (moved there so verifyWebRazorpayPayment could use them
+// too) — deliberately not redeclared here.
 
 // Gmail App Password for sacyra.edu@gmail.com — NOT the account's
 // normal login password. Generate one at myaccount.google.com under
@@ -516,14 +584,6 @@ import * as nodemailer from "nodemailer";
 // Google Workspace accounts no longer support App Password-based SMTP
 // auth (Google discontinued this for Workspace in May 2025 - personal
 // Gmail accounts still support it, Workspace accounts require OAuth2).
-// Set these via:
-//   firebase functions:secrets:set GMAIL_OAUTH_CLIENT_ID
-//   firebase functions:secrets:set GMAIL_OAUTH_CLIENT_SECRET
-//   firebase functions:secrets:set GMAIL_OAUTH_REFRESH_TOKEN
-const GMAIL_OAUTH_CLIENT_ID = defineSecret("GMAIL_OAUTH_CLIENT_ID");
-const GMAIL_OAUTH_CLIENT_SECRET = defineSecret("GMAIL_OAUTH_CLIENT_SECRET");
-const GMAIL_OAUTH_REFRESH_TOKEN = defineSecret("GMAIL_OAUTH_REFRESH_TOKEN");
-const SENDER_EMAIL = "sacyra.edu@sacyra.com";
 
 // TEMPORARY FOR TESTING — 2 minutes instead of a real day, so you don't
 // have to wait 24 hours to verify this works. Set back to
@@ -664,6 +724,75 @@ export const sendInactivityReminders = onSchedule(
   }
 );
 
+/**
+ * Fires automatically whenever a new document is created in
+ * podcastReports (i.e. whenever a user submits the in-app "Report this
+ * episode" form) and emails the details to sacyra.edu@sacyra.com, so
+ * reports get noticed without needing to check Firestore Console
+ * manually. Uses the same Gmail OAuth2 transporter as
+ * sendInactivityReminders above — same secrets, same sender.
+ */
+export const onPodcastReportCreated = onDocumentCreated(
+  {
+    document: "podcastReports/{reportId}",
+    region: "us-central1", // matches every other function and the Firestore database's actual location — deploying without this defaulted to asia-south1, a region mismatch that could keep the trigger from firing reliably
+    secrets: [GMAIL_OAUTH_CLIENT_ID, GMAIL_OAUTH_CLIENT_SECRET, GMAIL_OAUTH_REFRESH_TOKEN],
+  },
+  async (event) => {
+    const report = event.data?.data();
+    if (!report) {
+      console.log("onPodcastReportCreated: no data on the created document, skipping.");
+      return;
+    }
+
+    // Look up the reporter's email for a more useful notification —
+    // the report itself only stores their uid. Best-effort: if the
+    // account was somehow deleted since, fall back to showing the uid
+    // instead of failing the whole notification.
+    let reporterEmail = report.uid;
+    try {
+      const userRecord = await admin.auth().getUser(report.uid);
+      reporterEmail = userRecord.email || report.uid;
+    } catch (_) {
+      // Account no longer exists or lookup failed — uid fallback above is fine.
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        type: "OAuth2",
+        user: SENDER_EMAIL,
+        clientId: GMAIL_OAUTH_CLIENT_ID.value(),
+        clientSecret: GMAIL_OAUTH_CLIENT_SECRET.value(),
+        refreshToken: GMAIL_OAUTH_REFRESH_TOKEN.value(),
+      },
+    });
+
+    const subject = `Podcast report: ${report.episodeTitle || "Unknown episode"}`;
+    const bodyText = `A podcast episode was reported.
+
+Episode: ${report.episodeTitle || "Unknown"}
+Audio path: ${report.audioStoragePath || "Unknown"}
+Reason: ${report.reason || "Not specified"}
+Details: ${report.details || "(none provided)"}
+Reported by: ${reporterEmail}
+
+View all reports in Firestore Console under the podcastReports collection.`;
+
+    try {
+      await transporter.sendMail({
+        from: `"CyberPulse Academy" <${SENDER_EMAIL}>`,
+        to: SENDER_EMAIL,
+        subject,
+        text: bodyText,
+      });
+      console.log(`onPodcastReportCreated: notification email sent for report ${event.params.reportId}.`);
+    } catch (err) {
+      console.error(`onPodcastReportCreated: failed to send notification email: ${err}`);
+    }
+  }
+);
+
 // ═══════════════════════════════════════════════════════════════════════
 // Daily Puzzle + Leaderboard
 // ═══════════════════════════════════════════════════════════════════════
@@ -756,6 +885,25 @@ export const publishDailyPuzzle = onSchedule(
       { lastUsedAt: FieldValue.serverTimestamp(), releaseCount: FieldValue.increment(1), correctCountToday: 0 },
       { merge: true }
     );
+
+    // Best-effort: notify everyone subscribed to the daily_puzzle topic
+    // (subscribed client-side in puzzle_screen.dart when a user opts in).
+    // Wrapped separately from the puzzle-selection logic above so a
+    // notification-sending failure never prevents the actual puzzle
+    // publish from completing — the notification is a convenience on
+    // top of that, not a dependency of it.
+    try {
+      await admin.messaging().send({
+        topic: "daily_puzzle",
+        notification: {
+          title: "Today's puzzle is live!",
+          body: "A new cybersecurity puzzle just dropped — test yourself and climb the leaderboard.",
+        },
+      });
+      console.log("publishDailyPuzzle: notification sent to daily_puzzle topic.");
+    } catch (err) {
+      console.error(`publishDailyPuzzle: failed to send notification: ${err}`);
+    }
 
     console.log(`publishDailyPuzzle: published puzzle ${chosen.id} (type: ${chosen.data().type}).`);
   }
@@ -948,7 +1096,7 @@ export const submitPuzzleAnswer = onCall(async (request) => {
       { merge: true }
     );
 
-    return { correct: isCorrect, pointsEarned, wasBonus };
+    return { correct: isCorrect, pointsEarned, wasBonus, correctAnswer: puzzleData.correctAnswer };
   });
 
   return result;
@@ -1053,3 +1201,346 @@ export const getPuzzleLeaderboard = onCall(async () => {
 
   return { entries };
 });
+
+// ═══════════════════════════════════════════════════════════════════════
+// Cybersecurity Chatbot — floating in-app assistant, powered by Gemini
+// via Genkit. Scoped specifically to cybersecurity topics, both for
+// user experience (this is a cybersecurity learning app, not a general
+// chatbot) and for Google Play policy compliance: Play's 2025
+// generative-AI policy makes the developer responsible for preventing
+// offensive/off-topic generation, not just relying on the model
+// provider's own default safety filtering.
+//
+// Rate limiting: 5 questions/day for accounts without Full Access,
+// unlimited for Full Access — same "free taste, paid unlocks more"
+// pattern as the rest of the app (Chapter 1 free, 3-minute podcast
+// preview, etc.), and it bounds cost exposure on free accounts since
+// each question is a real, billed Gemini API call.
+//
+// Chat history: saved to users/{uid}/chatMessages, so conversations
+// persist across sessions rather than resetting each time the app
+// reopens.
+// ═══════════════════════════════════════════════════════════════════════
+
+const ai = genkit({
+  plugins: [googleAI()],
+  // This was the actual root cause of every chatbot request failing
+  // with a 500 — generate() has no built-in default and throws
+  // INVALID_ARGUMENT without one explicitly set. gemini-2.5-flash
+  // (originally set based on docs available at the time) turned out
+  // to already be deprecated for new users by the time this actually
+  // ran — Google's own API error response explicitly named
+  // gemini-3.8-flash as its replacement, which is what's used here.
+  // Worth knowing: model names in this space move fast enough that
+  // whatever's current when this comment was written may itself be
+  // outdated later — if this error recurs with a different suggested
+  // model name, that's the one to switch to.
+  model: googleAI.model("gemini-3.8-flash"),
+});
+
+const FREE_DAILY_QUESTION_LIMIT = 3;
+const FULL_ACCESS_WINDOW_QUESTION_LIMIT = 10;
+const CHAT_HISTORY_CONTEXT_MESSAGES = 10; // how many recent messages to send back to Gemini for context, keeping each request bounded in size/cost
+
+// ─── Reference-link support ──────────────────────────────────────────────
+// Every title here must exactly match a Module.title in levels_data.dart
+// (Core Curriculum + Bonus Chapters) or a Lesson.title in
+// soc_fundamentals_data.dart. Kept as plain string lists here rather than
+// imported from the Flutter app (different language/repo) — if a chapter
+// or SOC lesson is ever renamed on the client, this list needs updating
+// to match, or that title simply won't be recognized as referenceable
+// below (falls back to no reference link, never a broken one).
+const READ_THROUGH_CHAPTER_TITLES = [
+  "Chapter 1: Cybersecurity Fundamentals",
+  "Chapter 2: Threats, Attacks & Vulnerabilities",
+  "Chapter 3: Network Security",
+  "Chapter 4: Identity Access Management",
+  "Chapter 5: Cryptography",
+  "Chapter 6: Secure Protocols",
+  "Chapter 7: Endpoint Security",
+  "Chapter 8: Identity Federation & SSO",
+  "Chapter 9: Application Security",
+  "Chapter 10: Cloud Security",
+  "Chapter 11: Security Operations",
+  "Chapter 12: Incident Response",
+  "Chapter 13: Governance, Risk & Compliance",
+  "Social Engineering",
+  "Malware",
+  "Vulnerabilities and Threats",
+  "Alerts and Monitoring",
+  "Email Security",
+  "Windows Security",
+  "Linux Security",
+  "Capstone: Applied Defense",
+];
+
+const SOC_FUNDAMENTALS_LESSON_TITLES = [
+  "What a SOC Actually Is",
+  "The Investigation Workflow",
+  "Classifying Incident Severity",
+  "Documentation Discipline",
+  "Root Cause Analysis",
+  "Communicating an Incident",
+];
+
+// The tag the model is asked to emit on its own final line when a reply
+// clearly maps to one specific chapter/lesson — parsed and stripped out
+// server-side below, never shown to the user as raw text. A plain text
+// tag (rather than Genkit's structured `output: {schema}` mode) was the
+// simpler, more robust choice here: it degrades gracefully (worst case
+// the model omits it and no reference is shown) instead of a
+// malformed-JSON failure mode.
+const REFERENCE_TAG_REGEX = /\n?\[\[REF:(CHAPTER|SOC)\|([^\]]+)\]\]\s*$/;
+
+const CYBERSECURITY_CHATBOT_SYSTEM_PROMPT = `You are the in-app assistant for CyberPulse Academy, a cybersecurity
+learning app. You ONLY answer questions related to cybersecurity,
+information security, and directly related topics (networking
+security, privacy, safe online practices, IT security careers and
+certifications, and questions about this app's own course content).
+
+If a user asks something unrelated to cybersecurity, politely decline
+and redirect them back to cybersecurity topics — do not answer general
+knowledge questions, generate creative writing, write code unrelated to
+security, or engage with requests for harmful, offensive, or
+inappropriate content of any kind, even if framed as hypothetical or
+educational.
+
+Keep answers clear, accurate, and appropriately concise for a mobile
+chat interface — a few short paragraphs at most unless the user asks
+for more depth. When relevant, connect answers back to concepts covered
+in CyberPulse Academy's own course content.
+
+REFERENCING COURSE CONTENT:
+This app has two curricula you can point users to — the Read Through
+course (13 core chapters plus bonus chapters) and the SOC Fundamentals
+lessons (part of "The Pulse" module). Their exact titles are:
+
+Read Through chapters:
+${READ_THROUGH_CHAPTER_TITLES.map((t) => `- ${t}`).join("\n")}
+
+SOC Fundamentals lessons:
+${SOC_FUNDAMENTALS_LESSON_TITLES.map((t) => `- ${t}`).join("\n")}
+
+Whenever your answer touches a topic covered by one of these chapters
+or lessons, end your entire reply with a final line in exactly this
+format (nothing else on that line), choosing the SINGLE closest match
+even if it is not a perfect one (for example, a question about phishing
+maps to "Social Engineering"; passwords or MFA map to "Chapter 4:
+Identity Access Management"):
+[[REF:CHAPTER|<exact title from the list above>]]
+or
+[[REF:SOC|<exact title from the list above>]]
+
+Rules for this tag: always include it for cybersecurity concept
+questions that relate to course content. Omit it only for greetings,
+off-topic refusals, or questions with no relation to any listed title.
+Never invent a title that isn't in the lists above. Never include more
+than one tag. Never mention or explain the tag to the user — it is
+stripped out before they see your reply.`;
+
+const cybersecurityChatFlow = ai.defineFlow(
+  {
+    name: "cybersecurityChatFlow",
+    inputSchema: z.object({ message: z.string().min(1).max(2000) }),
+    outputSchema: z.object({
+      reply: z.string(),
+      referenceType: z.enum(["chapter", "soc"]).nullable(),
+      referenceLabel: z.string().nullable(),
+    }),
+  },
+  async (input, { context }) => {
+    // context.auth is populated by onCallGenkit from the caller's
+    // Firebase Auth token — see firebase-functions' Genkit
+    // authentication docs. If this ever comes back undefined, the
+    // authPolicy below should already have rejected the call before
+    // reaching here.
+    const uid = (context as { auth?: { uid?: string } } | undefined)?.auth?.uid;
+    if (!uid) {
+      throw new HttpsError("unauthenticated", "You must be signed in to use the chatbot.");
+    }
+
+    // Manual kill-switch for one specific account, set via Firebase
+    // Console the same way isAdmin is — chatDisabled: true on the
+    // root users/{uid} document. Lets a single misusing account be
+    // cut off from just this feature without banning them from the
+    // rest of the app.
+    const userDoc = await db.collection("users").doc(uid).get();
+    if (userDoc.data()?.chatDisabled === true) {
+      throw new HttpsError("permission-denied", "The chatbot is currently unavailable for this account.");
+    }
+
+    const progressRef = db.collection("users").doc(uid).collection("progress").doc("summary");
+    const progressSnap = await progressRef.get();
+    const progressData = progressSnap.data() ?? {};
+    const hasFullAccess = progressData.fullAccessPurchased === true;
+
+    // Rate limit check — both tiers are capped, just at different
+    // limits and window lengths, since even Full Access questions are
+    // a genuine, real cost per call. Only CHECKED here — the actual
+    // increment happens later, only after a successful reply.
+    // Incrementing unconditionally here was a real bug caught earlier:
+    // every failed attempt silently consumed a question from the
+    // user's quota despite them never actually getting an answer.
+    //
+    // Free tier: a calendar-day window (YYYY-MM-DD, UTC), same
+    // mechanism as before, just a lower limit.
+    //
+    // Full Access: a fixed 6-hour window (00:00/06:00/12:00/18:00
+    // UTC) rather than a rolling one — identified by a
+    // "YYYY-MM-DD_Q<0-3>" string, so the count simply resets whenever
+    // that identifier no longer matches the stored one, the same
+    // reset-by-comparison approach as the daily window, just at finer
+    // granularity.
+    const now = new Date();
+    const today = now.toISOString().slice(0, 10); // YYYY-MM-DD, UTC
+    const currentWindowId = `${today}_Q${Math.floor(now.getUTCHours() / 6)}`;
+
+    let currentCount: number;
+    let limit: number;
+    let exhaustedMessage: string;
+
+    if (hasFullAccess) {
+      const storedWindowId = progressData.chatQuestionsWindowId as string | undefined;
+      const storedCount = (progressData.chatQuestionsInWindow as number | undefined) ?? 0;
+      currentCount = storedWindowId === currentWindowId ? storedCount : 0;
+      limit = FULL_ACCESS_WINDOW_QUESTION_LIMIT;
+      exhaustedMessage = `You've reached the limit of ${FULL_ACCESS_WINDOW_QUESTION_LIMIT} questions for this period. This resets every 6 hours — please try again shortly.`;
+    } else {
+      const storedDate = progressData.chatQuestionsResetDate as string | undefined;
+      const storedCount = (progressData.chatQuestionsToday as number | undefined) ?? 0;
+      currentCount = storedDate === today ? storedCount : 0;
+      limit = FREE_DAILY_QUESTION_LIMIT;
+      exhaustedMessage = `You've reached today's limit of ${FREE_DAILY_QUESTION_LIMIT} questions. Unlock Full Access for a higher limit, or try again tomorrow.`;
+    }
+
+    if (currentCount >= limit) {
+      throw new HttpsError("resource-exhausted", exhaustedMessage);
+    }
+
+    const chatMessagesRef = db.collection("users").doc(uid).collection("chatMessages");
+
+    // Pull recent history for context, oldest-first, bounded so the
+    // request sent to Gemini stays a reasonable, predictable size.
+    const historySnap = await chatMessagesRef
+      .orderBy("timestamp", "desc")
+      .limit(CHAT_HISTORY_CONTEXT_MESSAGES)
+      .get();
+    let history = historySnap.docs
+      .map((doc) => doc.data())
+      .reverse()
+      .map((m) => ({
+        role: m.role === "model" ? ("model" as const) : ("user" as const),
+        content: [{ text: m.text as string }],
+      }));
+    // Gemini requires chat history to start with a "user" turn. Each
+    // exchange saves a user+model pair together, but limiting to the
+    // last N messages by count can land mid-pair once there's enough
+    // history — cutting off a user message while its paired model
+    // reply survives the limit, leaving that orphaned model message
+    // first. That orphaned reply can't be used without its own
+    // question anyway, so just drop it.
+    if (history.length > 0 && history[0].role === "model") {
+      history = history.slice(1);
+    }
+
+    const result = await ai.generate({
+      system: CYBERSECURITY_CHATBOT_SYSTEM_PROMPT,
+      messages: history,
+      prompt: input.message,
+      // Explicit, strict safety thresholds — a second layer beyond
+      // the system prompt alone, since prompt instructions can
+      // sometimes be worked around with clever phrasing. Set to the
+      // strictest common threshold (blocking even low-probability
+      // harmful content) rather than relying on whatever the API's
+      // own defaults happen to be.
+      config: {
+        safetySettings: [
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_LOW_AND_ABOVE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_LOW_AND_ABOVE" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_LOW_AND_ABOVE" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_LOW_AND_ABOVE" },
+        ],
+      },
+    });
+    // If the safety settings above blocked the response, result.text
+    // comes back empty rather than throwing — handle this explicitly
+    // so the user sees a clear message instead of a blank reply.
+    const rawReply = result.text.trim().length > 0
+      ? result.text
+      : "I'm not able to help with that request. Please ask a cybersecurity-related question instead.";
+
+    // Pull the optional [[REF:CHAPTER|...]] / [[REF:SOC|...]] tag off
+    // the end of the reply, if present, and validate it against the
+    // known title lists above before trusting it — the model could in
+    // principle hallucinate a title that isn't real, or malform the
+    // tag, and this must never surface a broken reference link to the
+    // user. Falls back to no reference at all rather than a bad one.
+    let reply = rawReply;
+    let referenceType: "chapter" | "soc" | null = null;
+    let referenceLabel: string | null = null;
+
+    console.log(`cybersecurityChatFlow: raw reply tail: ${JSON.stringify(rawReply.slice(-160))}`);
+    const tagMatch = rawReply.match(REFERENCE_TAG_REGEX);
+    if (tagMatch) {
+      const [, rawType, rawLabel] = tagMatch;
+      const label = rawLabel.trim();
+      const isValidChapter = rawType === "CHAPTER" && READ_THROUGH_CHAPTER_TITLES.includes(label);
+      const isValidSoc = rawType === "SOC" && SOC_FUNDAMENTALS_LESSON_TITLES.includes(label);
+      if (isValidChapter || isValidSoc) {
+        referenceType = isValidChapter ? "chapter" : "soc";
+        referenceLabel = label;
+      }
+      // Strip the tag regardless of whether it validated — it should
+      // never be shown to the user as raw text, even when it didn't
+      // match a real title.
+      reply = rawReply.slice(0, tagMatch.index).trimEnd();
+    }
+
+    // Only now, after a genuine successful reply, count this against
+    // the relevant limit — a failed attempt above never reaches this
+    // line at all, so it never consumes the user's quota.
+    if (hasFullAccess) {
+      await progressRef.set(
+        { chatQuestionsInWindow: currentCount + 1, chatQuestionsWindowId: currentWindowId },
+        { merge: true }
+      );
+    } else {
+      await progressRef.set(
+        { chatQuestionsToday: currentCount + 1, chatQuestionsResetDate: today },
+        { merge: true }
+      );
+    }
+
+    // Save both sides of this exchange — best-effort in the sense
+    // that a save failure shouldn't hide a reply the user already
+    // received, but genuinely worth knowing about if it happens.
+    const batch = db.batch();
+    batch.set(chatMessagesRef.doc(), { role: "user", text: input.message, timestamp: FieldValue.serverTimestamp() });
+    batch.set(chatMessagesRef.doc(), {
+      role: "model",
+      text: reply,
+      referenceType,
+      referenceLabel,
+      timestamp: FieldValue.serverTimestamp(),
+    });
+    try {
+      await batch.commit();
+    } catch (err) {
+      console.error(`cybersecurityChatFlow: failed to save chat history for ${uid}: ${err}`);
+    }
+
+    return { reply, referenceType, referenceLabel };
+  }
+);
+
+export const cybersecurityChat = onCallGenkit(
+  {
+    secrets: [GEMINI_API_KEY],
+    // Requires a signed-in user — matches every other sensitive
+    // function in this file. Genkit's Firebase auth helpers also
+    // support requiring specific claims (e.g. hasClaim("email_verified"))
+    // if stricter gating is wanted later.
+    authPolicy: (auth) => auth !== undefined,
+  },
+  cybersecurityChatFlow
+);

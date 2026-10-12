@@ -1,4 +1,4 @@
-package com.example.cyberpulse_academy
+package com.sacyra.cyberpulseacademy
 
 import android.os.Bundle
 import android.view.WindowManager

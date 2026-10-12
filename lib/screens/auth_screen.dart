@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../services/auth_service.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -107,6 +109,13 @@ class _AuthScreenState extends State<AuthScreen> {
       }
     } catch (e) {
       setState(() => _error = AuthService.friendlyError(e));
+    }
+  }
+
+  Future<void> _openLink(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 
@@ -266,6 +275,33 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
 
                     const SizedBox(height: 24),
+                    if (_isRegisterMode)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: TextStyle(fontSize: 11.5, color: Colors.white.withValues(alpha: 0.6)),
+                            children: [
+                              const TextSpan(text: 'By creating an account, you agree to our '),
+                              TextSpan(
+                                text: 'Privacy Policy',
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () => _openLink('https://sacyra.com/privacy-policy'),
+                              ),
+                              const TextSpan(text: ' and '),
+                              TextSpan(
+                                text: 'Terms of Service',
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () => _openLink('https://sacyra.com/terms'),
+                              ),
+                              const TextSpan(text: '.'),
+                            ],
+                          ),
+                        ),
+                      ),
                     Center(
                       child: TextButton(
                         onPressed: () => setState(() {

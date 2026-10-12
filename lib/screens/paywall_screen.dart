@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/progress_service.dart';
 import '../widgets/cyberpulse_logo.dart';
 
@@ -61,12 +63,77 @@ class _PaywallScreenState extends State<PaywallScreen> {
     if (!mounted) return;
     setState(() => _checkingExistingAccess = false);
     if (hasAccess) {
-      Navigator.of(context).pop(true);
+      await _showPurchaseConfirmation();
+      if (mounted) Navigator.of(context).pop(true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No purchase found for this account yet. If you just paid, this can take a minute to sync — try again shortly.')),
       );
     }
+  }
+
+  /// Reads the actual payment record verifyWebRazorpayPayment wrote to
+  /// this account (fullAccessPaymentId, fullAccessOrderId,
+  /// fullAccessPurchasedAt) and shows it as an in-app confirmation —
+  /// the same details the receipt email already sent, so someone who
+  /// misses the email (or doesn't check that inbox on this device)
+  /// still sees confirmation right where they unlocked access.
+  Future<void> _showPurchaseConfirmation() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null || !mounted) return;
+
+    Map<String, dynamic>? data;
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users').doc(uid).collection('progress').doc('summary').get();
+      data = doc.data();
+    } catch (_) {
+      // Best-effort — if this read fails for any reason, fall through
+      // and skip showing the dialog rather than blocking the user
+      // from proceeding into their now-unlocked content.
+    }
+    if (data == null || !mounted) return;
+
+    final orderId = data['fullAccessOrderId'] as String?;
+    final paymentId = data['fullAccessPaymentId'] as String?;
+    final purchasedAt = data['fullAccessPurchasedAt'] as Timestamp?;
+    if (orderId == null && paymentId == null) return; // nothing to actually show
+
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        icon: const Icon(Icons.check_circle, color: Colors.green, size: 40),
+        title: const Text('Purchase Confirmed'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Full Access is now unlocked on this account.', style: TextStyle(fontSize: 14)),
+            const SizedBox(height: 16),
+            if (orderId != null) _ReceiptRow(label: 'Order ID', value: orderId),
+            if (paymentId != null) _ReceiptRow(label: 'Payment ID', value: paymentId),
+            if (purchasedAt != null) _ReceiptRow(label: 'Date', value: _formatDate(purchasedAt.toDate())),
+            const SizedBox(height: 12),
+            Text(
+              'A copy of this receipt was also emailed to you.',
+              style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
+            ),
+          ],
+        ),
+        actions: [
+          FilledButton(onPressed: () => Navigator.pop(ctx), child: const Text('Continue')),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    final local = date.toLocal();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final hour = local.hour % 12 == 0 ? 12 : local.hour % 12;
+    final minute = local.minute.toString().padLeft(2, '0');
+    final period = local.hour < 12 ? 'AM' : 'PM';
+    return '${months[local.month - 1]} ${local.day}, ${local.year}, $hour:$minute $period';
   }
 
   @override
@@ -227,6 +294,32 @@ class _PaywallScreenState extends State<PaywallScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ReceiptRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _ReceiptRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        children: [
+          Text('$label: ', style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 12.5, fontFamily: 'monospace'),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       ),
     );
   }

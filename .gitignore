@@ -46,3 +46,8 @@ app.*.map.json
 
 # Service account related
 /scripts/service-account-key.json
+functions/node_modules/
+bundletool.jar
+key.properties
+*.jks
+*.keystore

@@ -139,6 +139,47 @@ class ProgressService {
     }
   }
 
+  /// Same exact pattern as [isAdmin] above, for a completely separate
+  /// purpose: gating an in-development home screen redesign (the
+  /// "Cybersecurity Fundamentals" / "The Pulse" two-card layout) to a
+  /// single account while it's being previewed, without affecting the
+  /// live layout anyone else — including active Closed Testing
+  /// testers — currently sees. Deliberately its own flag rather than
+  /// reusing isAdmin, since an account could be an admin without
+  /// wanting the in-progress redesign, or vice versa.
+  ///
+  /// To grant preview access: Firebase Console → Firestore Database →
+  /// `users` collection → that account's document (by UID) → add a
+  /// boolean field named `hasDesignPreview` set to `true`. No code
+  /// change or app update needed — same as isAdmin.
+  static final Map<String, bool> _designPreviewCache = {};
+  static final Map<String, DateTime> _designPreviewCacheAt = {};
+  static const _designPreviewCacheTtl = Duration(minutes: 5);
+
+  static Future<bool> hasDesignPreview() async {
+    final uid = _uid;
+    if (uid == null) return false;
+
+    final cachedAt = _designPreviewCacheAt[uid];
+    final cacheAge = cachedAt == null ? null : DateTime.now().difference(cachedAt);
+    if (_designPreviewCache.containsKey(uid) && cacheAge != null && cacheAge < _designPreviewCacheTtl) {
+      return _designPreviewCache[uid]!;
+    }
+
+    try {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final hasPreview = doc.data()?['hasDesignPreview'] == true;
+      _designPreviewCache[uid] = hasPreview;
+      _designPreviewCacheAt[uid] = DateTime.now();
+      return hasPreview;
+    } catch (_) {
+      // Offline or unreachable — fail closed (no preview, show the
+      // normal live layout) rather than risk showing the in-progress
+      // redesign to an account that shouldn't see it.
+      return _designPreviewCache[uid] ?? false;
+    }
+  }
+
   // ── Local (shared_preferences) helpers ──────────────────────────────────
 
   static Future<Set<int>> _getLocalPassedLevels() async {

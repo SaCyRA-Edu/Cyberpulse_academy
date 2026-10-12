@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../services/exam_attempt_service.dart';
+import '../services/chat_overlay_visibility.dart';
 import 'certificate_screen.dart';
 
 const int _examMinutes = 120;
@@ -37,12 +38,22 @@ class _FinalExamScreenState extends State<FinalExamScreen> {
   @override
   void initState() {
     super.initState();
+    // Hide the floating chatbot icon for the entire duration of the
+    // exam — an AI assistant floating over a timed, graded
+    // certification exam is an obvious way to look up answers, and
+    // this app already goes to real lengths elsewhere (server-side
+    // grading, FLAG_SECURE) to keep the exam honest.
+    ChatOverlayVisibility.hidden.value = true;
     _start();
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    // Always restore visibility on the way out, regardless of how
+    // this screen is left (submitted, timed out, or backed out of) —
+    // otherwise the icon would stay hidden app-wide after the exam.
+    ChatOverlayVisibility.hidden.value = false;
     super.dispose();
   }
 

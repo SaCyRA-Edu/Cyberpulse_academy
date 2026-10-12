@@ -7,7 +7,18 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 /// of which method a learner actually used to sign in.
 class AuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
-  static final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+  // serverClientId explicitly set to the Web client (client_type: 3) from
+  // google-services.json — without this, the plugin can be ambiguous
+  // about which OAuth client to request a token against, especially
+  // with more than one Android client entry on file (as this project
+  // has, from earlier package-name history). This is what actually
+  // requests a valid idToken for Firebase to accept, separate from the
+  // Android client entries that just authorize which app can trigger
+  // the sign-in flow in the first place.
+  static final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email'],
+    serverClientId: '311505412696-nj87o9pha5tq6h6muidpl9isl5l85tob.apps.googleusercontent.com',
+  );
 
   /// Emits the current user (or null when signed out) every time auth
   /// state changes — used by main.dart to decide which screen to show.

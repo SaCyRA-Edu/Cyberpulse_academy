@@ -1,6 +1,29 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- Required for Razorpay Checkout (and any other network access) -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Required on Android 13+ to actually show notifications, including
+         the daily puzzle alert sent via Firebase Cloud Messaging. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Explicitly strips the Advertising ID permission that
+         flutter_facebook_auth's SDK adds to the merged manifest by
+         default (for its own ad-attribution features), even though
+         this app never uses Advertising ID for anything. Without this,
+         Play Console flags the app as declaring Advertising ID usage
+         based on the manifest alone, regardless of what's answered in
+         the App Content questionnaire. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
+    <!-- Also strips the newer Privacy Sandbox AdServices permissions
+         (the modern replacement for the older AD_ID permission above),
+         which flutter_facebook_auth's SDK adds independently of it.
+         ACCESS_ADSERVICES_AD_ID specifically is what Play Console
+         actually checks for its Advertising ID declaration on newer
+         Android targets — removing only the older AD_ID permission
+         was not sufficient on its own. -->
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_CUSTOM_AUDIENCE" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_TOPICS" tools:node="remove" />
     <application
         android:label="CyberPulse"
         android:name="${applicationName}"

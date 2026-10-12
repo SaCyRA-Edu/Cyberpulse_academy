@@ -30,7 +30,17 @@ class LessonSection {
   final List<String>? bullets;
   final DiagramSpec? diagram;
 
-  const LessonSection({this.heading, this.body, this.bullets, this.diagram});
+  /// When true, this section's body renders in a visually distinct
+  /// "document" style (monospace, boxed background) instead of normal
+  /// lesson prose — for sections that are actually a filled sample
+  /// document (an Initial Report, an RCA, a KB article, a
+  /// communication template) rather than explanatory text. Without
+  /// this, sample documents looked identical to regular lesson
+  /// paragraphs, making them easy to mistake for prose rather than
+  /// recognize as a reference document to skim differently.
+  final bool isTemplate;
+
+  const LessonSection({this.heading, this.body, this.bullets, this.diagram, this.isTemplate = false});
 }
 
 class QuizQuestion {

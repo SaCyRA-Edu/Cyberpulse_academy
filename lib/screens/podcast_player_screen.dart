@@ -177,6 +177,7 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> with SingleTi
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
+          scrollable: true,
           title: const Text('Report This Episode'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
