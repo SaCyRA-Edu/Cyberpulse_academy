@@ -209,6 +209,15 @@ export const createWebRazorpayOrder = onRequest(
       return;
     }
 
+    // Which product this web checkout is for — defaults to full_access so
+    // the existing purchase page keeps working unchanged. "retake" is the
+    // half-price exam-retake unlock, bought from /purchase?product=retake.
+    const productType = ((req.body?.productType as string | undefined) ?? "full_access") as ProductType;
+    if (productType !== "full_access" && productType !== "retake") {
+      res.status(400).json({ error: "Invalid product type." });
+      return;
+    }
+
     // Check the account exists BEFORE creating any Razorpay order or
     // accepting any payment — this is what actually prevents someone
     // from paying for an email that has no matching app account. The
@@ -225,26 +234,38 @@ export const createWebRazorpayOrder = onRequest(
       return;
     }
 
+    // Don't let someone pay twice for the same unlock.
+    if (productType === "retake") {
+      const progressSnap = await db.collection("users").doc(userRecord.uid).collection("progress").doc("summary").get();
+      if (progressSnap.data()?.retakeUnlocked === true) {
+        res.status(409).json({ error: "Exam retakes are already unlocked on this account. Open the app and tap \"Already purchased? Refresh access\"." });
+        return;
+      }
+    }
+
     const razorpay = new Razorpay({
       key_id: RAZORPAY_KEY_ID.value(),
       key_secret: RAZORPAY_KEY_SECRET.value(),
     });
 
-    const amountPaise = await getFullAccessPricePaise();
+    const basePrice = await getFullAccessPricePaise();
+    // Same rule as the in-app createRazorpayOrder: a retake is 50% of the
+    // current full-access price.
+    const amountPaise = productType === "retake" ? Math.round(basePrice / 2) : basePrice;
 
     try {
       const order = await razorpay.orders.create({
         amount: amountPaise,
         currency: CURRENCY,
-        receipt: `web_full_access_${Date.now()}`,
-        notes: { email, product: "full_access", source: "web" },
+        receipt: `web_${productType}_${Date.now()}`,
+        notes: { email, product: productType, source: "web" },
       });
 
       // Recorded by email instead of uid, since there's no
       // authenticated session on the website to get a uid from.
       await db.collection("pendingOrders").doc(order.id).set({
         email,
-        productType: "full_access",
+        productType,
         source: "web",
         createdAt: FieldValue.serverTimestamp(),
       });
@@ -254,6 +275,7 @@ export const createWebRazorpayOrder = onRequest(
         amount: order.amount,
         currency: order.currency,
         keyId: RAZORPAY_KEY_ID.value(),
+        productType,
         // Sent back so the page can show "this will unlock access for
         // [name]" before payment — a chance to catch a typo that
         // happens to match a DIFFERENT real account, which the
@@ -326,14 +348,25 @@ export const verifyWebRazorpayPayment = onRequest(
       return;
     }
 
+    // What this order was actually FOR comes from the server-side
+    // pendingOrders record (older orders without the field are full access).
+    const productType = (pendingOrder.productType as ProductType | undefined) ?? "full_access";
+
     const progressRef = db.collection("users").doc(userRecord.uid).collection("progress").doc("summary");
     await progressRef.set(
-      {
-        fullAccessPurchased: true,
-        fullAccessPurchasedAt: FieldValue.serverTimestamp(),
-        fullAccessPaymentId: paymentId,
-        fullAccessOrderId: orderId,
-      },
+      productType === "retake"
+        ? {
+            retakeUnlocked: true,
+            retakeUnlockedAt: FieldValue.serverTimestamp(),
+            retakePaymentId: paymentId,
+            retakeOrderId: orderId,
+          }
+        : {
+            fullAccessPurchased: true,
+            fullAccessPurchasedAt: FieldValue.serverTimestamp(),
+            fullAccessPaymentId: paymentId,
+            fullAccessOrderId: orderId,
+          },
       { merge: true }
     );
     await pendingOrderDoc.ref.delete();
@@ -363,14 +396,25 @@ export const verifyWebRazorpayPayment = onRequest(
       await transporter.sendMail({
         from: `"CyberPulse Academy" <${SENDER_EMAIL}>`,
         to: email,
-        subject: "Your CyberPulse Academy Full Access purchase — receipt",
-        text: `Thank you for purchasing Full Access to CyberPulse Academy!
+        subject:
+          productType === "retake"
+            ? "Your CyberPulse Academy exam retake purchase — receipt"
+            : "Your CyberPulse Academy Full Access purchase — receipt",
+        text: `${
+          productType === "retake"
+            ? "Thank you for unlocking exam retakes on CyberPulse Academy!"
+            : "Thank you for purchasing Full Access to CyberPulse Academy!"
+        }
 
 Order ID: ${orderId}
 Payment ID: ${paymentId}
 Date: ${purchaseDate}
 
-Full Access is now active on your account (${email}) — open the app
+${
+  productType === "retake"
+    ? "Unlimited exam retakes are now active"
+    : "Full Access is now active"
+} on your account (${email}) — open the app
 and tap "Refresh access" if it doesn't unlock automatically.
 
 Keep this email as your receipt for this purchase.
@@ -381,7 +425,7 @@ Questions? Reply to this email or reach us at sacyra.edu@sacyra.com.`,
       console.error(`verifyWebRazorpayPayment: failed to send receipt email: ${err}`);
     }
 
-    res.status(200).json({ success: true, orderId, paymentId, purchaseDate });
+    res.status(200).json({ success: true, orderId, paymentId, purchaseDate, productType });
   }
 );
 
@@ -873,16 +917,35 @@ export const publishDailyPuzzle = onSchedule(
       }
     }
 
-    const candidates = activeSnap.docs.filter((doc) => doc.id !== mostRecentDoc?.id);
-    // Only fall back to including yesterday's puzzle if it's truly the
-    // only active puzzle in the whole bank — better to repeat once
-    // than publish nothing.
-    const pool = candidates.length > 0 ? candidates : activeSnap.docs;
+    // "asked" flag: every puzzle that has been published is marked
+    // asked:true (see the set() below), and only puzzles NOT yet asked
+    // are eligible. When every active puzzle has been asked once, a new
+    // cycle starts: all flags are cleared and the pick is random again
+    // (still never yesterday's puzzle, unless it is the only one).
+    let pool = activeSnap.docs.filter((doc) => doc.data().asked !== true && doc.id !== mostRecentDoc?.id);
+    if (pool.length === 0) {
+      const unasked = activeSnap.docs.filter((doc) => doc.data().asked !== true);
+      if (unasked.length > 0) {
+        pool = unasked; // the only unasked puzzle is yesterday's: better to repeat once than publish nothing
+      } else {
+        const resetBatch = db.batch();
+        for (const doc of activeSnap.docs) resetBatch.update(doc.ref, { asked: false });
+        await resetBatch.commit();
+        const fresh = activeSnap.docs.filter((doc) => doc.id !== mostRecentDoc?.id);
+        pool = fresh.length > 0 ? fresh : activeSnap.docs;
+        console.log("publishDailyPuzzle: every puzzle has been asked, starting a new cycle.");
+      }
+    }
 
     const chosen = pool[Math.floor(Math.random() * pool.length)];
 
     await chosen.ref.set(
-      { lastUsedAt: FieldValue.serverTimestamp(), releaseCount: FieldValue.increment(1), correctCountToday: 0 },
+      {
+        lastUsedAt: FieldValue.serverTimestamp(),
+        releaseCount: FieldValue.increment(1),
+        correctCountToday: 0,
+        asked: true,
+      },
       { merge: true }
     );
 
