@@ -108,7 +108,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Full Access is now unlocked on this account.', style: TextStyle(fontSize: 14)),
+            const Text('The Pulse is now unlocked on this account.', style: TextStyle(fontSize: 14)),
             const SizedBox(height: 16),
             if (orderId != null) _ReceiptRow(label: 'Order ID', value: orderId),
             if (paymentId != null) _ReceiptRow(label: 'Payment ID', value: paymentId),
@@ -143,7 +143,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
       appBar: AppBar(
         backgroundColor: _navy,
         foregroundColor: Colors.white,
-        title: const Text('Unlock Full Access'),
+        title: const Text('Unlock The Pulse'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -155,15 +155,16 @@ class _PaywallScreenState extends State<PaywallScreen> {
             const SizedBox(height: 20),
             Text(
               widget.lockedItemTitle != null
-                  ? '"${widget.lockedItemTitle}" requires full access'
-                  : 'This content requires full access',
+                  ? '"${widget.lockedItemTitle}" is part of The Pulse'
+                  : 'This content is part of The Pulse',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: _navy),
             ),
             const SizedBox(height: 8),
             Text(
-              'Chapter 1 is free to explore. Unlock everything else with '
-              'a one-time purchase on our website.',
+              'Chapter 1 of The Pulse is free to explore. Unlock the rest of the SOC '
+              'Blue Team course, including all 60 investigations, with a one-time '
+              'purchase on our website.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 13.5, color: Colors.grey.shade700),
             ),
@@ -218,10 +219,10 @@ class _PaywallScreenState extends State<PaywallScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
-                  _FeatureRow(icon: Icons.menu_book, text: 'All 13 core chapters + 8 bonus chapters'),
-                  _FeatureRow(icon: Icons.quiz_outlined, text: 'Every practice quiz, fully unlocked'),
-                  _FeatureRow(icon: Icons.workspace_premium, text: 'Final Certification Exam (100 adaptive questions)'),
-                  _FeatureRow(icon: Icons.verified, text: 'Shareable Certificate of Achievement on passing'),
+                  _FeatureRow(icon: Icons.menu_book, text: 'All 8 chapters of the SOC Blue Team course'),
+                  _FeatureRow(icon: Icons.search, text: '60 hands-on SOC investigations'),
+                  _FeatureRow(icon: Icons.assignment_turned_in, text: 'Alert-to-report workflow, scored and saved'),
+                  _FeatureRow(icon: Icons.smart_toy_outlined, text: 'Higher Pulse AI question limit'),
                   _FeatureRow(icon: Icons.sync, text: 'Progress synced across all your devices', showDivider: false),
                 ],
               ),

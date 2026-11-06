@@ -6,6 +6,8 @@ import '../data/levels_data.dart';
 import '../services/progress_service.dart';
 import '../services/auth_service.dart';
 import '../services/activity_tracker.dart';
+import '../services/analytics_log.dart';
+import '../services/notification_router.dart';
 import 'final_exam_screen.dart';
 import 'account_screen.dart';
 import 'paywall_screen.dart';
@@ -96,7 +98,14 @@ class _TopicsScreenState extends State<TopicsScreen> {
     // so its initState firing is a reliable "opened the app" signal —
     // no need to await this or block on it.
     ActivityTracker.recordActivity();
+    AnalyticsLog.logAppOpenOnce();
     _ensurePuzzleTopicSubscription();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      // If the app was opened by tapping a notification (e.g. the daily
+      // puzzle), go straight to that screen.
+      NotificationRouter.openPendingIfReady();
+    });
   }
 
   /// Topic subscriptions belong to a device's FCM token, and a fresh

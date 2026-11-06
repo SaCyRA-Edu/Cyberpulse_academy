@@ -22,6 +22,22 @@
           }
         },
         {
+          "client_id": "311505412696-8m43t1qrg3qpnl4oqjc39ejkl7mbcjpp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sacyra.cyberpulseacademy",
+            "certificate_hash": "dda5f93e8b16d20de03ac07ec7565966592b67a4"
+          }
+        },
+        {
+          "client_id": "311505412696-gn21lua8ad3lko5effvmldsobg1id82e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sacyra.cyberpulseacademy",
+            "certificate_hash": "135514e0c984d49e2f2dff6f2672fffa6553528c"
+          }
+        },
+        {
           "client_id": "311505412696-umu26u6alo5kkur1e8ic87cft7b5te4j.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

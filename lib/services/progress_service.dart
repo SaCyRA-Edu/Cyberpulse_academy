@@ -461,6 +461,18 @@ class ProgressService {
   /// True if the user should see every chapter, every practice quiz, and
   /// the Final Certification Exam unlocked — either because they're an
   /// admin (see [isAdmin]) or because they've purchased full access.
+  /// Cybersecurity Fundamentals (all chapters, podcast, the Final
+  /// Certification Exam) is a free product, so this is always true. The
+  /// Fundamentals screens call this instead of [hasFullAccess], which
+  /// keeps their existing lock/preview UI intact but never triggered.
+  static Future<bool> hasFundamentalsAccess() async => true;
+
+  /// The Pulse (SOC Blue Team) is the paid product: chapter 1 is a free
+  /// preview, the other chapters and the 60 investigations need this.
+  /// It reads the same purchase flag the web checkout has always set
+  /// (fullAccessPurchased), so existing purchasers keep their access.
+  static Future<bool> hasPulseAccess() => hasFullAccess();
+
   static Future<bool> hasFullAccess() async {
     if (await isAdmin()) return true;
     final merged = await _getMergedProgress();

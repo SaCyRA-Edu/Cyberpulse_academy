@@ -274,10 +274,12 @@ class _ChatScreenState extends State<ChatScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                message.text,
-                style: TextStyle(fontSize: 14.5, color: isUser ? Colors.white : Colors.black87, height: 1.4),
-              ),
+              isUser
+                  ? Text(
+                      message.text,
+                      style: const TextStyle(fontSize: 14.5, color: Colors.white, height: 1.4),
+                    )
+                  : _buildFormattedReply(message.text),
               if (!isUser && message.referenceType != null && message.referenceLabel != null) ...[
                 const SizedBox(height: 8),
                 _buildReferenceChip(message.referenceType!, message.referenceLabel!),
@@ -287,6 +289,73 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
     );
+  }
+
+  /// Renders the AI's light markdown (**bold**, *italic*, `code`,
+  /// "-"/"*"/"1." lists, "#" headings) as styled text, so raw
+  /// asterisks never show in a bubble. No extra dependency.
+  Widget _buildFormattedReply(String raw) {
+    const base = TextStyle(fontSize: 14.5, color: Colors.black87, height: 1.4);
+    final lines = raw.replaceAll('\r\n', '\n').split('\n');
+    final children = <Widget>[];
+    for (final line in lines) {
+      final t = line.trimRight();
+      if (t.trim().isEmpty) {
+        children.add(const SizedBox(height: 6));
+        continue;
+      }
+      final heading = RegExp(r'^\s*#{1,6}\s+(.*)$').firstMatch(t);
+      final bullet = RegExp(r'^\s*[-*•]\s+(.*)$').firstMatch(t);
+      final numbered = RegExp(r'^\s*(\d+)[.)]\s+(.*)$').firstMatch(t);
+      if (heading != null) {
+        children.add(Padding(
+          padding: const EdgeInsets.only(top: 2, bottom: 2),
+          child: Text.rich(_inlineSpans(heading.group(1)!, base.copyWith(fontWeight: FontWeight.bold, fontSize: 15.5))),
+        ));
+      } else if (bullet != null || numbered != null) {
+        final marker = bullet != null ? '•' : '${numbered!.group(1)}.';
+        final body = bullet != null ? bullet.group(1)! : numbered!.group(2)!;
+        children.add(Padding(
+          padding: const EdgeInsets.only(left: 4, top: 2, bottom: 2),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(width: 20, child: Text(marker, style: base)),
+              Expanded(child: Text.rich(_inlineSpans(body, base))),
+            ],
+          ),
+        ));
+      } else {
+        children.add(Text.rich(_inlineSpans(t, base)));
+      }
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: children,
+    );
+  }
+
+  TextSpan _inlineSpans(String text, TextStyle style) {
+    final spans = <InlineSpan>[];
+    final re = RegExp(r'\*\*(.+?)\*\*|__(.+?)__|`([^`]+)`|\*([^*\s][^*]*?)\*');
+    var last = 0;
+    for (final m in re.allMatches(text)) {
+      if (m.start > last) spans.add(TextSpan(text: text.substring(last, m.start)));
+      if (m.group(1) != null || m.group(2) != null) {
+        spans.add(TextSpan(text: m.group(1) ?? m.group(2), style: const TextStyle(fontWeight: FontWeight.bold)));
+      } else if (m.group(3) != null) {
+        spans.add(TextSpan(
+          text: m.group(3),
+          style: TextStyle(fontFamily: 'monospace', backgroundColor: Colors.grey.shade200, fontSize: style.fontSize! - 1),
+        ));
+      } else {
+        spans.add(TextSpan(text: m.group(4), style: const TextStyle(fontStyle: FontStyle.italic)));
+      }
+      last = m.end;
+    }
+    if (last < text.length) spans.add(TextSpan(text: text.substring(last)));
+    return TextSpan(style: style, children: spans);
   }
 
   /// A tappable chip pointing at the course content the reply drew on —

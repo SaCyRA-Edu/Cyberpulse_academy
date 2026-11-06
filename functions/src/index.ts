@@ -209,15 +209,6 @@ export const createWebRazorpayOrder = onRequest(
       return;
     }
 
-    // Which product this web checkout is for — defaults to full_access so
-    // the existing purchase page keeps working unchanged. "retake" is the
-    // half-price exam-retake unlock, bought from /purchase?product=retake.
-    const productType = ((req.body?.productType as string | undefined) ?? "full_access") as ProductType;
-    if (productType !== "full_access" && productType !== "retake") {
-      res.status(400).json({ error: "Invalid product type." });
-      return;
-    }
-
     // Check the account exists BEFORE creating any Razorpay order or
     // accepting any payment — this is what actually prevents someone
     // from paying for an email that has no matching app account. The
@@ -234,38 +225,26 @@ export const createWebRazorpayOrder = onRequest(
       return;
     }
 
-    // Don't let someone pay twice for the same unlock.
-    if (productType === "retake") {
-      const progressSnap = await db.collection("users").doc(userRecord.uid).collection("progress").doc("summary").get();
-      if (progressSnap.data()?.retakeUnlocked === true) {
-        res.status(409).json({ error: "Exam retakes are already unlocked on this account. Open the app and tap \"Already purchased? Refresh access\"." });
-        return;
-      }
-    }
-
     const razorpay = new Razorpay({
       key_id: RAZORPAY_KEY_ID.value(),
       key_secret: RAZORPAY_KEY_SECRET.value(),
     });
 
-    const basePrice = await getFullAccessPricePaise();
-    // Same rule as the in-app createRazorpayOrder: a retake is 50% of the
-    // current full-access price.
-    const amountPaise = productType === "retake" ? Math.round(basePrice / 2) : basePrice;
+    const amountPaise = await getFullAccessPricePaise();
 
     try {
       const order = await razorpay.orders.create({
         amount: amountPaise,
         currency: CURRENCY,
-        receipt: `web_${productType}_${Date.now()}`,
-        notes: { email, product: productType, source: "web" },
+        receipt: `web_full_access_${Date.now()}`,
+        notes: { email, product: "full_access", source: "web" },
       });
 
       // Recorded by email instead of uid, since there's no
       // authenticated session on the website to get a uid from.
       await db.collection("pendingOrders").doc(order.id).set({
         email,
-        productType,
+        productType: "full_access",
         source: "web",
         createdAt: FieldValue.serverTimestamp(),
       });
@@ -275,7 +254,6 @@ export const createWebRazorpayOrder = onRequest(
         amount: order.amount,
         currency: order.currency,
         keyId: RAZORPAY_KEY_ID.value(),
-        productType,
         // Sent back so the page can show "this will unlock access for
         // [name]" before payment — a chance to catch a typo that
         // happens to match a DIFFERENT real account, which the
@@ -348,25 +326,14 @@ export const verifyWebRazorpayPayment = onRequest(
       return;
     }
 
-    // What this order was actually FOR comes from the server-side
-    // pendingOrders record (older orders without the field are full access).
-    const productType = (pendingOrder.productType as ProductType | undefined) ?? "full_access";
-
     const progressRef = db.collection("users").doc(userRecord.uid).collection("progress").doc("summary");
     await progressRef.set(
-      productType === "retake"
-        ? {
-            retakeUnlocked: true,
-            retakeUnlockedAt: FieldValue.serverTimestamp(),
-            retakePaymentId: paymentId,
-            retakeOrderId: orderId,
-          }
-        : {
-            fullAccessPurchased: true,
-            fullAccessPurchasedAt: FieldValue.serverTimestamp(),
-            fullAccessPaymentId: paymentId,
-            fullAccessOrderId: orderId,
-          },
+      {
+        fullAccessPurchased: true,
+        fullAccessPurchasedAt: FieldValue.serverTimestamp(),
+        fullAccessPaymentId: paymentId,
+        fullAccessOrderId: orderId,
+      },
       { merge: true }
     );
     await pendingOrderDoc.ref.delete();
@@ -396,25 +363,14 @@ export const verifyWebRazorpayPayment = onRequest(
       await transporter.sendMail({
         from: `"CyberPulse Academy" <${SENDER_EMAIL}>`,
         to: email,
-        subject:
-          productType === "retake"
-            ? "Your CyberPulse Academy exam retake purchase — receipt"
-            : "Your CyberPulse Academy Full Access purchase — receipt",
-        text: `${
-          productType === "retake"
-            ? "Thank you for unlocking exam retakes on CyberPulse Academy!"
-            : "Thank you for purchasing Full Access to CyberPulse Academy!"
-        }
+        subject: "Your CyberPulse Academy Full Access purchase — receipt",
+        text: `Thank you for purchasing Full Access to CyberPulse Academy!
 
 Order ID: ${orderId}
 Payment ID: ${paymentId}
 Date: ${purchaseDate}
 
-${
-  productType === "retake"
-    ? "Unlimited exam retakes are now active"
-    : "Full Access is now active"
-} on your account (${email}) — open the app
+Full Access is now active on your account (${email}) — open the app
 and tap "Refresh access" if it doesn't unlock automatically.
 
 Keep this email as your receipt for this purchase.
@@ -425,7 +381,7 @@ Questions? Reply to this email or reach us at sacyra.edu@sacyra.com.`,
       console.error(`verifyWebRazorpayPayment: failed to send receipt email: ${err}`);
     }
 
-    res.status(200).json({ success: true, orderId, paymentId, purchaseDate, productType });
+    res.status(200).json({ success: true, orderId, paymentId, purchaseDate });
   }
 );
 
@@ -962,6 +918,10 @@ export const publishDailyPuzzle = onSchedule(
           title: "Today's puzzle is live!",
           body: "A new cybersecurity puzzle just dropped — test yourself and climb the leaderboard.",
         },
+        // Read by NotificationRouter in the app: tapping this
+        // notification opens the puzzle screen directly instead of
+        // just landing on the home screen.
+        data: { screen: "puzzle" },
       });
       console.log("publishDailyPuzzle: notification sent to daily_puzzle topic.");
     } catch (err) {
@@ -1171,6 +1131,89 @@ export const submitPuzzleAnswer = onCall(async (request) => {
  * used everywhere else — no dedicated leaderboard collection to keep
  * in sync.
  */
+// ── App event log ─────────────────────────────────────────────────────
+// A tiny first-party event log (no Google Analytics needed). The app
+// calls logAppEvent for a handful of whitelisted events; the admin
+// report aggregates them per day. Written through this function (Admin
+// SDK) instead of directly from the client so no Firestore rule changes
+// are needed and clients can't write arbitrary data.
+const ALLOWED_APP_EVENTS = new Set(["app_open", "puzzle_opened", "puzzle_answered", "notification_opened"]);
+
+/** YYYY-MM-DD in India time (UTC+5:30), so "today" matches the admin's day. */
+function istDayKey(d: Date = new Date()): string {
+  return new Date(d.getTime() + 5.5 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+const IN_STATES: Record<string, string> = {
+  AN: "Andaman and Nicobar Islands", AP: "Andhra Pradesh", AR: "Arunachal Pradesh", AS: "Assam", BR: "Bihar",
+  CH: "Chandigarh", CT: "Chhattisgarh", CG: "Chhattisgarh", DD: "Daman and Diu", DL: "Delhi", DN: "Dadra and Nagar Haveli",
+  GA: "Goa", GJ: "Gujarat", HP: "Himachal Pradesh", HR: "Haryana", JH: "Jharkhand", JK: "Jammu and Kashmir",
+  KA: "Karnataka", KL: "Kerala", LA: "Ladakh", LD: "Lakshadweep", MH: "Maharashtra", ML: "Meghalaya", MN: "Manipur",
+  MP: "Madhya Pradesh", MZ: "Mizoram", NL: "Nagaland", OD: "Odisha", OR: "Odisha", PB: "Punjab", PY: "Puducherry",
+  RJ: "Rajasthan", SK: "Sikkim", TG: "Telangana", TS: "Telangana", TN: "Tamil Nadu", TR: "Tripura",
+  UK: "Uttarakhand", UT: "Uttarakhand", UP: "Uttar Pradesh", WB: "West Bengal",
+};
+
+/**
+ * Approximate location from the caller's IP using geoip-lite's bundled
+ * offline database (no external service, nothing sent anywhere). Only
+ * country / state / city are kept; the IP itself is never stored.
+ * Lazy-required so deploy-time code analysis and unrelated functions
+ * never load the (large) database.
+ */
+function lookupLocation(request: any): Record<string, string> {
+  try {
+    const headers = request.rawRequest?.headers ?? {};
+    const forwarded = headers["x-forwarded-for"];
+    const first = (Array.isArray(forwarded) ? forwarded[0] : forwarded)?.toString().split(",")[0]?.trim();
+    const ip: string | undefined = first || request.rawRequest?.ip;
+    if (!ip) return {};
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const geoip = require("geoip-lite");
+    const hit = geoip.lookup(ip);
+    if (!hit) return {};
+    const out: Record<string, string> = {};
+    if (hit.country) out.country = String(hit.country).toUpperCase();
+    if (hit.region) out.state = hit.country === "IN" ? IN_STATES[hit.region] ?? String(hit.region) : String(hit.region);
+    if (hit.city) out.city = String(hit.city);
+    return out;
+  } catch (err) {
+    console.error(`lookupLocation failed: ${err}`);
+    return {};
+  }
+}
+
+export const logAppEvent = onCall({ memory: "512MiB" }, async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) throw new HttpsError("unauthenticated", "Sign in required.");
+  const name = request.data?.name;
+  if (typeof name !== "string" || !ALLOWED_APP_EVENTS.has(name)) {
+    throw new HttpsError("invalid-argument", "Unknown event.");
+  }
+  await db.collection("appEvents").add({
+    uid,
+    name,
+    day: istDayKey(),
+    ts: FieldValue.serverTimestamp(),
+  });
+
+  // Approximate location, no prompt and no permission. Derived from the
+  // caller's IP; falls back to the phone's region setting for country.
+  if (name === "app_open") {
+    const update: Record<string, string> = lookupLocation(request);
+    const country = request.data?.country;
+    const timeZone = request.data?.timeZone;
+    if (!update.country && typeof country === "string" && /^[A-Za-z]{2}$/.test(country)) {
+      update.country = country.toUpperCase();
+    }
+    if (typeof timeZone === "string" && timeZone.length > 0 && timeZone.length <= 40) update.timeZone = timeZone;
+    if (Object.keys(update).length > 0) {
+      await db.collection("users").doc(uid).collection("progress").doc("summary").set(update, { merge: true });
+    }
+  }
+  return { ok: true };
+});
+
 export const getAdminReport = onCall(async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError("unauthenticated", "Sign in required.");
@@ -1180,38 +1223,35 @@ export const getAdminReport = onCall(async (request) => {
     throw new HttpsError("permission-denied", "Admin access required.");
   }
 
-  // Fetch every registered user via the Auth Admin SDK (paginated —
-  // listUsers returns at most 1000 per page, so this loops until
-  // there's no pageToken left). This is the source of truth for
-  // registration counts/dates, separate from Firestore progress data.
-  const authUsers: { uid: string; createdAt: string }[] = [];
+  // Every registered user via the Auth Admin SDK (paginated, 1000 per
+  // page). Source of truth for registration dates, names and emails.
+  const authUsers: {
+    uid: string;
+    createdAt: string;
+    lastSignIn: string | null;
+    name: string;
+    email: string | null;
+  }[] = [];
   let pageToken: string | undefined = undefined;
   do {
     const result: admin.auth.ListUsersResult = await admin.auth().listUsers(1000, pageToken);
     for (const userRecord of result.users) {
-      // metadata.creationTime comes back as an RFC-1123-style string
-      // (e.g. "Thu, 01 Jan 2026 00:00:00 GMT"), not ISO8601 — Dart's
-      // DateTime.tryParse() can't reliably parse that format, so it's
-      // converted here at the source rather than risk silently
-      // failing to parse on the client and breaking every date-range
-      // calculation.
-      authUsers.push({ uid: userRecord.uid, createdAt: new Date(userRecord.metadata.creationTime).toISOString() });
+      // Auth returns RFC-1123 strings; converted to ISO here so Dart can parse them.
+      const lastSignInRaw = userRecord.metadata.lastSignInTime;
+      authUsers.push({
+        uid: userRecord.uid,
+        createdAt: new Date(userRecord.metadata.creationTime).toISOString(),
+        lastSignIn: lastSignInRaw ? new Date(lastSignInRaw).toISOString() : null,
+        name: userRecord.displayName || (userRecord.email ? userRecord.email.split("@")[0] : "User"),
+        email: userRecord.email || null,
+      });
     }
     pageToken = result.pageToken;
   } while (pageToken);
 
-  // For each user, pull just what's needed from their progress/summary
-  // doc. Returns RAW counts (e.g. viewedLessonsCount), not
-  // percentages — turning that into "% of reading completed" needs
-  // dividing by the total lesson count, which lives in the Flutter
-  // app's levels_data.dart, not duplicated here. Doing the percentage
-  // math client-side means this never needs updating when lessons are
-  // added or changed.
-  //
-  // NOTE: this does one Firestore read per user. Fine at current scale;
-  // if the user base grows substantially, this would benefit from
-  // batching reads or maintaining running aggregate counters instead
-  // of recomputing from scratch on every call.
+  // One Firestore read per user (fine at current scale). Returns RAW
+  // counts — the app turns lesson counts into percentages against the
+  // real lesson total from levels_data.dart.
   const perUserData = await Promise.all(
     authUsers.map(async (u) => {
       const progressDoc = await db.collection("users").doc(u.uid).collection("progress").doc("summary").get();
@@ -1221,17 +1261,49 @@ export const getAdminReport = onCall(async (request) => {
       const certificationCompleted = finalExamHistory.some(
         (attempt: { score?: number }) => (attempt?.score ?? 0) >= 75
       );
-      const fullAccessPurchased = data?.fullAccessPurchased === true;
+      const lastActiveRaw = data?.lastActiveAt;
+      const lastActiveAt =
+        lastActiveRaw && typeof lastActiveRaw.toDate === "function" ? lastActiveRaw.toDate().toISOString() : null;
       return {
+        uid: u.uid,
+        name: u.name,
+        email: u.email,
         createdAt: u.createdAt,
+        lastSignIn: u.lastSignIn,
+        lastActiveAt,
         viewedLessonsCount,
         certificationCompleted,
-        fullAccessPurchased,
+        fullAccessPurchased: data?.fullAccessPurchased === true,
+        finalExamBest: typeof data?.finalExamScore === "number" ? data!.finalExamScore : null,
+        finalExamAttempts: finalExamHistory.length,
+        puzzleTotalScore: typeof data?.puzzleTotalScore === "number" ? data!.puzzleTotalScore : 0,
+        puzzleTotalCorrect: typeof data?.puzzleTotalCorrect === "number" ? data!.puzzleTotalCorrect : 0,
+        puzzleSubscribed: data?.puzzleSubscribed === true,
+        // Optional self-reported profile (asked once, can be skipped).
+        country: typeof data?.country === "string" ? data!.country : null,
+        state: typeof data?.state === "string" ? data!.state : null,
+        city: typeof data?.city === "string" ? data!.city : null,
       };
     })
   );
 
-  return { totalUsers: authUsers.length, users: perUserData };
+  // Daily activity for the last 30 days from the app event log:
+  // unique active users and per-event counts, per India-time day.
+  const cutoffDay = istDayKey(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
+  const eventSnap = await db.collection("appEvents").where("day", ">=", cutoffDay).limit(50000).get();
+  const byDay: Record<string, { users: Set<string>; events: Record<string, number> }> = {};
+  eventSnap.forEach((doc) => {
+    const e = doc.data();
+    const day = e.day as string;
+    if (!byDay[day]) byDay[day] = { users: new Set<string>(), events: {} };
+    if (e.name === "app_open") byDay[day].users.add(e.uid as string);
+    byDay[day].events[e.name as string] = (byDay[day].events[e.name as string] ?? 0) + 1;
+  });
+  const daily = Object.keys(byDay)
+    .sort()
+    .map((day) => ({ day, activeUsers: byDay[day].users.size, events: byDay[day].events }));
+
+  return { totalUsers: authUsers.length, users: perUserData, daily, today: istDayKey() };
 });
 
 export const getPuzzleLeaderboard = onCall(async () => {

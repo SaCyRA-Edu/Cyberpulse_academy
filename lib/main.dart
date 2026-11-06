@@ -11,6 +11,7 @@ import 'screens/email_verification_screen.dart';
 import 'screens/topics_screen.dart';
 import 'screens/chat_screen.dart';
 import 'services/chat_overlay_visibility.dart';
+import 'services/notification_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -141,6 +142,10 @@ class _RootRouterState extends State<_RootRouter> {
       // for puzzle opt-in specifically — previously, someone who
       // never touched puzzles would never even be asked at all.
       FirebaseMessaging.instance.requestPermission();
+      // Start listening for notification taps (e.g. "Today's puzzle is
+      // live!") so they open the right screen instead of just the home
+      // screen. See services/notification_router.dart.
+      NotificationRouter.init(rootNavigatorKey);
     });
   }
 

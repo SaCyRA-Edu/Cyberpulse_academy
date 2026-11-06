@@ -29,7 +29,7 @@ class _PodcastScreenState extends State<PodcastScreen> {
   }
 
   Future<void> _refresh() async {
-    final hasAccess = await ProgressService.hasFullAccess();
+    final hasAccess = await ProgressService.hasFundamentalsAccess();
     if (mounted) {
       setState(() {
         _hasFullAccess = hasAccess;

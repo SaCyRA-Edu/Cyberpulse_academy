@@ -1,0 +1,627 @@
+[
+  {
+    "type": "mcq",
+    "prompt": "A login form pastes the typed username straight into its SQL query. An attacker types ' OR '1'='1 as the username. What is the main risk?",
+    "options": [
+      "The attacker may bypass the login by altering the query",
+      "The website will run out of storage",
+      "The user's browser will stop working",
+      "The password will be encrypted twice"
+    ],
+    "correct": "The attacker may bypass the login by altering the query"
+  },
+  {
+    "type": "mcq",
+    "prompt": "A comment box shows whatever visitors type as live HTML. An attacker posts a script tag. What happens when other visitors open the page?",
+    "options": [
+      "The server's disk is wiped immediately",
+      "The script runs in their browsers and may steal session data",
+      "Their passwords are reset automatically",
+      "Nothing, because browsers ignore scripts in comments"
+    ],
+    "correct": "The script runs in their browsers and may steal session data"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Which backup approach best follows the 3-2-1 rule?",
+    "options": [
+      "Three copies, on two different media types, with one copy kept off-site",
+      "One copy on a USB drive kept at the desk",
+      "Two copies, both on the office network",
+      "Three copies stored in different folders on the same server"
+    ],
+    "correct": "Three copies, on two different media types, with one copy kept off-site"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Why is a password manager safer than reusing one strong password on many sites?",
+    "options": [
+      "It removes the need for any login at all",
+      "It stores passwords in the browser history",
+      "A breach at one site cannot unlock the user's other accounts",
+      "It makes passwords shorter and easier to remember"
+    ],
+    "correct": "A breach at one site cannot unlock the user's other accounts"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Which statement about asymmetric encryption is correct?",
+    "options": [
+      "It uses a single shared secret key for both sides",
+      "It can only be used when offline",
+      "It uses a public key and a private key as a pair",
+      "It needs no keys at all"
+    ],
+    "correct": "It uses a public key and a private key as a pair"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Why are stored passwords hashed instead of simply encrypted?",
+    "options": [
+      "Hashed passwords never need to be unique",
+      "Hashes make logins faster for the user",
+      "Hashing lets administrators read forgotten passwords",
+      "A hash cannot be reversed to read the original, so a stolen database reveals less"
+    ],
+    "correct": "A hash cannot be reversed to read the original, so a stolen database reveals less"
+  },
+  {
+    "type": "mcq",
+    "prompt": "A website shows a padlock in the address bar. What does this tell you for certain?",
+    "options": [
+      "The site is run by a trustworthy company",
+      "The connection between you and the site is encrypted",
+      "The site is free of malware",
+      "The site cannot be a phishing site"
+    ],
+    "correct": "The connection between you and the site is encrypted"
+  },
+  {
+    "type": "mcq",
+    "prompt": "A shop's website goes down after millions of requests per second arrive from thousands of infected devices. What is this attack?",
+    "options": [
+      "SQL injection",
+      "Credential stuffing",
+      "Man-in-the-middle",
+      "Distributed denial of service (DDoS)"
+    ],
+    "correct": "Distributed denial of service (DDoS)"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Attackers try email and password pairs leaked from one breached site on many other sites. What is this called?",
+    "options": [
+      "Clickjacking",
+      "Session fixation",
+      "Cross-site scripting",
+      "Credential stuffing"
+    ],
+    "correct": "Credential stuffing"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Finance receives an email that appears to come from the CEO, asking for an urgent transfer to a new bank account and to tell no one. What is the best first action?",
+    "options": [
+      "Forward it to colleagues and wait for opinions",
+      "Verify the request through a separate known channel, such as phoning the CEO",
+      "Reply to the email asking for the account details again",
+      "Make the transfer quickly because the CEO is senior"
+    ],
+    "correct": "Verify the request through a separate known channel, such as phoning the CEO"
+  },
+  {
+    "type": "mcq",
+    "prompt": "A caller claiming to be from your bank asks for the OTP you just received by SMS, saying it will cancel a fraud transaction. What should you do?",
+    "options": [
+      "Hang up, never share the OTP, and call the bank's official number",
+      "Share only the last three digits",
+      "Read out the OTP quickly to stop the fraud",
+      "Ask the caller to call back after you share it by email"
+    ],
+    "correct": "Hang up, never share the OTP, and call the bank's official number"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Which is the safest way to do work on a cafe's public Wi-Fi?",
+    "options": [
+      "Use any open network with the same name as the cafe",
+      "Connect through the company VPN",
+      "Disable the device firewall so pages load faster",
+      "Turn off the screen lock for speed"
+    ],
+    "correct": "Connect through the company VPN"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Which statement best describes zero trust?",
+    "options": [
+      "Trust users for a year after they log in once",
+      "Never trust by default; verify every user and device for each access request",
+      "Trust everyone who is inside the office network",
+      "Trust any device that has antivirus installed"
+    ],
+    "correct": "Never trust by default; verify every user and device for each access request"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Why do organizations keep guest Wi-Fi separate from the internal network?",
+    "options": [
+      "So guest traffic is never logged",
+      "So the internal network needs no passwords",
+      "So guests get faster internet",
+      "So a compromised guest device cannot reach internal systems directly"
+    ],
+    "correct": "So a compromised guest device cannot reach internal systems directly"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Which tool continuously watches laptops and servers for suspicious behaviour and can isolate an infected device?",
+    "options": [
+      "A network printer",
+      "Endpoint detection and response (EDR)",
+      "A DNS server",
+      "A password policy"
+    ],
+    "correct": "Endpoint detection and response (EDR)"
+  },
+  {
+    "type": "mcq",
+    "prompt": "A decoy system is deliberately set up to attract attackers so their methods can be studied. What is it called?",
+    "options": [
+      "A backup server",
+      "A honeypot",
+      "A firewall",
+      "A proxy"
+    ],
+    "correct": "A honeypot"
+  },
+  {
+    "type": "mcq",
+    "prompt": "A vulnerability scores 9.8 on CVSS and can be exploited from the internet with no login. How should it be treated?",
+    "options": [
+      "As low priority, since scores are only advisory",
+      "As something to ignore until users complain",
+      "As critical, to be patched or mitigated urgently",
+      "As something to review at the next yearly audit"
+    ],
+    "correct": "As critical, to be patched or mitigated urgently"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Which email controls help stop attackers from spoofing your company's domain?",
+    "options": [
+      "Shorter email signatures",
+      "Dark mode in the email client",
+      "Larger mailbox quotas",
+      "SPF, DKIM and DMARC"
+    ],
+    "correct": "SPF, DKIM and DMARC"
+  },
+  {
+    "type": "mcq",
+    "prompt": "A hospital's patient records are quietly altered by an attacker. Which part of the CIA triad is mainly lost?",
+    "options": [
+      "Portability",
+      "Integrity",
+      "Confidentiality",
+      "Availability"
+    ],
+    "correct": "Integrity"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Why does chain of custody matter for digital evidence?",
+    "options": [
+      "It makes the evidence load faster",
+      "It allows anyone to edit the original",
+      "It deletes sensitive data after analysis",
+      "It records who handled the evidence and when, so it stays trustworthy"
+    ],
+    "correct": "It records who handled the evidence and when, so it stays trustworthy"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Which incident deserves the highest severity rating?",
+    "options": [
+      "A user forgetting their password",
+      "A spam email blocked by the filter",
+      "Ransomware encrypting the main customer database",
+      "A single failed login attempt"
+    ],
+    "correct": "Ransomware encrypting the main customer database"
+  },
+  {
+    "type": "mcq",
+    "prompt": "An employee who has just resigned copies thousands of customer files to a personal drive. Which risk is this?",
+    "options": [
+      "Insider threat and data exfiltration",
+      "A denial of service attack",
+      "A routine software update",
+      "A harmless backup"
+    ],
+    "correct": "Insider threat and data exfiltration"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Staff begin using an unapproved file-sharing app to send client data. What is this called?",
+    "options": [
+      "Zero trust",
+      "Patch management",
+      "Shadow IT",
+      "Penetration testing"
+    ],
+    "correct": "Shadow IT"
+  },
+  {
+    "type": "mcq",
+    "prompt": "Which pair counts as true multi-factor authentication?",
+    "options": [
+      "A PIN and a password",
+      "A password and a fingerprint",
+      "A password and a security question",
+      "Two different passwords"
+    ],
+    "correct": "A password and a fingerprint"
+  },
+  {
+    "type": "mcq",
+    "prompt": "An attacker alters DNS records so people typing your bank's address land on a fake copy. What is this called?",
+    "options": [
+      "Keylogging",
+      "DNS spoofing (cache poisoning)",
+      "Port scanning",
+      "Tailgating"
+    ],
+    "correct": "DNS spoofing (cache poisoning)"
+  },
+  {
+    "type": "mcq",
+    "prompt": "What is the main purpose of a SIEM?",
+    "options": [
+      "Print security reports on paper",
+      "Speed up the internet connection",
+      "Collect and correlate logs from many systems to detect threats",
+      "Store employee passwords"
+    ],
+    "correct": "Collect and correlate logs from many systems to detect threats"
+  },
+  {
+    "type": "mcq",
+    "prompt": "What makes recovery from ransomware most reliable?",
+    "options": [
+      "Deleting all logs",
+      "Clean, tested, offline backups",
+      "Rebooting every machine",
+      "Paying the ransom quickly"
+    ],
+    "correct": "Clean, tested, offline backups"
+  },
+  {
+    "type": "mcq",
+    "prompt": "How does a penetration test differ from a vulnerability scan?",
+    "options": [
+      "A scan exploits weaknesses and a pen test does not",
+      "A pen test is fully automated and a scan is manual",
+      "They are exactly the same thing",
+      "A pen test tries to exploit weaknesses, while a scan only identifies them"
+    ],
+    "correct": "A pen test tries to exploit weaknesses, while a scan only identifies them"
+  },
+  {
+    "type": "mcq",
+    "prompt": "In MITRE ATT&CK, what do tactics describe?",
+    "options": [
+      "The brand of malware used",
+      "The location of the attacker",
+      "The attacker's goals at each stage, such as persistence or exfiltration",
+      "The age of the vulnerability"
+    ],
+    "correct": "The attacker's goals at each stage, such as persistence or exfiltration"
+  },
+  {
+    "type": "spotMistake",
+    "scenario": "A staff member leaves a laptop in a parked car overnight. The laptop has no disk encryption and holds customer records.",
+    "flags": [
+      "The laptop has no disk encryption",
+      "It was left unattended in a car",
+      "The laptop is company property",
+      "Customer records are stored digitally"
+    ],
+    "correctFlags": [
+      "The laptop has no disk encryption",
+      "It was left unattended in a car"
+    ]
+  },
+  {
+    "type": "spotMistake",
+    "scenario": "A developer commits a file containing a database password to a public code repository, then deletes the file in the next commit.",
+    "flags": [
+      "A secret was published in a public repository",
+      "Deleting it later is assumed to remove it from history",
+      "The developer uses version control",
+      "The file was inside a repository"
+    ],
+    "correctFlags": [
+      "A secret was published in a public repository",
+      "Deleting it later is assumed to remove it from history"
+    ]
+  },
+  {
+    "type": "spotMistake",
+    "scenario": "A hospital's Wi-Fi uses one shared password that has not changed in five years and is known to all former staff.",
+    "flags": [
+      "The password is shared by everyone",
+      "It has not been changed in five years",
+      "Former staff still know it",
+      "The hospital offers Wi-Fi"
+    ],
+    "correctFlags": [
+      "The password is shared by everyone",
+      "It has not been changed in five years",
+      "Former staff still know it"
+    ]
+  },
+  {
+    "type": "spotMistake",
+    "scenario": "A user gets an email from support@paypa1-help.com saying the account closes in 2 hours unless they click a link and enter their login.",
+    "flags": [
+      "The sender domain imitates the real brand",
+      "The message creates artificial urgency",
+      "It asks for a login through a link",
+      "The email mentions a company name"
+    ],
+    "correctFlags": [
+      "The sender domain imitates the real brand",
+      "The message creates artificial urgency",
+      "It asks for a login through a link"
+    ]
+  },
+  {
+    "type": "spotMistake",
+    "scenario": "An admin turns off the server firewall 'temporarily' to troubleshoot and forgets to turn it back on for three months.",
+    "flags": [
+      "The firewall was left disabled",
+      "No one tracked the temporary change",
+      "Troubleshooting was needed",
+      "The server is in a data centre"
+    ],
+    "correctFlags": [
+      "The firewall was left disabled",
+      "No one tracked the temporary change"
+    ]
+  },
+  {
+    "type": "spotMistake",
+    "scenario": "A company lets every employee install any software and run as local administrator on their laptop.",
+    "flags": [
+      "Everyone has local administrator rights",
+      "Unrestricted software installation is allowed",
+      "Employees use laptops",
+      "The company has employees"
+    ],
+    "correctFlags": [
+      "Everyone has local administrator rights",
+      "Unrestricted software installation is allowed"
+    ]
+  },
+  {
+    "type": "spotMistake",
+    "scenario": "A receptionist holds the door for a delivery person in an unfamiliar uniform who says he left his badge in the van.",
+    "flags": [
+      "No identity or authorization check was made",
+      "Courtesy replaced the visitor procedure",
+      "The visitor wore a uniform",
+      "The door is a main entrance"
+    ],
+    "correctFlags": [
+      "No identity or authorization check was made",
+      "Courtesy replaced the visitor procedure"
+    ]
+  },
+  {
+    "type": "spotMistake",
+    "scenario": "A team keeps its only backup on a drive permanently plugged into the same server it protects.",
+    "flags": [
+      "The only backup sits on the same server",
+      "The backup is always connected, so ransomware can encrypt it too",
+      "Backups are being taken",
+      "The backup uses a drive"
+    ],
+    "correctFlags": [
+      "The only backup sits on the same server",
+      "The backup is always connected, so ransomware can encrypt it too"
+    ]
+  },
+  {
+    "type": "sequence",
+    "prompt": "Arrange the steps for handling a suspected phishing email from the employee's side.",
+    "steps": [
+      "Do not click or open anything",
+      "Report it to the security team",
+      "Security analyses and blocks the sender",
+      "Delete the email after confirmation",
+      "Warn colleagues about the campaign"
+    ]
+  },
+  {
+    "type": "sequence",
+    "prompt": "Arrange the stages of a secure software development lifecycle.",
+    "steps": [
+      "Requirements and threat modelling",
+      "Secure design",
+      "Secure coding and review",
+      "Security testing",
+      "Deployment and monitoring"
+    ]
+  },
+  {
+    "type": "sequence",
+    "prompt": "Arrange the steps of securely onboarding a new employee.",
+    "steps": [
+      "Verify identity and approval",
+      "Create an account with least privilege",
+      "Enrol multi-factor authentication",
+      "Security awareness training",
+      "Review access after probation"
+    ]
+  },
+  {
+    "type": "sequence",
+    "prompt": "Arrange the steps of a safe helpdesk password reset.",
+    "steps": [
+      "Verify the caller's identity",
+      "Reset to a temporary password",
+      "Send it through a separate channel",
+      "Force a change at next login",
+      "Log the request"
+    ]
+  },
+  {
+    "type": "sequence",
+    "prompt": "Arrange the steps of handling digital evidence.",
+    "steps": [
+      "Identify the evidence",
+      "Preserve it and prevent changes",
+      "Collect it with documentation",
+      "Analyse a copy",
+      "Report the findings"
+    ]
+  },
+  {
+    "type": "sequence",
+    "prompt": "Arrange the steps of a risk assessment.",
+    "steps": [
+      "Identify assets",
+      "Identify threats and vulnerabilities",
+      "Estimate likelihood and impact",
+      "Decide how to treat each risk",
+      "Monitor and review"
+    ]
+  },
+  {
+    "type": "matching",
+    "pairs": [
+      {
+        "term": "Phishing",
+        "definition": "Deceptive messages that trick users"
+      },
+      {
+        "term": "Ransomware",
+        "definition": "Encrypts files and demands payment"
+      },
+      {
+        "term": "DDoS",
+        "definition": "Floods a service until it is unavailable"
+      },
+      {
+        "term": "SQL injection",
+        "definition": "Inserts malicious commands through input fields"
+      }
+    ]
+  },
+  {
+    "type": "matching",
+    "pairs": [
+      {
+        "term": "Preventive control",
+        "definition": "Stops an incident from happening"
+      },
+      {
+        "term": "Detective control",
+        "definition": "Identifies that an incident has occurred"
+      },
+      {
+        "term": "Corrective control",
+        "definition": "Restores systems after an incident"
+      },
+      {
+        "term": "Deterrent control",
+        "definition": "Discourages attackers from trying"
+      }
+    ]
+  },
+  {
+    "type": "matching",
+    "pairs": [
+      {
+        "term": "Port 22",
+        "definition": "Secure remote shell (SSH)"
+      },
+      {
+        "term": "Port 443",
+        "definition": "Encrypted web traffic (HTTPS)"
+      },
+      {
+        "term": "Port 53",
+        "definition": "Domain name lookups (DNS)"
+      },
+      {
+        "term": "Port 25",
+        "definition": "Sending email (SMTP)"
+      }
+    ]
+  },
+  {
+    "type": "matching",
+    "pairs": [
+      {
+        "term": "SOC analyst",
+        "definition": "Monitors alerts and investigates them"
+      },
+      {
+        "term": "Incident responder",
+        "definition": "Contains and recovers from incidents"
+      },
+      {
+        "term": "Threat hunter",
+        "definition": "Proactively searches for hidden threats"
+      },
+      {
+        "term": "Penetration tester",
+        "definition": "Simulates attacks to find weaknesses"
+      }
+    ]
+  },
+  {
+    "type": "matching",
+    "pairs": [
+      {
+        "term": "Symmetric encryption",
+        "definition": "One shared secret key"
+      },
+      {
+        "term": "Asymmetric encryption",
+        "definition": "A public and private key pair"
+      },
+      {
+        "term": "Hash",
+        "definition": "A one-way fingerprint of data"
+      },
+      {
+        "term": "Digital signature",
+        "definition": "Proves origin and integrity"
+      }
+    ]
+  },
+  {
+    "type": "matching",
+    "pairs": [
+      {
+        "term": "Virus",
+        "definition": "Attaches to files and spreads when they run"
+      },
+      {
+        "term": "Worm",
+        "definition": "Spreads by itself across networks"
+      },
+      {
+        "term": "Trojan",
+        "definition": "Disguised as legitimate software"
+      },
+      {
+        "term": "Spyware",
+        "definition": "Secretly collects user information"
+      }
+    ]
+  }
+]

@@ -75,7 +75,7 @@ class _PodcastPlayerScreenState extends State<PodcastPlayerScreen> with SingleTi
   }
 
   Future<void> _checkFullAccess() async {
-    final hasAccess = await ProgressService.hasFullAccess();
+    final hasAccess = await ProgressService.hasFundamentalsAccess();
     if (mounted) setState(() => _hasFullAccess = hasAccess);
   }
 

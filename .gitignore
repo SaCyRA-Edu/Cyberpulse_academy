@@ -51,3 +51,7 @@ bundletool.jar
 key.properties
 *.jks
 *.keystore
+
+serviceAccountKey.json
+
+serviceAccountKey.json

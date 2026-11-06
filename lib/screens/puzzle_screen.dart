@@ -3,6 +3,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import '../services/analytics_log.dart';
 import '../services/progress_service.dart';
 import 'admin_puzzle_screen.dart';
 import 'puzzle_leaderboard_screen.dart';
@@ -41,6 +42,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsLog.log('puzzle_opened');
     _load();
   }
 
@@ -151,6 +153,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
         );
         _alreadyAttemptedToday = true;
       });
+      AnalyticsLog.log('puzzle_answered');
     } on FirebaseFunctionsException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? 'Could not submit your answer.')));

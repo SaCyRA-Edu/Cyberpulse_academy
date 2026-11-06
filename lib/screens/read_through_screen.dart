@@ -29,7 +29,7 @@ _ChapterProgress _progressFor(TopicEntry entry, Set<String> viewedLessons) {
 /// the icon (kept per-chapter, see _moduleIcons below) still gives
 /// each chapter its own visual identity without adding color noise.
 const Map<_ChapterProgress, List<Color>> _progressGradients = {
-  _ChapterProgress.untouched: [Color(0xFFBDBDBD), Color(0xFFE0E0E0)],
+  _ChapterProgress.untouched: [Color(0xFF455A64), Color(0xFF607D8B)],
   _ChapterProgress.inProgress: [Color(0xFF1565C0), Color(0xFF42A5F5)],
   _ChapterProgress.completed: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
 };
@@ -147,7 +147,7 @@ class _ReadThroughScreenState extends State<ReadThroughScreen> {
     for (final entry in allTopics) {
       scores[entry.levelIndex] = await ProgressService.getBestScore(entry.levelIndex);
     }
-    final hasFullAccess = await ProgressService.hasFullAccess();
+    final hasFullAccess = await ProgressService.hasFundamentalsAccess();
     final viewedLessons = await ProgressService.getViewedLessons();
     setState(() {
       _bestScoresByLevel = scores;

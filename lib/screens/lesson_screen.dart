@@ -86,7 +86,7 @@ class _LessonScreenState extends State<LessonScreen> {
     if (quiz == null) {
       ProgressService.markLessonViewed('${widget.moduleTitle}::${widget.lesson.title}');
     }
-    ProgressService.hasFullAccess().then((value) {
+    ProgressService.hasFundamentalsAccess().then((value) {
       if (mounted) setState(() => _hasFullAccess = value);
     });
 
